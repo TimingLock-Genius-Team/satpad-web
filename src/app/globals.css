@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme by default as per spec */
+  --surface-base: #09090b;
+  --surface: #18181b;
+  --surface-elevated: #27272a;
+  --surface-highlight: #3f3f46;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+
+  --border-default: #27272a;
+  --border-hover: #3f3f46;
+
+  --accent-primary: #f97316; /* Orange/Brand color */
+  --accent-success: #22c55e;
+  --accent-warning: #eab308;
+  --accent-danger: #ef4444;
+
+  --radius-card: 1rem;
+  --radius-input: 0.5rem;
+  --radius-pill: 9999px;
+}
+
+body {
+  background-color: var(--surface-base);
+  color: var(--text-primary);
+}

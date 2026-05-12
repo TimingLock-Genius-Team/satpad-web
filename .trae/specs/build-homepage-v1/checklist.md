@@ -1,0 +1,5 @@
+- [x] 成功使用 Next.js 14 建立项目，`npm run dev` 能够无报错运行。
+- [x] Tailwind CSS 的主题色与设计系统 Token 已成功注入。
+- [x] 页面具有全局的 Header 与 Footer 布局。
+- [x] 访问首页 `/` 时，能看到代币列表（基于 Mock 数据）、Tabs 以及搜索框。
+- [x] `TokenCard` 在不同屏幕断点下（手机、平板、桌面）能通过 `TokenGrid` 正确地响应式换行展示。
