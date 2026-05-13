@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { Plus, ChevronRight } from "lucide-react";
 
 export default function CreatePage() {
   return (
     <div className="w-full min-h-screen bg-surface-base flex flex-col items-center pt-8 md:pt-12 px-4 pb-20">
-      <div className="max-w-[720px] w-full">
+      <div className="max-w-[900px] w-full">
         {/* Header */}
         <div className="mb-10 text-left">
           <h1 className="text-3xl md:text-[32px] font-bold tracking-tight mb-2 text-content-primary">

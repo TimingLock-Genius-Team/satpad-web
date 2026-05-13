@@ -29,8 +29,8 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="w-full border-b border-[#1E2028] pb-14 pt-16 md:pt-24 px-4 bg-[#0A0B0E]">
-        <div className="max-w-[1440px] mx-auto flex flex-col items-start justify-center text-left">
+      <section className="w-full  pb-14 pt-16 md:pt-24 px-4 bg-[#0A0B0E]">
+        <div className="max-w-[1260px] mx-auto flex flex-col items-start justify-center text-left">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-content-primary max-w-[820px]">
             The exponential <span className="text-accent-primary italic drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">launchpad</span>.
           </h1>
@@ -77,8 +77,8 @@ export default function Home() {
       </section>
 
       {/* Tabs and Search Section */}
-      <div className="sticky top-[64px] z-10 bg-[#0A0B0E] border-b border-[#1E2028] h-16 mb-8 w-full">
-        <div className="max-w-[1440px] mx-auto px-4 h-full flex items-center gap-6">
+      <div className="sticky top-[64px] z-10 bg-[#0A0B0E] border-b border-t border-[#1E2028] h-16 mb-8 max-w-[1260px] mx-auto">
+        <div className="max-w-[1260px] mx-auto px-4 h-full flex items-center gap-6">
           <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
           
           <div className="flex-1"></div>
@@ -118,7 +118,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 pb-8">
+      <div className="max-w-[1260px] mx-auto px-4 pb-8">
         <TokenGrid tokens={filteredTokens} viewMode={viewMode} />
       </div>
     </div>

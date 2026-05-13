@@ -16,7 +16,7 @@ const TABS = [
 
 export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
   return (
-    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-full">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         
