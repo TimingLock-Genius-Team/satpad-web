@@ -4,8 +4,6 @@ import {
   ExternalLink,
   Copy,
   Info,
-  ChevronDown,
-  ArrowDown,
   Globe,
   Send,
 } from "lucide-react";

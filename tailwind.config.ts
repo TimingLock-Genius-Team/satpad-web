@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
+        mono: ["'JetBrains Mono'", "ui-monospace", "monospace"],
       },
       keyframes: {
         "brand-pulse": {
@@ -22,25 +23,25 @@ const config: Config = {
       },
       colors: {
         surface: {
-          base: "var(--surface-base)",
-          DEFAULT: "var(--surface)",
-          elevated: "var(--surface-elevated)",
-          highlight: "var(--surface-highlight)",
+          base: "rgb(var(--surface-base) / <alpha-value>)",
+          DEFAULT: "rgb(var(--surface) / <alpha-value>)",
+          elevated: "rgb(var(--surface-elevated) / <alpha-value>)",
+          highlight: "rgb(var(--surface-highlight) / <alpha-value>)",
         },
         content: {
-          primary: "var(--text-primary)",
-          secondary: "var(--text-secondary)",
-          tertiary: "var(--text-tertiary)",
+          primary: "rgb(var(--text-primary) / <alpha-value>)",
+          secondary: "rgb(var(--text-secondary) / <alpha-value>)",
+          tertiary: "rgb(var(--text-tertiary) / <alpha-value>)",
         },
         border: {
-          DEFAULT: "var(--border-default)",
-          hover: "var(--border-hover)",
+          DEFAULT: "rgb(var(--border-default) / <alpha-value>)",
+          hover: "rgb(var(--border-hover) / <alpha-value>)",
         },
         accent: {
-          primary: "var(--accent-primary)",
-          success: "var(--accent-success)",
-          warning: "var(--accent-warning)",
-          danger: "var(--accent-danger)",
+          primary: "rgb(var(--accent-primary) / <alpha-value>)",
+          success: "rgb(var(--accent-success) / <alpha-value>)",
+          warning: "rgb(var(--accent-warning) / <alpha-value>)",
+          danger: "rgb(var(--accent-danger) / <alpha-value>)",
         },
       },
       borderRadius: {

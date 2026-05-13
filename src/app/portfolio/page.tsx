@@ -1,4 +1,90 @@
-import { Copy, Triangle } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Copy, Triangle, ExternalLink } from "lucide-react";
+
+const mockHistory = [
+  {
+    time: "4h ago",
+    token: { symbol: "PE", bgColor: "bg-[#10B981]", name: "PEPE2099", ticker: "PEPE" },
+    type: "BUY",
+    okb: "-1.300",
+    tokenAmount: "+615.8k",
+    link: "#",
+  },
+  {
+    time: "14h ago",
+    token: { symbol: "PE", bgColor: "bg-[#10B981]", name: "PEPE2099", ticker: "PEPE" },
+    type: "BUY",
+    okb: "-2.400",
+    tokenAmount: "+615.8k",
+    link: "#",
+  },
+  {
+    time: "1d ago",
+    token: { symbol: "PE", bgColor: "bg-[#10B981]", name: "PEPE2099", ticker: "PEPE" },
+    type: "SELL",
+    okb: "+0.500",
+    tokenAmount: "-615.8k",
+    link: "#",
+  },
+  {
+    time: "1d ago",
+    token: { symbol: "MO", bgColor: "bg-[#8B5CF6]", name: "MoonRune", ticker: "MOON" },
+    type: "BUY",
+    okb: "-0.600",
+    tokenAmount: "+180.7k",
+    link: "#",
+  },
+  {
+    time: "1d ago",
+    token: { symbol: "MO", bgColor: "bg-[#8B5CF6]", name: "MoonRune", ticker: "MOON" },
+    type: "BUY",
+    okb: "-1.700",
+    tokenAmount: "+180.7k",
+    link: "#",
+  },
+  {
+    time: "2d ago",
+    token: { symbol: "MO", bgColor: "bg-[#8B5CF6]", name: "MoonRune", ticker: "MOON" },
+    type: "BUY",
+    okb: "-2.800",
+    tokenAmount: "+180.7k",
+    link: "#",
+  },
+  {
+    time: "2d ago",
+    token: { symbol: "EU", bgColor: "bg-[#3B82F6]", name: "EulerCoin", ticker: "EULC" },
+    type: "BUY",
+    okb: "-2.900",
+    tokenAmount: "+29.8k",
+    link: "#",
+  },
+  {
+    time: "2d ago",
+    token: { symbol: "EU", bgColor: "bg-[#3B82F6]", name: "EulerCoin", ticker: "EULC" },
+    type: "BUY",
+    okb: "-1.000",
+    tokenAmount: "+29.8k",
+    link: "#",
+  },
+  {
+    time: "3d ago",
+    token: { symbol: "EU", bgColor: "bg-[#3B82F6]", name: "EulerCoin", ticker: "EULC" },
+    type: "BUY",
+    okb: "-2.100",
+    tokenAmount: "+29.8k",
+    link: "#",
+  },
+  {
+    time: "3d ago",
+    token: { symbol: "SI", bgColor: "bg-[#C0C334]", name: "SigmaInu", ticker: "SIGMA" },
+    type: "BUY",
+    okb: "-2.200",
+    tokenAmount: "+706.8k",
+    link: "#",
+  },
+];
 
 const mockHoldings = [
   {
@@ -94,6 +180,8 @@ const mockHoldings = [
 ];
 
 export default function PortfolioPage() {
+  const [activeTab, setActiveTab] = useState<"holdings" | "history">("holdings");
+
   return (
     <div className="w-full max-w-[1260px] mx-auto px-4 py-8">
       {/* Header Section */}
@@ -147,96 +235,180 @@ export default function PortfolioPage() {
 
       {/* Tabs */}
       <div className="flex items-center gap-6 border-b border-border mb-6">
-        <div className="pb-3 border-b-2 border-accent-success text-content-primary font-medium cursor-pointer">
+        <div
+          onClick={() => setActiveTab("holdings")}
+          className={`pb-3 border-b-2 font-medium cursor-pointer transition-colors ${
+            activeTab === "holdings"
+              ? "border-accent-success text-content-primary"
+              : "border-transparent text-content-tertiary hover:text-content-primary"
+          }`}
+        >
           Holdings
         </div>
-        <div className="pb-3 text-content-tertiary font-medium cursor-pointer hover:text-content-primary transition-colors">
+        <div
+          onClick={() => setActiveTab("history")}
+          className={`pb-3 border-b-2 font-medium cursor-pointer transition-colors ${
+            activeTab === "history"
+              ? "border-accent-success text-content-primary"
+              : "border-transparent text-content-tertiary hover:text-content-primary"
+          }`}
+        >
           History
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-transparent rounded-xl border border-border overflow-x-auto">
-        <table className="w-full text-sm text-left whitespace-nowrap">
-          <thead>
-            <tr className="border-b border-border text-content-tertiary text-xs uppercase tracking-wider">
-              <th className="px-6 py-4 font-semibold">TOKEN</th>
-              <th className="px-6 py-4 font-semibold">BALANCE</th>
-              <th className="px-6 py-4 font-semibold">AVG COST</th>
-              <th className="px-6 py-4 font-semibold">PRICE</th>
-              <th className="px-6 py-4 font-semibold flex items-center gap-1">
-                VALUE <span className="text-[10px]">↓</span>
-              </th>
-              <th className="px-6 py-4 font-semibold text-right">PNL</th>
-              <th className="px-6 py-4 font-semibold"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border bg-[#13151A]">
-            {mockHoldings.map((token, idx) => (
-              <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 rounded flex items-center justify-center text-white font-bold text-xs ${token.bgColor}`}
-                    >
-                      {token.symbol}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-content-primary group-hover:text-accent-primary transition-colors">
-                        {token.name}
-                      </div>
-                      <div className="text-xs text-content-tertiary flex items-center gap-1">
-                        {token.ticker}
-                        {token.hasSocials && (
-                          <span className="inline-flex items-center gap-1">
-                            <span className="w-3 h-3 bg-surface-elevated rounded-sm inline-block"></span>
-                            <span className="w-3 h-3 bg-surface-elevated rounded-sm inline-block"></span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 font-medium font-mono text-content-primary">{token.balance}</td>
-                <td className="px-6 py-4 font-medium text-content-secondary font-mono">
-                  {token.avgCost}
-                </td>
-                <td className="px-6 py-4 font-medium text-content-secondary font-mono">
-                  {token.price}
-                </td>
-                <td className="px-6 py-4 font-semibold font-mono text-content-primary">{token.value}</td>
-                <td className="px-6 py-4 text-right">
-                  <div
-                    className={`font-semibold font-mono ${
-                      token.isPositive ? "text-accent-success" : "text-accent-danger"
-                    }`}
-                  >
-                    {token.pnl}
-                  </div>
-                  <div
-                    className={`text-xs font-mono ${
-                      token.isPositive ? "text-accent-success" : "text-accent-danger"
-                    }`}
-                  >
-                    {token.pnlPercent}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <button
-                    className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${
-                      token.action === "Sell"
-                        ? "bg-surface-elevated hover:bg-surface-highlight text-content-primary border border-border"
-                        : "bg-surface-elevated hover:bg-surface-highlight text-content-primary border border-border"
-                    }`}
-                  >
-                    {token.action}
-                  </button>
-                </td>
+      {activeTab === "holdings" ? (
+        <div className="bg-transparent rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm text-left whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-border text-content-tertiary text-xs uppercase tracking-wider">
+                <th className="px-6 py-4 font-semibold">TOKEN</th>
+                <th className="px-6 py-4 font-semibold">BALANCE</th>
+                <th className="px-6 py-4 font-semibold">AVG COST</th>
+                <th className="px-6 py-4 font-semibold">PRICE</th>
+                <th className="px-6 py-4 font-semibold flex items-center gap-1">
+                  VALUE <span className="text-[10px]">↓</span>
+                </th>
+                <th className="px-6 py-4 font-semibold text-right">PNL</th>
+                <th className="px-6 py-4 font-semibold"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-border bg-[#13151A]">
+              {mockHoldings.map((token, idx) => (
+                <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-8 h-8 rounded flex items-center justify-center text-white font-bold text-xs ${token.bgColor}`}
+                      >
+                        {token.symbol}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-content-primary group-hover:text-accent-primary transition-colors">
+                          {token.name}
+                        </div>
+                        <div className="text-xs text-content-tertiary flex items-center gap-1">
+                          {token.ticker}
+                          {token.hasSocials && (
+                            <span className="inline-flex items-center gap-1">
+                              <span className="w-3 h-3 bg-surface-elevated rounded-sm inline-block"></span>
+                              <span className="w-3 h-3 bg-surface-elevated rounded-sm inline-block"></span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 font-medium font-mono text-content-primary">{token.balance}</td>
+                  <td className="px-6 py-4 font-medium text-content-secondary font-mono">
+                    {token.avgCost}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-content-secondary font-mono">
+                    {token.price}
+                  </td>
+                  <td className="px-6 py-4 font-semibold font-mono text-content-primary">{token.value}</td>
+                  <td className="px-6 py-4 text-right">
+                    <div
+                      className={`font-semibold font-mono ${
+                        token.isPositive ? "text-accent-success" : "text-accent-danger"
+                      }`}
+                    >
+                      {token.pnl}
+                    </div>
+                    <div
+                      className={`text-xs font-mono ${
+                        token.isPositive ? "text-accent-success" : "text-accent-danger"
+                      }`}
+                    >
+                      {token.pnlPercent}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${
+                        token.action === "Sell"
+                          ? "bg-surface-elevated hover:bg-surface-highlight text-content-primary border border-border"
+                          : "bg-surface-elevated hover:bg-surface-highlight text-content-primary border border-border"
+                      }`}
+                    >
+                      {token.action}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="bg-transparent rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm text-left whitespace-nowrap">
+            <thead>
+              <tr className="border-b border-border text-content-tertiary text-xs uppercase tracking-wider">
+                <th className="px-6 py-4 font-semibold">TIME</th>
+                <th className="px-6 py-4 font-semibold">TOKEN</th>
+                <th className="px-6 py-4 font-semibold">TYPE</th>
+                <th className="px-6 py-4 font-semibold">OKB</th>
+                <th className="px-6 py-4 font-semibold">TOKEN</th>
+                <th className="px-6 py-4 font-semibold"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border bg-[#13151A]">
+              {mockHistory.map((item, idx) => (
+                <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
+                  <td className="px-6 py-4 text-content-tertiary">{item.time}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-6 h-6 rounded flex items-center justify-center text-white font-bold text-[10px] ${item.token.bgColor}`}
+                      >
+                        {item.token.symbol}
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="font-semibold text-content-primary">{item.token.name}</span>
+                        <span className="text-xs text-content-tertiary">{item.token.ticker}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        item.type === "BUY"
+                          ? "bg-accent-success/10 text-accent-success"
+                          : "bg-accent-danger/10 text-accent-danger"
+                      }`}
+                    >
+                      {item.type}
+                    </span>
+                  </td>
+                  <td
+                    className={`px-6 py-4 font-mono font-medium ${
+                      item.okb.startsWith("+") ? "text-accent-success" : "text-content-secondary"
+                    }`}
+                  >
+                    {item.okb}
+                  </td>
+                  <td
+                    className={`px-6 py-4 font-mono font-medium ${
+                      item.tokenAmount.startsWith("+") ? "text-accent-success" : "text-content-secondary"
+                    }`}
+                  >
+                    {item.tokenAmount}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <a
+                      href={item.link}
+                      className="text-content-tertiary hover:text-content-primary transition-colors inline-flex"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -27,7 +27,7 @@ export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
             className={cn(
               "inline-flex items-center gap-[6px] px-[14px] py-2 rounded-[8px] text-[14px] leading-[1.4] font-medium transition-all whitespace-nowrap",
               isActive
-                ? "bg-[#00FF88]/12 text-[#1AFF88]"
+                ? "bg-accent-primary/80 text-content-primary"
                 : "bg-transparent text-content-secondary hover:text-content-primary"
             )}
           >

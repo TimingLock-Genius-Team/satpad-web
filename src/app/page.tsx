@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="w-full  pb-14 pt-16 md:pt-24 px-4 bg-[#0A0B0E]">
+      <section className="w-full  pb-14 pt-16 md:pt-14 px-4 bg-[#0A0B0E]">
         <div className="max-w-[1260px] mx-auto flex flex-col items-start justify-center text-left">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-content-primary max-w-[820px]">
             The exponential <span className="text-accent-primary italic drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">launchpad</span>.
@@ -61,7 +61,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="px-6 py-3 bg-[#00FF88] text-[#0A0B0E] font-semibold rounded-lg hover:bg-[#00FF88]/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5">
+            <button className="px-6 py-3 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all hover:bg-accent-primary/90 hover:-translate-y-0.5 shadow-[0_0_15px_rgb(var(--accent-primary)_/_15%)] hover:shadow-[0_0_20px_rgb(var(--accent-primary)_/_30%)]">
               Launch a token
             </button>
             <a href="/docs" className="text-content-primary hover:text-accent-primary font-medium transition-colors flex items-center gap-2 group text-sm">
