@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
+import { FilterBar } from "@/components/explore/FilterBar";
+import { Hero } from "@/components/home/Hero";
 import { MOCK_TOKENS } from "@/types/token";
 
 export default function Home() {
@@ -26,6 +28,8 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Hero />
+
       {/* Mobile Search - Visible only on small screens */}
       <div className="md:hidden mb-6 relative">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-tertiary" />
@@ -38,9 +42,11 @@ export default function Home() {
         />
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
+
+      <FilterBar />
 
       <TokenGrid tokens={filteredTokens} />
     </div>

@@ -9,9 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: "var(--bg-base)",
         surface: {
-          base: "var(--surface-base)",
-          DEFAULT: "var(--surface)",
+          base: "var(--bg-base)",
+          DEFAULT: "var(--bg-surface)",
           elevated: "var(--surface-elevated)",
           highlight: "var(--surface-highlight)",
         },
@@ -36,6 +37,15 @@ const config: Config = {
         input: "var(--radius-input)",
         pill: "var(--radius-pill)",
       },
+      animation: {
+        'marquee': 'marquee 30s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        }
+      }
     },
   },
   plugins: [],

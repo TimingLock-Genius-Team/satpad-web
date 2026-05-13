@@ -4,16 +4,17 @@ import { cn } from "@/utils/cn";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-surface-base/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface-base/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold text-accent-primary flex items-center gap-2">
+          {/* Logo visible only on mobile/tablet when sidebar is hidden */}
+          <Link href="/" className="text-xl font-bold text-accent-primary flex lg:hidden items-center gap-2">
             <span className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center text-white text-sm">
               S
             </span>
             SATPAD
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex lg:hidden items-center gap-6">
             <Link href="/" className="text-content-primary font-medium hover:text-accent-primary transition-colors">
               Explore
             </Link>

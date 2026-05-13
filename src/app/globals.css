@@ -4,19 +4,23 @@
 
 :root {
   /* Dark theme by default as per spec */
-  --surface-base: #09090b;
-  --surface: #18181b;
-  --surface-elevated: #27272a;
-  --surface-highlight: #3f3f46;
+  --bg-base: #000000;
+  --bg-surface: #121212;
+  
+  /* Legacy surface variables mapping for compatibility */
+  --surface-base: var(--bg-base);
+  --surface: var(--bg-surface);
+  --surface-elevated: #1a1a1a;
+  --surface-highlight: #2a2a2a;
 
-  --text-primary: #fafafa;
+  --text-primary: #ffffff;
   --text-secondary: #a1a1aa;
   --text-tertiary: #71717a;
 
   --border-default: #27272a;
   --border-hover: #3f3f46;
 
-  --accent-primary: #f97316; /* Orange/Brand color */
+  --accent-primary: #00FF66; /* Neon Green / four.meme style */
   --accent-success: #22c55e;
   --accent-warning: #eab308;
   --accent-danger: #ef4444;
@@ -27,6 +31,6 @@
 }
 
 body {
-  background-color: var(--surface-base);
+  background-color: var(--bg-base);
   color: var(--text-primary);
 }
