@@ -8,6 +8,18 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+      },
+      keyframes: {
+        "brand-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+      },
+      animation: {
+        "brand-pulse": "brand-pulse 2s ease-in-out infinite",
+      },
       colors: {
         surface: {
           base: "var(--surface-base)",

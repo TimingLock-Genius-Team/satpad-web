@@ -1,37 +1,92 @@
 import Link from "next/link";
-import { MessageCircle, Send, Globe } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-surface-base mt-auto">
-      <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-accent-primary flex items-center justify-center text-white text-xs font-bold">
-            S
-          </span>
-          <span className="text-content-primary font-bold">SATPAD</span>
-          <span className="text-content-tertiary text-sm ml-2">© {new Date().getFullYear()}</span>
-        </div>
+    <footer className="bg-surface border-t border-border py-10 mt-20">
+      <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
         
-        <div className="flex items-center gap-6">
-          <Link href="#" className="text-content-secondary hover:text-accent-primary transition-colors text-sm">
-            Docs
-          </Link>
-          <Link href="#" className="text-content-secondary hover:text-accent-primary transition-colors text-sm">
-            Terms
-          </Link>
-          <div className="flex items-center gap-4 ml-4 pl-4 border-l border-border">
-            <Link href="#" className="text-content-tertiary hover:text-content-primary transition-colors">
-              <Globe className="w-5 h-5" />
+        {/* Logo and Description */}
+        <div>
+          <div className="text-[22px] font-semibold tracking-[-0.04em]">
+            <span className="italic text-accent-primary">e</span>ulr
+          </div>
+          <div className="text-[13px] text-content-tertiary mt-2 max-w-[280px]">
+            The exponential launchpad. Permissionless token issuance on XLayer.
+          </div>
+        </div>
+
+        {/* About */}
+        <div>
+          <div className="text-[11px] font-semibold text-content-tertiary uppercase tracking-[0.06em] mb-3">
+            About
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Manifesto
             </Link>
-            <Link href="#" className="text-content-tertiary hover:text-content-primary transition-colors">
-              <MessageCircle className="w-5 h-5" />
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              What is Eulr?
             </Link>
-            <Link href="#" className="text-content-tertiary hover:text-content-primary transition-colors">
-              <Send className="w-5 h-5" />
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Brand
             </Link>
           </div>
         </div>
+
+        {/* Resources */}
+        <div>
+          <div className="text-[11px] font-semibold text-content-tertiary uppercase tracking-[0.06em] mb-3">
+            Resources
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Docs
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Blog
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              API
+            </Link>
+          </div>
+        </div>
+
+        {/* Verified contracts */}
+        <div>
+          <div className="text-[11px] font-semibold text-content-tertiary uppercase tracking-[0.06em] mb-3">
+            Verified contracts
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-mono hover:text-content-primary transition-colors">
+              Factory: 0xfa…cb
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-mono hover:text-content-primary transition-colors">
+              Curve: 0x5e…7d
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              GitHub
+            </Link>
+          </div>
+        </div>
+
+        {/* Social */}
+        <div>
+          <div className="text-[11px] font-semibold text-content-tertiary uppercase tracking-[0.06em] mb-3">
+            Social
+          </div>
+          <div className="flex flex-col gap-2">
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Twitter
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Telegram
+            </Link>
+            <Link href="#" className="text-left text-[13px] text-content-secondary font-sans hover:text-content-primary transition-colors">
+              Discord
+            </Link>
+          </div>
+        </div>
+
       </div>
     </footer>
   );

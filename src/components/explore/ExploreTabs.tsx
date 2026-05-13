@@ -8,28 +8,38 @@ interface ExploreTabsProps {
 }
 
 const TABS = [
-  { id: "trending", label: "Trending" },
-  { id: "new", label: "New" },
-  { id: "graduating", label: "Graduating" },
+  { id: "trending", label: "Trending", icon: "🔥" },
+  { id: "new", label: "New", icon: "✨" },
+  { id: "graduating", label: "Graduating soon", icon: "🎓" },
+  { id: "all", label: "All", icon: null },
 ];
 
 export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      {TABS.map((tab) => (
-        <button
-          key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={cn(
-            "px-6 py-2.5 rounded-pill text-sm font-medium transition-colors whitespace-nowrap",
-            activeTab === tab.id
-              ? "bg-accent-primary text-white"
-              : "bg-surface text-content-secondary hover:bg-surface-elevated hover:text-content-primary"
-          )}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+      {TABS.map((tab) => {
+        const isActive = activeTab === tab.id;
+        
+        return (
+          <button
+            key={tab.id}
+            onClick={() => onTabChange(tab.id)}
+            className={cn(
+              "inline-flex items-center gap-[6px] px-[14px] py-2 rounded-[8px] text-[14px] leading-[1.4] font-medium transition-all whitespace-nowrap",
+              isActive
+                ? "bg-[#00FF88]/12 text-[#1AFF88]"
+                : "bg-transparent text-content-secondary hover:text-content-primary"
+            )}
+          >
+            {tab.icon && (
+              <span>
+                {tab.icon}
+              </span>
+            )}
+            {tab.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

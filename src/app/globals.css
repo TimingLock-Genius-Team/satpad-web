@@ -4,25 +4,25 @@
 
 :root {
   /* Dark theme by default as per spec */
-  --surface-base: #09090b;
-  --surface: #18181b;
-  --surface-elevated: #27272a;
-  --surface-highlight: #3f3f46;
+  --surface-base: #0A0B0E;
+  --surface: #121318;
+  --surface-elevated: #161821;
+  --surface-highlight: #1F222E;
 
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0AABF;
+  --text-tertiary: #64748B;
 
-  --border-default: #27272a;
-  --border-hover: #3f3f46;
+  --border-default: #1E2230;
+  --border-hover: #2D3348;
 
-  --accent-primary: #f97316; /* Orange/Brand color */
-  --accent-success: #22c55e;
-  --accent-warning: #eab308;
-  --accent-danger: #ef4444;
+  --accent-primary: #00FF88;
+  --accent-success: #00FF88;
+  --accent-warning: #F59E0B;
+  --accent-danger: #EF4444;
 
-  --radius-card: 1rem;
-  --radius-input: 0.5rem;
+  --radius-card: 16px;
+  --radius-input: 8px;
   --radius-pill: 9999px;
 }
 

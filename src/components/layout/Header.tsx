@@ -1,47 +1,70 @@
+"use client";
+
 import Link from "next/link";
-import { Search, Wallet } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ChevronDown, HelpCircle, Moon } from "lucide-react";
 import { cn } from "@/utils/cn";
 
+const NAV_ITEMS = [
+  { href: "/", label: "Explore" },
+  { href: "/create", label: "Create" },
+  { href: "/portfolio", label: "Portfolio" },
+];
+
 export function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-surface-base/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold text-accent-primary flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center text-white text-sm">
-              S
-            </span>
-            SATPAD
+          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center">
+            <span className="text-accent-primary italic drop-shadow-[0_0_8px_rgba(0,255,136,0.5)]">e</span>
+            <span className="text-content-primary">ulr</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-content-primary font-medium hover:text-accent-primary transition-colors">
-              Explore
-            </Link>
-            <Link href="/create" className="text-content-secondary font-medium hover:text-accent-primary transition-colors">
-              Create
-            </Link>
-            <Link href="/portfolio" className="text-content-secondary font-medium hover:text-accent-primary transition-colors">
-              Portfolio
-            </Link>
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "font-medium transition-colors",
+                    isActive
+                      ? "text-accent-primary"
+                      : "text-content-secondary hover:text-accent-primary"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center relative">
-            <Search className="w-4 h-4 absolute left-3 text-content-tertiary" />
-            <input 
-              type="text" 
-              placeholder="Search tokens..." 
-              className="pl-9 pr-4 py-2 bg-surface rounded-input border border-border focus:outline-none focus:border-accent-primary text-sm w-64 transition-colors text-content-primary placeholder:text-content-tertiary"
-            />
+          <div className="hidden md:flex items-center gap-2">
+            <button className="p-2 text-content-secondary hover:text-content-primary hover:bg-surface-elevated rounded-full transition-colors">
+              <HelpCircle className="w-5 h-5" />
+            </button>
+            <button className="p-2 text-content-secondary hover:text-content-primary hover:bg-surface-elevated rounded-full transition-colors">
+              <Moon className="w-5 h-5" />
+            </button>
           </div>
           
           <button className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-pill font-medium text-sm transition-all",
-            "bg-surface-highlight text-content-primary hover:bg-surface-elevated border border-border"
+            "flex items-center gap-3 px-3 py-1.5 rounded-pill font-medium text-sm transition-all",
+            "bg-surface-highlight hover:bg-surface-elevated border border-border"
           )}>
-            <Wallet className="w-4 h-4" />
-            Connect Wallet
+            <div className="flex items-center gap-2 pr-3 border-r border-border/60">
+              <span className="w-2 h-2 rounded-full bg-accent-primary shadow-[0_0_8px_rgba(0,255,136,0.6)]"></span>
+              <span className="text-content-primary">12.45 OKB</span>
+            </div>
+            <div className="flex items-center gap-2 pl-1">
+              <span className="text-content-secondary font-mono">0x4c2a...8a23</span>
+              <ChevronDown className="w-4 h-4 text-content-secondary" />
+            </div>
           </button>
         </div>
       </div>

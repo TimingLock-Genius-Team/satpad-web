@@ -1,0 +1,7 @@
+- [x] Color palette and typography are updated to match the dark theme and neon green accent.
+- [x] Header displays the "eulr BETA" logo and balance/address badge.
+- [x] Hero section contains the correct headline, description, and two action buttons.
+- [x] Four statistics cards are visible and styled correctly.
+- [x] Explore tabs have the correct icons and active styling.
+- [x] Comfy/Compact toggle and search bar are present in the tabs section.
+- [x] Token cards match the new UI (badges, progress bars, metrics, mini-chart).
