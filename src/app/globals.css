@@ -30,3 +30,43 @@ body {
   background-color: var(--surface-base);
   color: var(--text-primary);
 }
+
+/* 
+ * ----------------------------------------------------
+ * Custom Scrollbar
+ * A refined, low-contrast scrollbar that blends with 
+ * the dark theme. Uses a border trick for a "floating" 
+ * effect on webkit browsers.
+ * ----------------------------------------------------
+ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-highlight) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--surface-highlight);
+  border-radius: var(--radius-pill);
+  /* Creates a floating effect by matching the body background */
+  border: 4px solid var(--surface-base);
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-tertiary);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
