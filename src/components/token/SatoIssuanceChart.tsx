@@ -127,8 +127,8 @@ const CurrentDot = (props: {
 
 export const SatoIssuanceChart = () => {
   return (
-    <div className="w-full bg-surface-base border border-border/50 rounded-card p-4">
-      <div className="w-full h-[260px] bg-[#0a0a0a] rounded-xl border border-border/50 overflow-hidden">
+    <div className="w-full flex flex-col gap-2">
+      <div className="w-full h-[260px] bg-[#0a0a0a]/50 rounded-xl overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}
@@ -143,7 +143,7 @@ export const SatoIssuanceChart = () => {
             <XAxis
               dataKey="epoch"
               type="number"
-              domain={[0, 8]}
+              domain={[-0.5, 8]}
               tick={{ fill: "#64748B", fontSize: 11, fontFamily: "monospace" }}
               tickLine={false}
               axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
@@ -157,7 +157,7 @@ export const SatoIssuanceChart = () => {
               domain={[0, MAX_SUPPLY]}
               tick={{ fill: "#64748B", fontSize: 10, fontFamily: "monospace" }}
               tickLine={false}
-              axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              axisLine={false}
               ticks={[0, 21]}
               tickFormatter={(v) => (v === 0 ? "0" : `${v}m`)}
               width={35}
@@ -231,7 +231,7 @@ export const SatoIssuanceChart = () => {
         </ResponsiveContainer>
       </div>
 
-      <p className="text-xs text-content-tertiary font-mono text-center mt-2">
+      <p className="text-[10px] text-content-tertiary font-mono text-center uppercase tracking-wider">
         cumulative eth (0 to ∞)
       </p>
     </div>

@@ -140,57 +140,65 @@ export function BondingCurveChart({
   }, [data, currentCumEth]);
 
   return (
-    <div className="flex flex-col border border-border p-6 rounded-card bg-surface shadow-sm font-sans">
-      <div className="flex justify-between items-start xl:items-center flex-col xl:flex-row gap-4 mb-6 w-full">
-        <div className="flex gap-6 items-center font-mono text-sm">
-          <span className="text-content-secondary">curve</span>
-          <div className="flex items-center gap-2 text-accent-primary">
-            <div className="w-4 h-[2px] bg-accent-primary" />
+    <div className="flex flex-col border border-border p-4 rounded-card bg-surface shadow-sm font-sans">
+      <div className="flex justify-between items-start xl:items-center flex-col xl:flex-row gap-2 mb-3 w-full">
+        <div className="flex gap-3 items-center font-mono text-[11px]">
+          <span className="text-content-secondary uppercase tracking-wider font-semibold text-[9px]">curve</span>
+          <div className="flex items-center gap-1 text-accent-primary">
+            <div className="w-2.5 h-[2px] bg-accent-primary" />
             supply
           </div>
-          <div className="flex items-center gap-2 text-accent-warning">
-            <div className="w-4 h-[2px] bg-accent-warning" />
+          <div className="flex items-center gap-1 text-accent-warning">
+            <div className="w-2.5 h-[2px] bg-accent-warning" />
             price
           </div>
         </div>
 
-        <div className="flex items-center gap-x-4 font-mono text-sm whitespace-nowrap overflow-x-auto">
-          <div className="text-content-secondary shrink-0">
-            supply{" "}
-            <span className="text-accent-primary">
-              {currentSupply.toFixed(1)}m
-            </span>{" "}
-            of{" "}
-            <span className="text-content-primary">
-              {forwardSupply.toFixed(1)}m
-            </span>{" "}
-            forward{" "}
-            <span className="text-content-tertiary">
-              (drift{" "}
-              <span className="text-accent-danger">
-                {drift.toLocaleString()}k
+        <div className="flex items-center gap-1.5 font-mono text-[11px] mt-1 xl:mt-0 overflow-x-auto whitespace-nowrap pb-0.5 no-scrollbar w-full xl:w-auto">
+          {/* Supply Pill */}
+          <div className="flex items-center border border-border/60 rounded bg-surface-base shadow-sm shrink-0">
+            <div className="px-2 py-1 text-content-secondary border-r border-border/60 bg-surface-highlight/30">
+              supply
+            </div>
+            <div className="px-2 py-1 flex items-center gap-1.5">
+              <span className="text-accent-primary font-medium">{currentSupply.toFixed(1)}m</span>
+              <span className="text-content-tertiary">/</span>
+              <span className="text-content-primary">{forwardSupply.toFixed(1)}m</span>
+              <span className="text-content-tertiary border-l border-border/60 pl-1.5 ml-0.5">
+                drift: <span className="text-accent-danger">{drift.toLocaleString()}k</span>
               </span>
-              )
-            </span>
+            </div>
           </div>
-          <div className="text-content-secondary shrink-0">
-            price{" "}
-            <span className="text-accent-danger">${currentPrice.toFixed(2)}</span>
+
+          {/* Price Pill */}
+          <div className="flex items-center border border-border/60 rounded bg-surface-base shadow-sm shrink-0">
+            <div className="px-2 py-1 text-content-secondary border-r border-border/60 bg-surface-highlight/30">
+              price
+            </div>
+            <div className="px-2 py-1 text-accent-danger font-medium">
+              ${currentPrice.toFixed(2)}
+            </div>
           </div>
-          <div className="border border-border/50 px-3 py-1.5 rounded-md bg-surface-base text-content-secondary text-xs shrink-0">
-            burn{" "}
-            <span className="text-accent-danger">${burnPrice.toFixed(4)}</span>{" "}
-            <span className="text-content-tertiary">/</span> mint{" "}
-            <span className="text-accent-primary">${mintPrice.toFixed(2)}</span>
+
+          {/* Burn / Mint Pill */}
+          <div className="flex items-center border border-border/60 rounded bg-surface-base shadow-sm shrink-0">
+            <div className="px-2 py-1 flex items-center gap-1.5 border-r border-border/60">
+              <span className="text-content-secondary">burn</span>
+              <span className="text-accent-danger">${burnPrice.toFixed(4)}</span>
+            </div>
+            <div className="px-2 py-1 flex items-center gap-1.5">
+              <span className="text-content-secondary">mint</span>
+              <span className="text-accent-primary">${mintPrice.toFixed(2)}</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="w-full h-[400px] mb-6 bg-[#0a0a0a] rounded-xl border border-border/50 overflow-hidden">
+      <div className="w-full h-[360px] mb-4 bg-[#0a0a0a] rounded-xl border border-border/50 overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={data}
-            margin={{ top: 20, right: 40, left: 20, bottom: 30 }}
+            margin={{ top: 24, right: 10, left: 10, bottom: 10 }}
           >
             <defs>
               <linearGradient
@@ -238,7 +246,7 @@ export function BondingCurveChart({
               axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
               ticks={[0, 5, 10, 15, 20, 21]}
               tickFormatter={(v) => (v === 0 ? "0" : `${v}m`)}
-              width={45}
+              width={35}
             />
 
             <YAxis
@@ -251,7 +259,7 @@ export function BondingCurveChart({
               tickFormatter={(v) =>
                 v === 0 ? "$0" : `$${Number(v).toFixed(2)}`
               }
-              width={55}
+              width={45}
             />
 
             <Tooltip
@@ -301,8 +309,8 @@ export function BondingCurveChart({
         </ResponsiveContainer>
       </div>
 
-      <p className="text-xs text-content-tertiary max-w-3xl leading-relaxed font-mono">
-        21m pure-math asymptote that the curve approaches but never touches.
+      <p className="text-[12px] text-content-tertiary max-w-3xl leading-relaxed font-mono mt-1">
+        <span className="text-content-primary">21m</span> pure-math asymptote that the curve approaches but never touches.
         minting continues indefinitely; price grows exponentially with
         cumulative eth.
       </p>
