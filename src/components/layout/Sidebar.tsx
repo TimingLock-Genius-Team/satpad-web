@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
@@ -9,9 +10,12 @@ import {
   Zap, 
   Megaphone, 
   Bell, 
-  MoreHorizontal 
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { SatpadLogo } from "@/components/common/Logo";
 
 const navItems = [
   { name: "Home", href: "/", icon: Home },
@@ -25,20 +29,44 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <aside className="w-64 border-r border-border bg-surface-base flex-col hidden lg:flex h-full sticky top-0 overflow-y-auto">
-      <div className="p-4 h-16 flex items-center mb-4">
-        <Link href="/" className="text-xl font-bold text-accent-primary flex items-center gap-2">
-          <span className="w-8 h-8 rounded-full bg-accent-primary flex items-center justify-center text-white text-sm">
-            S
-          </span>
-          SATPAD
-        </Link>
+    <aside className={cn(
+      "border-r border-border bg-surface-base flex-col hidden lg:flex h-full sticky top-0 transition-all duration-300 relative z-50",
+      isCollapsed ? "w-20" : "w-64"
+    )}>
+      <div className={cn(
+        "p-4 h-16 flex items-center mb-4",
+        isCollapsed ? "justify-center" : "justify-between"
+      )}>
+        {!isCollapsed && (
+          <Link href="/" className="text-xl font-bold text-white flex items-center gap-2">
+            <SatpadLogo size={32} className="-rotate-12" />
+            <span className="truncate italic tracking-wider">SATPAD</span>
+          </Link>
+        )}
+        {isCollapsed && (
+          <Link href="/" className="flex items-center justify-center shrink-0">
+            <SatpadLogo size={32} className="-rotate-12" />
+          </Link>
+        )}
+        
+        {/* Toggle Button */}
+        {!isCollapsed && (
+          <button 
+            onClick={() => setIsCollapsed(true)}
+            className="p-1.5 rounded-lg text-content-tertiary hover:bg-surface-elevated hover:text-content-primary transition-colors"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
       </div>
-      
-      <nav className="flex-1 px-4 space-y-2">
-        {navItems.map((item) => {
+
+      <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
+        <nav className="px-3 space-y-2 pb-4 flex-1">
+          {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           
@@ -46,28 +74,37 @@ export function Sidebar() {
             <Link
               key={item.name}
               href={item.href}
+              title={isCollapsed ? item.name : undefined}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
                 isActive 
                   ? "bg-surface-highlight text-accent-primary" 
-                  : "text-content-secondary hover:bg-surface-elevated hover:text-content-primary"
+                  : "text-content-secondary hover:bg-surface-elevated hover:text-content-primary",
+                isCollapsed && "justify-center px-0"
               )}
             >
               <Icon className={cn(
-                "w-5 h-5",
+                "w-5 h-5 shrink-0",
                 isActive ? "text-accent-primary" : "text-content-tertiary group-hover:text-content-primary"
               )} />
-              {item.name}
+              {!isCollapsed && <span className="truncate">{item.name}</span>}
             </Link>
           );
         })}
-      </nav>
-      
-      {/* Optional: Add user profile or settings at the bottom */}
-      <div className="p-4 border-t border-border mt-auto">
-        <div className="text-xs text-content-tertiary text-center">
-          © 2026 SATPAD
-        </div>
+        </nav>
+
+        {/* Expand Button (when collapsed) */}
+        {isCollapsed && (
+          <div className="p-3 mt-auto">
+            <button 
+              onClick={() => setIsCollapsed(false)}
+              className="w-full flex justify-center p-2 rounded-lg text-content-tertiary hover:bg-surface-elevated hover:text-content-primary transition-colors"
+              title="Expand Sidebar"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

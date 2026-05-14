@@ -1,109 +1,83 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, ChevronDown, LayoutGrid, List } from "lucide-react";
+import { Filter, ChevronDown, LayoutGrid, List, Search } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { ExploreTabs } from "./ExploreTabs";
 
-const TAGS = ["humans", "just", "意外", "animals", "games", "art"];
+interface FilterBarProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
 
-export function FilterBar() {
-  const [isListed, setIsListed] = useState(false);
-  const [activeTags, setActiveTags] = useState<string[]>([]);
+export function FilterBar({ activeTab, onTabChange, searchQuery, onSearchChange }: FilterBarProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const toggleTag = (tag: string) => {
-    setActiveTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
-
   return (
-    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 p-4 rounded-xl bg-surface-elevated/50 border border-border">
-      {/* Left side: Toggle & Tags */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        {/* Listed Toggle */}
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <div className="relative">
-            <input
-              type="checkbox"
-              className="sr-only"
-              checked={isListed}
-              onChange={() => setIsListed(!isListed)}
-            />
-            <div className={cn(
-              "block w-11 h-6 rounded-full transition-colors",
-              isListed ? "bg-accent-primary" : "bg-surface"
-            )}></div>
-            <div className={cn(
-              "absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform",
-              isListed ? "transform translate-x-5" : ""
-            )}></div>
-          </div>
-          <span className="text-sm font-semibold text-content-secondary group-hover:text-content-primary transition-colors whitespace-nowrap">
-            Listed on PancakeSwap
-          </span>
-        </label>
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 pb-4 border-b border-border">
+      {/* Left side: Search & Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-wrap">
+        {/* Tabs */}
+        <div>
+          <ExploreTabs activeTab={activeTab} onTabChange={onTabChange} />
+        </div>
 
-        <div className="w-px h-6 bg-border hidden sm:block"></div>
+        <div className="hidden sm:block w-px h-6 bg-border mx-2"></div>
 
-        {/* Tags */}
-        <div className="flex flex-wrap items-center gap-2">
-          {TAGS.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={cn(
-                "px-3 py-1.5 text-xs font-bold rounded-lg transition-all border",
-                activeTags.includes(tag)
-                  ? "bg-accent-primary/20 text-accent-primary border-accent-primary/50 shadow-[0_0_10px_rgba(0,255,102,0.1)]"
-                  : "bg-surface border-border text-content-secondary hover:text-content-primary hover:border-border-hover"
-              )}
-            >
-              {tag}
-            </button>
-          ))}
+        {/* Search */}
+        <div className="hidden md:flex items-center relative mr-2">
+          <Search className="w-4 h-4 absolute left-0 text-content-tertiary" />
+          <input 
+            type="text" 
+            placeholder="Search tokens..." 
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-7 pr-0 py-1.5 bg-transparent border-b border-transparent focus:border-accent-primary focus:outline-none text-sm w-48 lg:w-64 transition-colors text-content-primary placeholder:text-content-tertiary"
+          />
         </div>
       </div>
 
       {/* Right side: Dropdowns & View toggles */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-4">
         {/* Filters Dropdown */}
-        <button className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-lg text-sm font-semibold text-content-secondary hover:text-content-primary hover:border-border-hover transition-colors">
+        <button className="flex items-center gap-2 text-sm font-bold text-content-secondary hover:text-content-primary transition-colors uppercase tracking-wider">
           <Filter className="w-4 h-4" />
-          Filters
+          FILTERS
         </button>
 
         {/* Featured Dropdown */}
-        <button className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-lg text-sm font-semibold text-content-secondary hover:text-content-primary hover:border-border-hover transition-colors">
-          Featured
+        <button className="flex items-center gap-1 text-sm font-bold text-content-secondary hover:text-content-primary transition-colors uppercase tracking-wider">
+          FEATURED
           <ChevronDown className="w-4 h-4" />
         </button>
 
-        <div className="w-px h-6 bg-border hidden sm:block"></div>
+        <div className="w-1 h-1 rounded-full bg-border hidden sm:block mx-1"></div>
 
         {/* View Toggles */}
-        <div className="flex items-center bg-surface border border-border rounded-lg p-1">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => setViewMode("grid")}
             className={cn(
-              "p-1.5 rounded-md transition-colors",
+              "transition-colors",
               viewMode === "grid" 
-                ? "bg-surface-elevated text-accent-primary shadow-sm" 
+                ? "text-accent-primary" 
                 : "text-content-tertiary hover:text-content-secondary"
             )}
           >
-            <LayoutGrid className="w-4 h-4" />
+            <LayoutGrid className="w-5 h-5" />
           </button>
           <button
             onClick={() => setViewMode("list")}
             className={cn(
-              "p-1.5 rounded-md transition-colors",
+              "transition-colors",
               viewMode === "list" 
-                ? "bg-surface-elevated text-accent-primary shadow-sm" 
+                ? "text-accent-primary" 
                 : "text-content-tertiary hover:text-content-secondary"
             )}
           >
-            <List className="w-4 h-4" />
+            <List className="w-5 h-5" />
           </button>
         </div>
       </div>

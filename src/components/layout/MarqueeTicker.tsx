@@ -15,7 +15,7 @@ export function MarqueeTicker() {
   const displayTickers = [...MOCK_TICKERS, ...MOCK_TICKERS];
 
   return (
-    <div className="w-full bg-surface-elevated border-b border-border overflow-hidden h-10 flex items-center relative z-40">
+    <div className="flex-1 overflow-hidden flex items-center relative mask-image-fade">
       <div className="flex animate-marquee whitespace-nowrap min-w-max">
         {displayTickers.map((ticker, index) => (
           <div 

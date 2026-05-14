@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Providers } from "@/components/providers/Providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { MarqueeTicker } from "@/components/layout/MarqueeTicker";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -30,17 +30,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex bg-background`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen overflow-hidden flex bg-background`}
       >
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
-          <MarqueeTicker />
-          <Header />
-          <main className="flex-1 flex flex-col">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <Providers>
+          <Sidebar />
+          <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+            <Header />
+            <div className="flex-1 overflow-y-auto">
+              <main className="flex-1 flex flex-col min-h-full">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </div>
+        </Providers>
       </body>
     </html>
   );
