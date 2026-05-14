@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
+import { Pagination } from "@/components/explore/Pagination";
 import { MOCK_TOKENS } from "@/types/token";
 import { cn } from "@/utils/cn";
+
+const PAGE_SIZE = 12;
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"comfy" | "compact">("comfy");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Simple mock filtering based on tab and search query
-  const filteredTokens = MOCK_TOKENS.filter((token) => {
+  const filteredTokens = useMemo(() => MOCK_TOKENS.filter((token) => {
     // Search filter
     if (searchQuery && !token.name.toLowerCase().includes(searchQuery.toLowerCase()) && !token.symbol.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
@@ -24,7 +28,23 @@ export default function Home() {
     if (activeTab === "new") return Date.now() - token.createdAt <= 1000 * 60 * 60 * 24;
     
     return true;
-  });
+  }), [activeTab, searchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTokens.length / PAGE_SIZE));
+  const paginatedTokens = useMemo(
+    () => filteredTokens.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filteredTokens, currentPage]
+  );
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="w-full">
@@ -80,7 +100,7 @@ export default function Home() {
       <div className="sticky top-[64px] z-10 bg-[#0A0B0E] border-b border-t border-[#1E2028] py-3 md:h-16 md:py-0 mb-8 max-w-[1260px] mx-auto">
         <div className="max-w-[1260px] mx-auto px-4 h-full flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
           <div className="w-full md:w-auto overflow-hidden">
-            <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            <ExploreTabs activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
           
           <div className="hidden md:block flex-1"></div>
@@ -114,7 +134,7 @@ export default function Home() {
                 type="text" 
                 placeholder="Search name, symbol, or 0x address" 
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="flex-1 bg-transparent border-none focus:outline-none text-[13px] text-content-primary placeholder:text-content-tertiary min-w-0"
               />
             </div>
@@ -123,7 +143,12 @@ export default function Home() {
       </div>
 
       <div className="max-w-[1260px] mx-auto px-4 pb-8">
-        <TokenGrid tokens={filteredTokens} viewMode={viewMode} />
+        <TokenGrid tokens={paginatedTokens} viewMode={viewMode} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );
