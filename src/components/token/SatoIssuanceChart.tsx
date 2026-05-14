@@ -1,249 +1,239 @@
+"use client";
+
 import React from "react";
+import {
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  Cell,
+} from "recharts";
 
-export const SatoIssuanceChart = () => {
-  const data = [
-    { label: "29k", reward: 29000 },
-    { label: "", reward: 14500 },
-    { label: "6k", reward: 6000 },
-    { label: "", reward: 2500 },
-    { label: "1k", reward: 1000, current: true },
-    { label: "", reward: 500 },
-    { label: "321", reward: 321 },
-    { label: "", reward: 100 },
-  ];
+const MAX_SUPPLY = 21;
 
-  // Supply data points: [supply in millions]
-  const supplies = [
-    { y: 0 },
-    { y: 10.5 },
-    { y: 15.75 },
-    { y: 18.375 },
-    { y: 19.6875 },
-    { y: 20.34375 },
-    { y: 20.671875 },
-    { y: 20.8359375 },
-    { y: 20.91796875 },
-  ];
+const chartData = [
+  { epoch: 0, reward: 29000, supply: 0, showLabel: true, label: "29k" },
+  { epoch: 1, reward: 14500, supply: 10.5 },
+  { epoch: 2, reward: 6000, supply: 15.75, showLabel: true, label: "6k" },
+  { epoch: 3, reward: 2500, supply: 18.375 },
+  { epoch: 4, reward: 1000, supply: 19.6875, isCurrent: true, showLabel: true, label: "1k" },
+  { epoch: 5, reward: 500, supply: 20.34375 },
+  { epoch: 6, reward: 321, supply: 20.671875, showLabel: true, label: "321" },
+  { epoch: 7, reward: 100, supply: 20.8359375 },
+  { epoch: 8, supply: 20.91796875 },
+];
 
-  const xAxisTicks = [
-    { index: 0, label: "0" },
-    { index: 2, label: "750" },
-    { index: 4, label: "1500", current: true },
-    { index: 6, label: "2250" },
-    { index: 8, label: "∞" },
-  ];
+const xTickLabels: Record<number, string> = {
+  0: "0",
+  2: "750",
+  4: "1500",
+  6: "2250",
+  8: "\u221E",
+};
 
-  const width = 600;
-  const height = 260;
-  const padding = { top: 40, right: 20, bottom: 40, left: 40 };
+const currentPoint = chartData.find((d) => d.isCurrent);
+const currentEpoch = currentPoint?.epoch ?? 4;
 
-  const innerWidth = width - padding.left - padding.right;
-  const innerHeight = height - padding.top - padding.bottom;
+function CustomTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { dataKey?: string | number; value?: number; payload?: (typeof chartData)[number] }[];
+}) {
+  if (!active || !payload || payload.length === 0) return null;
 
-  // Max values
-  const maxReward = 29000;
-  const maxSupply = 21;
-
-  // Scales
-  const numBars = data.length;
-  const barWidth = innerWidth / numBars;
-  
-  // Create a mapping from index to X coordinate
-  const getTickX = (index: number) => padding.left + index * barWidth;
-  const getBarX = (index: number) => padding.left + index * barWidth + 2; // +2 for gap
-  const getBarCenterX = (index: number) => padding.left + index * barWidth + barWidth / 2;
-  const getBarWidth = () => barWidth - 4; // -4 for gap
-
-  const getRewardY = (reward: number) => {
-    // Let's make the max reward height about 35% of the inner height
-    const barMaxHeight = innerHeight * 0.35;
-    const h = (reward / maxReward) * barMaxHeight;
-    return padding.top + innerHeight - h;
-  };
-
-  const getSupplyY = (supply: number) => {
-    // Leave some padding at the top for the 21m label
-    const maxCurveHeight = innerHeight * 0.9;
-    return padding.top + innerHeight - (supply / maxSupply) * maxCurveHeight;
-  };
-
-  // Generate SVG path for the supply line
-  let linePath = "";
-  supplies.forEach((point, i) => {
-    const x = padding.left + i * barWidth;
-    const y = getSupplyY(point.y);
-    if (i === 0) {
-      linePath += `M ${x} ${y} `;
-    } else {
-      // Create a smooth curve
-      const prevX = padding.left + (i - 1) * barWidth;
-      const prevY = getSupplyY(supplies[i - 1].y);
-      const cp1X = prevX + barWidth / 2;
-      const cp1Y = prevY;
-      const cp2X = x - barWidth / 2;
-      const cp2Y = y;
-      linePath += `C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${x} ${y} `;
-    }
-  });
-
-  const currentIndex = data.findIndex(d => d.current);
-  const currentX = getBarCenterX(currentIndex);
-  // Current Y is halfway through the epoch
-  const currentSupply = (supplies[currentIndex].y + supplies[currentIndex + 1].y) / 2;
-  const currentY = getSupplyY(currentSupply);
+  const data = payload[0]?.payload;
+  if (!data) return null;
 
   return (
-    <div className="w-full relative overflow-hidden bg-surface-base border border-border/50 rounded-card" style={{ paddingBottom: '45%' }}>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="absolute inset-0 w-full h-full text-xs font-mono"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* Background Grids */}
-        {/* 21m dashed line */}
-        <line
-          x1={padding.left}
-          y1={getSupplyY(21)}
-          x2={width - padding.right}
-          y2={getSupplyY(21)}
-          stroke="currentColor"
-          className="text-content-tertiary"
-          strokeWidth="1.5"
-          strokeDasharray="4 4"
-        />
-        <text
-          x={padding.left - 8}
-          y={getSupplyY(21)}
-          fill="currentColor"
-          className="text-content-secondary"
-          textAnchor="end"
-          alignmentBaseline="middle"
-        >
-          21m
-        </text>
+    <div className="bg-[#111] border border-[#333] p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
+      <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5">
+        <span className="text-content-secondary">epoch</span>
+        <span className="text-content-primary text-right">
+          {xTickLabels[data.epoch] ?? data.epoch}
+        </span>
 
-        {/* 0 line */}
-        <line
-          x1={padding.left}
-          y1={padding.top + innerHeight}
-          x2={width - padding.right}
-          y2={padding.top + innerHeight}
-          stroke="currentColor"
-          className="text-content-tertiary"
-          strokeWidth="1.5"
-        />
-        <text
-          x={padding.left - 8}
-          y={padding.top + innerHeight}
-          fill="currentColor"
-          className="text-content-secondary"
-          textAnchor="end"
-          alignmentBaseline="middle"
-        >
-          0
-        </text>
-        
-        {/* Y Axis line */}
-        <line
-          x1={padding.left}
-          y1={padding.top}
-          x2={padding.left}
-          y2={padding.top + innerHeight}
-          stroke="currentColor"
-          className="text-content-tertiary"
-          strokeWidth="1.5"
-        />
+        {data.reward != null && (
+          <>
+            <span className="text-content-secondary">reward</span>
+            <span className="text-accent-primary text-right">
+              {data.reward.toLocaleString()}
+            </span>
+          </>
+        )}
 
-        {/* Bars */}
-        {data.map((d, i) => {
-          const y = getRewardY(d.reward);
-          const h = padding.top + innerHeight - y;
-          const isCurrent = d.current;
-          
-          return (
-            <g key={i}>
-              <rect
-                x={getBarX(i)}
-                y={y}
-                width={getBarWidth()}
-                height={h}
-                className={isCurrent ? "fill-accent-primary" : "fill-accent-primary/20"}
-              />
-              {d.label && (
-                <text
-                  x={getBarCenterX(i)}
-                  y={y - 8}
-                  fill="currentColor"
-                  className={isCurrent ? "text-accent-primary font-medium" : "text-content-secondary"}
-                  textAnchor="middle"
-                >
-                  {d.label}
-                </text>
-              )}
-            </g>
-          );
-        })}
+        <span className="text-content-secondary">supply</span>
+        <span className="text-accent-primary text-right">
+          {data.supply.toFixed(1)}m
+        </span>
+      </div>
+    </div>
+  );
+}
 
-        {/* X Axis Ticks */}
-        {xAxisTicks.map((tick) => {
-          const x = getTickX(tick.index);
-          const y = padding.top + innerHeight + 20;
-          
-          return (
-            <text
-              key={tick.label}
-              x={x}
-              y={y}
-              fill="currentColor"
-              className={tick.current ? "text-accent-primary font-bold" : "text-content-tertiary"}
-              textAnchor={tick.index === 0 ? "start" : tick.index === numBars ? "end" : "middle"}
+function CustomBarLabel(props: {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+  index?: number;
+}) {
+  const { x = 0, y = 0, width = 0, index = 0 } = props;
+  const entry = chartData[index];
+  if (!entry?.showLabel) return null;
+
+  const isCurrent = entry.isCurrent;
+
+  return (
+    <text
+      x={x + width / 2}
+      y={y - 6}
+      fill={isCurrent ? "#00ff88" : "#64748B"}
+      textAnchor="middle"
+      fontSize={11}
+      fontFamily="monospace"
+      fontWeight={isCurrent ? 600 : 400}
+    >
+      {entry.label}
+    </text>
+  );
+}
+
+const CurrentDot = (props: {
+  cx?: number;
+  cy?: number;
+  index?: number;
+}) => {
+  const { cx = 0, cy = 0, index } = props;
+  if (index !== chartData.findIndex((d) => d.isCurrent)) return null;
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={5}
+      fill="#0a0a0a"
+      stroke="#00ff88"
+      strokeWidth={2.5}
+    />
+  );
+};
+
+export const SatoIssuanceChart = () => {
+  return (
+    <div className="w-full bg-surface-base border border-border/50 rounded-card p-4">
+      <div className="w-full h-[260px] bg-[#0a0a0a] rounded-xl border border-border/50 overflow-hidden">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={chartData}
+            margin={{ top: 24, right: 20, left: 10, bottom: 10 }}
+          >
+            <CartesianGrid
+              strokeDasharray="2 4"
+              stroke="rgba(255,255,255,0.05)"
+              vertical={false}
+            />
+
+            <XAxis
+              dataKey="epoch"
+              type="number"
+              domain={[0, 8]}
+              tick={{ fill: "#64748B", fontSize: 11, fontFamily: "monospace" }}
+              tickLine={false}
+              axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              ticks={[0, 2, 4, 6, 8]}
+              tickFormatter={(v) => xTickLabels[v] ?? String(v)}
+            />
+
+            <YAxis
+              yAxisId="left"
+              orientation="left"
+              domain={[0, MAX_SUPPLY]}
+              tick={{ fill: "#64748B", fontSize: 10, fontFamily: "monospace" }}
+              tickLine={false}
+              axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+              ticks={[0, 21]}
+              tickFormatter={(v) => (v === 0 ? "0" : `${v}m`)}
+              width={35}
+            />
+
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              domain={[0, 32000]}
+              tick={false}
+              axisLine={false}
+              width={1}
+            />
+
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ stroke: "rgba(255,255,255,0.15)", strokeDasharray: "2 4" }}
+            />
+
+            <ReferenceLine
+              yAxisId="left"
+              y={MAX_SUPPLY}
+              stroke="rgba(100,116,139,0.5)"
+              strokeWidth={1}
+              strokeDasharray="4 4"
+            />
+
+            <ReferenceLine
+              yAxisId="left"
+              y={0}
+              stroke="rgba(100,116,139,0.5)"
+              strokeWidth={1}
+            />
+
+            <ReferenceLine
+              yAxisId="left"
+              x={currentEpoch}
+              stroke="#00ff88"
+              strokeWidth={1}
+              strokeDasharray="4 4"
+              opacity={0.5}
+            />
+
+            <Bar
+              dataKey="reward"
+              yAxisId="right"
+              barSize={18}
+              radius={[2, 2, 0, 0]}
+              label={<CustomBarLabel />}
             >
-              {tick.label}
-            </text>
-          );
-        })}
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={index}
+                  fill={entry.isCurrent ? "#00ff88" : "rgba(0,255,136,0.12)"}
+                />
+              ))}
+            </Bar>
 
-        {/* Current Epoch Vertical Dashed Line */}
-        <line
-          x1={currentX}
-          y1={currentY}
-          x2={currentX}
-          y2={padding.top + innerHeight}
-          stroke="currentColor"
-          className="text-accent-primary"
-          strokeWidth="1.5"
-          strokeDasharray="4 4"
-        />
+            <Line
+              yAxisId="left"
+              type="monotone"
+              dataKey="supply"
+              stroke="#00ff88"
+              strokeWidth={2.5}
+              dot={<CurrentDot />}
+              activeDot={{ r: 5, fill: "#0a0a0a", stroke: "#00ff88", strokeWidth: 2 }}
+              connectNulls
+              isAnimationActive={false}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
 
-        {/* Supply Curve */}
-        <path
-          d={linePath}
-          fill="none"
-          stroke="currentColor"
-          className="text-accent-primary"
-          strokeWidth="2.5"
-        />
-
-        {/* Current Marker Point */}
-        <circle
-          cx={currentX}
-          cy={currentY}
-          r="4.5"
-          className="fill-surface-base stroke-accent-primary"
-          strokeWidth="2.5"
-        />
-
-        {/* Footer Text */}
-        <text
-          x={padding.left + innerWidth / 2}
-          y={height - 5}
-          fill="currentColor"
-          className="text-content-tertiary font-mono text-xs"
-          textAnchor="middle"
-        >
-          cumulative eth (0 to ∞)
-        </text>
-      </svg>
+      <p className="text-xs text-content-tertiary font-mono text-center mt-2">
+        cumulative eth (0 to ∞)
+      </p>
     </div>
   );
 };
