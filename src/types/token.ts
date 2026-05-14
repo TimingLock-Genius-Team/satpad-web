@@ -17,8 +17,8 @@ export interface Token {
   totalAmount: string;
 }
 
-// Mock Data
-export const MOCK_TOKENS: Token[] = [
+// Base Mock Data
+const BASE_TOKENS: Token[] = [
   {
     address: "0x1d41...cb9a",
     name: "BasedKitty",
@@ -128,3 +128,42 @@ export const MOCK_TOKENS: Token[] = [
     totalAmount: "21M",
   }
 ];
+
+const generateMockTokens = (count: number): Token[] => {
+  const tokens: Token[] = [...BASE_TOKENS];
+  
+  const prefixes = ["Mega", "Super", "Ultra", "Hyper", "Based", "Doge", "Pepe", "Moon", "Safe", "Satoshi", "Chad", "Giga", "Rocket"];
+  const suffixes = ["Coin", "Token", "Inu", "Cat", "Dog", "Frog", "Rock", "Bro", "Lord", "Owl", "Bear", "Bull", "Ape"];
+  
+  for (let i = tokens.length; i < count; i++) {
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const name = `${prefix}${suffix}`;
+    const symbol = `${prefix.substring(0, 3).toUpperCase()}${suffix.substring(0, 3).toUpperCase()}`;
+    const progress = Math.floor(Math.random() * 100);
+    
+    tokens.push({
+      address: `0x${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}...${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}`,
+      name: `${name} ${i}`,
+      symbol: `${symbol}${i}`,
+      creator: `0x${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}...${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}`,
+      description: `The next big thing in the ${suffix.toLowerCase()} space.`,
+      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}${i}`,
+      price: Number((Math.random() * 0.001).toFixed(6)),
+      progress: progress,
+      reserve: `${Math.floor(Math.random() * 5000)} OKB`,
+      isGraduated: progress === 100,
+      createdAt: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 14), // Up to 14 days ago
+      mcap: `$${(Math.random() * 500).toFixed(1)}k`,
+      volume24h: `$${(Math.random() * 200).toFixed(1)}k`,
+      priceChange24h: Math.floor((Math.random() * 100) - 50),
+      mintedAmount: `${(progress * 0.21).toFixed(2)}M`,
+      totalAmount: "21M",
+    });
+  }
+  
+  return tokens;
+};
+
+// Generated 100 Mock Data
+export const MOCK_TOKENS: Token[] = generateMockTokens(100);
