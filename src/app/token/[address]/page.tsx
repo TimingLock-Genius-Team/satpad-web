@@ -10,6 +10,7 @@ import {
 import { MOCK_TOKENS } from "@/types/token";
 import { TokenTabs } from "./TokenTabs";
 import { TradePanel } from "./TradePanel";
+import { TokenChart } from "@/components/token/TokenChart";
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -119,85 +120,7 @@ export default function TokenDetailPage({
               ))}
             </div>
 
-            {/* Chart Card */}
-            <div className="bg-surface rounded-xl border border-border p-4">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-1 bg-[#0B0E14] p-1 rounded-lg border border-border">
-                  {["1m", "5m", "1h", "1d"].map((t) => (
-                    <button
-                      key={t}
-                      className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                        t === "1h" ? "bg-surface-highlight text-content-primary" : "text-content-tertiary hover:text-content-secondary"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-                <label className="flex items-center gap-2 text-xs font-medium text-content-secondary cursor-pointer">
-                  <div className="w-4 h-4 rounded bg-accent-primary flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-3 h-3 text-surface-base" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                  </div>
-                  Theoretical curve
-                </label>
-              </div>
-              <div className="h-[280px] w-full flex flex-col">
-                <div className="flex-1 relative w-full min-h-0">
-                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full absolute inset-0">
-                    <defs>
-                      <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.2" />
-                        <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0,32 Q10,32 20,30 T40,25 T60,18 T80,10 T100,5"
-                      fill="none"
-                      stroke="var(--accent-primary)"
-                      strokeWidth="0.5"
-                    />
-                    <path
-                      d="M0,32 Q10,32 20,30 T40,25 T60,18 T80,10 T100,5 L100,40 L0,40 Z"
-                      fill="url(#chart-gradient)"
-                    />
-                    <g opacity="0.8">
-                      {Array.from({ length: 50 }).map((_, i) => {
-                        const pseudoRandom = Math.abs(Math.sin(i * 12.345));
-                        const h = 4 + pseudoRandom * 6;
-                        const isPositive = Math.sin(i * 45.678) > 0;
-                        return (
-                          <rect
-                            key={i}
-                            x={i * 2}
-                            y={40 - h}
-                            width="1"
-                            height={h}
-                            fill={isPositive ? "var(--accent-success)" : "var(--accent-danger)"}
-                          />
-                        );
-                      })}
-                    </g>
-                  </svg>
-                  <div className="absolute left-0 top-0 bottom-2 flex flex-col justify-between text-[10px] font-mono text-content-tertiary pointer-events-none">
-                    <span>6.3e-6</span>
-                    <span>4.5e-6</span>
-                    <span>2.8e-6</span>
-                    <span>1.0e-6</span>
-                    <span>VOL</span>
-                  </div>
-                </div>
-                <div className="mt-3 pl-8 flex justify-between text-[10px] font-mono text-content-tertiary">
-                  <span>18:00</span>
-                  <span>14:00</span>
-                  <span>18:00</span>
-                  <span>22:00</span>
-                  <span>02:00</span>
-                  <span>now</span>
-                </div>
-              </div>
-            </div>
+            <TokenChart currentPrice={token.price} progressPercent={token.progress} />
 
             <TokenTabs />
           </div>
