@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="bg-surface border-t border-border py-10 mt-20">
-      <div className="max-w-[1440px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-8">
+    <footer className="bg-surface border-t border-border py-8 md:py-10 mt-12 md:mt-20">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-x-4 gap-y-8 md:gap-8">
         
         {/* Logo and Description */}
-        <div>
+        <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-2 md:mb-0">
           <div className="text-[22px] font-semibold tracking-[-0.04em]">
             <span className="italic text-accent-primary">e</span>ulr
           </div>

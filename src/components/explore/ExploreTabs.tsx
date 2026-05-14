@@ -16,7 +16,7 @@ const TABS = [
 
 export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
   return (
-    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-full">
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide w-full max-w-full">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         
@@ -25,7 +25,7 @@ export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "inline-flex items-center gap-[6px] px-[14px] py-2 rounded-[8px] text-[14px] leading-[1.4] font-medium transition-all whitespace-nowrap",
+              "inline-flex items-center gap-[6px] px-[14px] py-2 rounded-[8px] text-[14px] leading-[1.4] font-medium transition-all whitespace-nowrap shrink-0",
               isActive
                 ? "bg-accent-primary/80 text-content-primary"
                 : "bg-transparent text-content-secondary hover:text-content-primary"

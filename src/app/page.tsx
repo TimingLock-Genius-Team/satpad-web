@@ -77,43 +77,47 @@ export default function Home() {
       </section>
 
       {/* Tabs and Search Section */}
-      <div className="sticky top-[64px] z-10 bg-[#0A0B0E] border-b border-t border-[#1E2028] h-16 mb-8 max-w-[1260px] mx-auto">
-        <div className="max-w-[1260px] mx-auto px-4 h-full flex items-center gap-6">
-          <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
-          
-          <div className="flex-1"></div>
-
-          <div className="flex gap-0 border border-[#1E2028] rounded-lg overflow-hidden bg-transparent">
-            <button 
-              onClick={() => setViewMode("comfy")}
-              className={cn(
-                "px-[10px] py-[6px] text-xs font-medium transition-colors",
-                viewMode === "comfy" ? "bg-[#1E2028] text-content-primary" : "bg-transparent text-content-tertiary hover:text-content-secondary"
-              )}
-            >
-              Comfy
-            </button>
-            <button 
-              onClick={() => setViewMode("compact")}
-              className={cn(
-                "px-[10px] py-[6px] text-xs font-medium transition-colors",
-                viewMode === "compact" ? "bg-[#1E2028] text-content-primary" : "bg-transparent text-content-tertiary hover:text-content-secondary"
-              )}
-            >
-              Compact
-            </button>
+      <div className="sticky top-[64px] z-10 bg-[#0A0B0E] border-b border-t border-[#1E2028] py-3 md:h-16 md:py-0 mb-8 max-w-[1260px] mx-auto">
+        <div className="max-w-[1260px] mx-auto px-4 h-full flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+          <div className="w-full md:w-auto overflow-hidden">
+            <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
+          
+          <div className="hidden md:block flex-1"></div>
 
-          {/* Search */}
-          <div className="flex items-center gap-2 bg-[#12131A] border border-[#1E2028] rounded-lg px-3 h-9 w-full max-w-[320px]">
-            <Search className="w-4 h-4 text-content-tertiary flex-shrink-0" />
-            <input 
-              type="text" 
-              placeholder="Search name, symbol, or 0x address" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none focus:outline-none text-[13px] text-content-primary placeholder:text-content-tertiary min-w-0"
-            />
+          <div className="flex items-center justify-between gap-3 w-full md:w-auto">
+            <div className="flex gap-0 border border-[#1E2028] rounded-lg overflow-hidden bg-transparent shrink-0">
+              <button 
+                onClick={() => setViewMode("comfy")}
+                className={cn(
+                  "px-[10px] py-[6px] text-xs font-medium transition-colors",
+                  viewMode === "comfy" ? "bg-[#1E2028] text-content-primary" : "bg-transparent text-content-tertiary hover:text-content-secondary"
+                )}
+              >
+                Comfy
+              </button>
+              <button 
+                onClick={() => setViewMode("compact")}
+                className={cn(
+                  "px-[10px] py-[6px] text-xs font-medium transition-colors",
+                  viewMode === "compact" ? "bg-[#1E2028] text-content-primary" : "bg-transparent text-content-tertiary hover:text-content-secondary"
+                )}
+              >
+                Compact
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className="flex items-center gap-2 bg-[#12131A] border border-[#1E2028] rounded-lg px-3 h-9 w-full md:max-w-[320px]">
+              <Search className="w-4 h-4 text-content-tertiary flex-shrink-0" />
+              <input 
+                type="text" 
+                placeholder="Search name, symbol, or 0x address" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 bg-transparent border-none focus:outline-none text-[13px] text-content-primary placeholder:text-content-tertiary min-w-0"
+              />
+            </div>
           </div>
         </div>
       </div>
