@@ -1,22 +1,19 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { Search } from "lucide-react";
+import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
 import { FilterBar } from "@/components/explore/FilterBar";
-import { Pagination } from "@/components/explore/Pagination";
 import { Hero } from "@/components/home/Hero";
 import { MOCK_TOKENS } from "@/types/token";
-
-const PAGE_SIZE = 20;
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("trending");
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Simple mock filtering based on tab and search query
-  const filteredTokens = useMemo(() => MOCK_TOKENS.filter((token) => {
+  const filteredTokens = MOCK_TOKENS.filter((token) => {
     // Search filter
     if (searchQuery && !token.name.toLowerCase().includes(searchQuery.toLowerCase()) && !token.symbol.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
@@ -27,22 +24,7 @@ export default function Home() {
     if (activeTab === "new") return Date.now() - token.createdAt <= 1000 * 60 * 60 * 24;
     
     return true;
-  }), [activeTab, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredTokens.length / PAGE_SIZE));
-
-  // Reset page to 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [activeTab, searchQuery]);
-
-  // Guard: if currentPage exceeds totalPages, clamp it
-  const safePage = Math.min(currentPage, totalPages);
-
-  const paginatedTokens = filteredTokens.slice(
-    (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE
-  );
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -60,23 +42,13 @@ export default function Home() {
         />
       </div>
 
-      <FilterBar 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <ExploreTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
-      <TokenGrid tokens={paginatedTokens} />
-      
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Pagination 
-          currentPage={safePage} 
-          totalPages={totalPages} 
-          onPageChange={setCurrentPage} 
-        />
-      )}
+      <FilterBar />
+
+      <TokenGrid tokens={filteredTokens} />
     </div>
   );
 }
