@@ -10,7 +10,7 @@ export function TradePanel({ token }: { token: Token }) {
   const isMint = tradeType === "mint";
 
   return (
-    <div className="flex flex-col border border-border p-6 rounded-card bg-surface shadow-sm">
+    <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
       {/* Tabs */}
       <div className="flex w-full mb-6 border border-border rounded-input overflow-hidden text-sm font-semibold tracking-wide">
         <button
@@ -91,4 +91,3 @@ export function TradePanel({ token }: { token: Token }) {
     </div>
   );
 }
-

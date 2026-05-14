@@ -33,9 +33,9 @@ export default function TokenDetailPage({
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
       <div className="max-w-[1200px] mx-auto space-y-8">
         
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 items-start relative">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,360px)] gap-8 items-start relative">
           {/* Left Column: All Content */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 min-w-0">
             
             {/* Token Header Profile Card with Progress */}
             <div className="border border-border p-6 rounded-card bg-surface shadow-sm flex flex-col gap-6 relative overflow-hidden">

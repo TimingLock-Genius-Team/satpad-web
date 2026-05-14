@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/utils/cn";
 import { Token } from "@/types/token";
@@ -6,7 +9,6 @@ interface TokenCardProps {
   token: Token;
 }
 
-// Generate background color based on symbol
 const getBgColor = (symbol: string) => {
   let hash = 0;
   for (let i = 0; i < symbol.length; i++) {
@@ -18,8 +20,8 @@ const getBgColor = (symbol: string) => {
   return `rgb(${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40})`;
 };
 
-const timeAgo = (timestamp: number) => {
-  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+const timeAgo = (timestamp: number, now: number) => {
+  const seconds = Math.floor((now - timestamp) / 1000);
   let interval = seconds / 86400;
   if (interval > 1) return Math.floor(interval) + "d ago";
   interval = seconds / 3600;
@@ -37,6 +39,12 @@ const formatPrice = (price: number) => {
 };
 
 export function TokenCard({ token }: TokenCardProps) {
+  const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    setNow(Date.now());
+  }, []);
+
   const priceHistory = token.priceHistory;
   const minPrice = Math.min(...priceHistory);
   const maxPrice = Math.max(...priceHistory);
@@ -46,8 +54,8 @@ export function TokenCard({ token }: TokenCardProps) {
     const y = 20 - ((val - minPrice) / range) * 18 - 1;
     return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
   }).join(" ");
-  // New token is within 24 hours
-  const isNew = Date.now() - token.createdAt <= 1000 * 60 * 60 * 24;
+
+  const isNew = now == null ? false : now - token.createdAt <= 1000 * 60 * 60 * 24;
 
   return (
     <Link 
@@ -79,7 +87,7 @@ export function TokenCard({ token }: TokenCardProps) {
               {token.address.slice(0, 6)}…{token.address.slice(-4)}
             </span>
             <span className="text-[11px] text-[#8F94A8]/60">
-              · {timeAgo(token.createdAt)}
+              · {now != null ? timeAgo(token.createdAt, now) : "..."}
             </span>
           </div>
         </div>
