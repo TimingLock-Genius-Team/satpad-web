@@ -6,18 +6,6 @@ interface TokenCardProps {
   token: Token;
 }
 
-// Simple random data generator for mini-charts based on address string
-const generateChartData = (seed: string, points = 20) => {
-  let value = 50;
-  const data = [];
-  for (let i = 0; i < points; i++) {
-    const change = (seed.charCodeAt(i % seed.length) % 10) - 4;
-    value = Math.max(10, Math.min(90, value + change));
-    data.push(value);
-  }
-  return data;
-};
-
 // Generate background color based on symbol
 const getBgColor = (symbol: string) => {
   let hash = 0;
@@ -49,9 +37,15 @@ const formatPrice = (price: number) => {
 };
 
 export function TokenCard({ token }: TokenCardProps) {
-  const chartData = generateChartData(token.address);
-  // Scale the chart so it occupies 0-20 in y-axis
-  const chartPath = chartData.map((val, i) => `${i === 0 ? 'M' : 'L'} ${i * (100 / (chartData.length - 1))} ${20 - (val * 0.2)}`).join(" ");
+  const priceHistory = token.priceHistory;
+  const minPrice = Math.min(...priceHistory);
+  const maxPrice = Math.max(...priceHistory);
+  const range = maxPrice - minPrice || 1;
+  const chartPath = priceHistory.map((val, i) => {
+    const x = i * (100 / (priceHistory.length - 1));
+    const y = 20 - ((val - minPrice) / range) * 18 - 1;
+    return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+  }).join(" ");
   // New token is within 24 hours
   const isNew = Date.now() - token.createdAt <= 1000 * 60 * 60 * 24;
 

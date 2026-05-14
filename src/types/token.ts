@@ -13,12 +13,26 @@ export interface Token {
   mcap: string;
   volume24h: string;
   priceChange24h: number;
+  priceHistory: number[];
   mintedAmount: string;
   totalAmount: string;
 }
 
-// Base Mock Data
-const BASE_TOKENS: Token[] = [
+export const generatePriceHistory = (currentPrice: number, priceChange24h: number, points = 24): number[] => {
+  const history: number[] = [];
+  const startPrice = currentPrice / (1 + priceChange24h / 100);
+
+  for (let i = 0; i < points; i++) {
+    const t = i / (points - 1);
+    const basePrice = startPrice + (currentPrice - startPrice) * Math.pow(t, 1.2);
+    const noise = (Math.random() - 0.5) * currentPrice * 0.08 * Math.sin(t * Math.PI);
+    history.push(Math.max(0, basePrice + noise));
+  }
+
+  return history;
+};
+
+const BASE_TOKEN_DEFS: Omit<Token, 'priceHistory'>[] = [
   {
     address: "0x1d41...cb9a",
     name: "BasedKitty",
@@ -30,7 +44,7 @@ const BASE_TOKENS: Token[] = [
     progress: 99.0,
     reserve: "1,250 OKB",
     isGraduated: true,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 6, // 6 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 6,
     mcap: "$380.4k",
     volume24h: "$125.0k",
     priceChange24h: 0,
@@ -48,7 +62,7 @@ const BASE_TOKENS: Token[] = [
     progress: 25.0,
     reserve: "5,000 OKB",
     isGraduated: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
     mcap: "$1.3k",
     volume24h: "$90.0k",
     priceChange24h: -22.0,
@@ -66,7 +80,7 @@ const BASE_TOKENS: Token[] = [
     progress: 40.0,
     reserve: "450 OKB",
     isGraduated: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7, // 7 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 7,
     mcap: "$2.6k",
     volume24h: "$85.0k",
     priceChange24h: 13.0,
@@ -84,7 +98,7 @@ const BASE_TOKENS: Token[] = [
     progress: 55.0,
     reserve: "800 OKB",
     isGraduated: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
     mcap: "$4.7k",
     volume24h: "$80.0k",
     priceChange24h: 48.0,
@@ -102,7 +116,7 @@ const BASE_TOKENS: Token[] = [
     progress: 83.0,
     reserve: "2,100 OKB",
     isGraduated: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 17, // 17 hours ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 17,
     mcap: "$18.8k",
     volume24h: "$78.0k",
     priceChange24h: 0,
@@ -120,7 +134,7 @@ const BASE_TOKENS: Token[] = [
     progress: 3.0,
     reserve: "10 OKB",
     isGraduated: false,
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
     mcap: "$119",
     volume24h: "$73.0k",
     priceChange24h: 51.0,
@@ -128,6 +142,11 @@ const BASE_TOKENS: Token[] = [
     totalAmount: "21M",
   }
 ];
+
+const BASE_TOKENS: Token[] = BASE_TOKEN_DEFS.map((t) => ({
+  ...t,
+  priceHistory: generatePriceHistory(t.price, t.priceChange24h),
+}));
 
 const generateMockTokens = (count: number): Token[] => {
   const tokens: Token[] = [...BASE_TOKENS];
@@ -142,6 +161,8 @@ const generateMockTokens = (count: number): Token[] => {
     const symbol = `${prefix.substring(0, 3).toUpperCase()}${suffix.substring(0, 3).toUpperCase()}`;
     const progress = Math.floor(Math.random() * 100);
     
+    const p = Number((Math.random() * 0.001).toFixed(6));
+    const change = Math.floor((Math.random() * 100) - 50);
     tokens.push({
       address: `0x${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}...${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}`,
       name: `${name} ${i}`,
@@ -149,14 +170,15 @@ const generateMockTokens = (count: number): Token[] => {
       creator: `0x${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}...${Math.floor(Math.random() * 65535).toString(16).padStart(4, '0')}`,
       description: `The next big thing in the ${suffix.toLowerCase()} space.`,
       avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}${i}`,
-      price: Number((Math.random() * 0.001).toFixed(6)),
+      price: p,
       progress: progress,
       reserve: `${Math.floor(Math.random() * 5000)} OKB`,
       isGraduated: progress === 100,
-      createdAt: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 14), // Up to 14 days ago
+      createdAt: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 14),
       mcap: `$${(Math.random() * 500).toFixed(1)}k`,
       volume24h: `$${(Math.random() * 200).toFixed(1)}k`,
-      priceChange24h: Math.floor((Math.random() * 100) - 50),
+      priceChange24h: change,
+      priceHistory: generatePriceHistory(p, change),
       mintedAmount: `${(progress * 0.21).toFixed(2)}M`,
       totalAmount: "21M",
     });
