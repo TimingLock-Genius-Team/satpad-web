@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useRef, type DragEvent, type ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import { Plus, ChevronRight, ArrowLeft, Globe, X, Send } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useCreateTokenStore } from "@/store/createToken";
+import { useMetadataUpload, useCreateBuild } from "@/lib/api-hooks";
+import { getDefaultNetwork } from "@/lib/api";
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -17,11 +21,17 @@ function isValidUrl(url: string) {
 }
 
 export default function CreatePage() {
+  const router = useRouter();
+  const { isConnected } = useAccount();
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<{ name?: string; symbol?: string; twitter?: string; telegram?: string; website?: string }>({});
-  const [deployStatus, setDeployStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [deployStatus, setDeployStatus] = useState<"idle" | "uploading" | "building" | "success" | "error">("idle");
+  const [deployError, setDeployError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const store = useCreateTokenStore();
+
+  const metadataUpload = useMetadataUpload();
+  const createBuild = useCreateBuild();
 
   const progressWidth =
     currentStep === 1
@@ -100,19 +110,62 @@ export default function CreatePage() {
   };
 
   const handleDeploy = async () => {
-    setDeployStatus("loading");
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    if (Math.random() < 0.8) {
+    const network = getDefaultNetwork();
+
+    try {
+      // Step 1: Upload metadata
+      setDeployStatus("uploading");
+      setDeployError("");
+
+      let metadataURI = store.metadataURI;
+
+      if (!metadataURI) {
+        const metadataResult = await metadataUpload.mutateAsync({
+          name: store.name,
+          symbol: store.symbol,
+          description: store.description,
+          image: store.image || "",
+          website: store.website,
+          twitter: store.twitter,
+          telegram: store.telegram,
+        });
+        metadataURI = metadataResult.metadataURI;
+        store.setField("metadataURI", metadataURI);
+      }
+
+      // Step 2: Build transaction
+      setDeployStatus("building");
+
+      const buildResult = await createBuild.mutateAsync({
+        network,
+        name: store.name,
+        symbol: store.symbol,
+        description: store.description,
+        metadataURI,
+        socialURI: store.website || store.twitter || store.telegram || "",
+        curveS: store.curveS,
+      });
+
       setDeployStatus("success");
-      store.reset();
-    } else {
+
+      // Navigate after a short delay to the success state
+      setTimeout(() => {
+        store.reset();
+      }, 3000);
+
+    } catch (err) {
+      console.error("Deploy failed:", err);
       setDeployStatus("error");
+      setDeployError(err instanceof Error ? err.message : "Unknown error occurred");
     }
   };
 
   const handleRetry = () => {
     setDeployStatus("idle");
+    setDeployError("");
   };
+
+  const isLoading = deployStatus === "uploading" || deployStatus === "building";
 
   return (
     <div className="w-full min-h-screen bg-surface-base flex flex-col items-center pt-8 md:pt-12 px-4 pb-20">
@@ -448,6 +501,19 @@ export default function CreatePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
+                    Curve S
+                  </p>
+                  <input
+                    type="number"
+                    value={store.curveS}
+                    onChange={(e) => store.setField("curveS", Number(e.target.value))}
+                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm"
+                    min={1}
+                    max={100}
+                  />
+                </div>
+                <div>
+                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
                     Total Supply
                   </p>
                   <p className="text-content-primary text-[14px] font-medium font-mono">
@@ -460,14 +526,6 @@ export default function CreatePage() {
                   </p>
                   <p className="text-content-primary text-[14px] font-medium">
                     Exponential Bonding Curve
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
-                    Initial Price
-                  </p>
-                  <p className="text-content-primary text-[14px] font-medium font-mono">
-                    ~0.0000001 OKB
                   </p>
                 </div>
                 <div>
@@ -485,7 +543,15 @@ export default function CreatePage() {
           {/* ============ Step 4: Deploy ============ */}
           {currentStep === 4 && (
             <>
-              {deployStatus === "idle" && (
+              {!isConnected && (
+                <div className="flex flex-col items-center justify-center py-12 gap-4">
+                  <p className="text-content-tertiary text-[14px]">
+                    Please connect your wallet to deploy
+                  </p>
+                </div>
+              )}
+
+              {isConnected && deployStatus === "idle" && (
                 <div className="space-y-4">
                   <h3 className="text-content-primary text-[14px] font-semibold">
                     Review your token
@@ -584,10 +650,8 @@ export default function CreatePage() {
                         <span className="text-content-secondary text-[12px] font-mono">21,000,000</span>
                         <span className="text-content-tertiary text-[12px]">Curve Type</span>
                         <span className="text-content-secondary text-[12px]">Exponential</span>
-                        <span className="text-content-tertiary text-[12px]">Initial Price</span>
-                        <span className="text-content-secondary text-[12px] font-mono">~0.0000001 OKB</span>
-                        <span className="text-content-tertiary text-[12px]">Graduation</span>
-                        <span className="text-content-secondary text-[12px] font-mono">100,000 OKB</span>
+                        <span className="text-content-tertiary text-[12px]">Curve S</span>
+                        <span className="text-content-secondary text-[12px] font-mono">{store.curveS}</span>
                       </div>
                     </div>
                   </div>
@@ -595,14 +659,14 @@ export default function CreatePage() {
               )}
 
               {/* Loading State */}
-              {deployStatus === "loading" && (
+              {isLoading && (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="w-10 h-10 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
                   <p className="text-content-secondary text-[14px] font-medium">
-                    Deploying your token...
+                    {deployStatus === "uploading" ? "Uploading metadata..." : "Building transaction..."}
                   </p>
                   <p className="text-content-tertiary text-[12px]">
-                    This may take a moment. Please do not close this page.
+                    Please do not close this page.
                   </p>
                 </div>
               )}
@@ -626,17 +690,17 @@ export default function CreatePage() {
                     </svg>
                   </div>
                   <p className="text-accent-success text-[16px] font-semibold">
-                    Token deployed successfully!
+                    Token created successfully!
                   </p>
                   <p className="text-content-tertiary text-[13px] text-center max-w-sm">
-                    Your token has been created and is now live on the bonding curve.
-                    Share it with your community.
+                    Your transaction has been submitted. The token will appear on the explore page shortly.
                   </p>
                   <button
                     type="button"
+                    onClick={() => router.push("/")}
                     className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5 text-[13px]"
                   >
-                    View Token
+                    View Explore
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -652,7 +716,7 @@ export default function CreatePage() {
                     Deployment failed
                   </p>
                   <p className="text-content-tertiary text-[13px] text-center max-w-sm">
-                    Something went wrong while deploying your token. Please try again.
+                    {deployError || "Something went wrong. Please try again."}
                   </p>
                   <button
                     type="button"
@@ -667,7 +731,7 @@ export default function CreatePage() {
           )}
 
           {/* ============ Navigation ============ */}
-          {deployStatus !== "loading" && deployStatus !== "success" && (
+          {!isLoading && deployStatus !== "success" && (
             <div
               className={cn(
                 "pt-4 flex",
@@ -694,7 +758,7 @@ export default function CreatePage() {
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}
-              {currentStep === 4 && (
+              {currentStep === 4 && isConnected && (
                 <button
                   type="button"
                   onClick={handleDeploy}

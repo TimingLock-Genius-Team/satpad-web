@@ -5,10 +5,36 @@ import { Search } from "lucide-react";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
 import { Pagination } from "@/components/explore/Pagination";
-import { MOCK_TOKENS } from "@/types/token";
 import { cn } from "@/utils/cn";
+import { useTokens, useStats } from "@/lib/api-hooks";
+import type { ApiTokenListItem } from "@/lib/api-types";
+import type { Token } from "@/types/token";
 
 const PAGE_SIZE = 12;
+
+function mapToken(item: ApiTokenListItem): Token {
+  return {
+    address: item.address,
+    name: item.name,
+    symbol: item.symbol,
+    creator: item.creator,
+    priceOkb: item.priceOkb,
+    progress: item.progress,
+    reserve: item.reserve,
+    mintedAmount: item.mintedAmount ?? "--",
+    totalAmount: item.totalAmount ?? "--",
+    volume24hOkb: item.volume24hOkb,
+    volume24h: item.volume24h,
+    price: item.price,
+    curve: item.curve,
+  };
+}
+
+function fmtOkb(weiString: string): string {
+  const n = Number(weiString) / 1e18;
+  if (isNaN(n)) return "0";
+  return n.toFixed(2);
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("trending");
@@ -16,29 +42,27 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<"comfy" | "compact">("comfy");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Simple mock filtering based on tab and search query
-  const filteredTokens = useMemo(() => MOCK_TOKENS.filter((token) => {
-    // Search filter
-    if (searchQuery && !token.name.toLowerCase().includes(searchQuery.toLowerCase()) && !token.symbol.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    
-    // Tab filter
-    if (activeTab === "graduating" && token.progress < 80) return false;
-    if (activeTab === "new") return Date.now() - token.createdAt <= 1000 * 60 * 60 * 24;
-    
-    return true;
-  }), [activeTab, searchQuery]);
+  const { data: statsData } = useStats();
+  const { data: tokensData, isLoading, error } = useTokens({
+    tab: activeTab as "trending" | "new" | "all",
+    q: searchQuery || undefined,
+  });
 
-  const totalPages = Math.max(1, Math.ceil(filteredTokens.length / PAGE_SIZE));
+  const tokens: Token[] = useMemo(
+    () => (tokensData?.items ?? []).map(mapToken),
+    [tokensData]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(tokens.length / PAGE_SIZE));
   const paginatedTokens = useMemo(
-    () => filteredTokens.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [filteredTokens, currentPage]
+    () => tokens.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [tokens, currentPage]
   );
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setCurrentPage(1);
+    setSearchQuery("");
   };
 
   const handleSearchChange = (query: string) => {
@@ -49,7 +73,7 @@ export default function Home() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="w-full  pb-14 pt-16 md:pt-14 px-4 bg-[#0A0B0E]">
+      <section className="w-full pb-14 pt-16 md:pt-14 px-4 bg-[#0A0B0E]">
         <div className="max-w-[1260px] mx-auto flex flex-col items-start justify-center text-left">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-content-primary max-w-[820px]">
             The exponential <span className="text-accent-primary italic drop-shadow-[0_0_8px_rgba(0,255,136,0.3)]">launchpad</span>.
@@ -58,25 +82,31 @@ export default function Home() {
             Permissionless token issuance on XLayer, powered by sat1 bonding curves. No admins. No backdoors. Just math.
           </p>
 
-          {/* Stats Section moved inside Hero */}
+          {/* Stats Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10 w-full max-w-[920px]">
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Tokens Live</div>
-              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">1,247</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
+                {statsData ? statsData.tokensLive : "--"}
+              </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">24H Volume</div>
               <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8] flex items-baseline gap-2">
-                8,432 <span className="text-base md:text-lg font-medium text-[#8F94A8]">OKB</span>
+                {statsData ? fmtOkb(statsData.volume24hOkb) : "--"} <span className="text-base md:text-lg font-medium text-[#8F94A8]">OKB</span>
               </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Graduated</div>
-              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">72</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
+                {statsData ? statsData.graduated : "--"}
+              </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Total Trades</div>
-              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">18,234</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
+                {statsData ? statsData.totalTrades.toLocaleString() : "--"}
+              </div>
             </div>
           </div>
 
@@ -143,12 +173,26 @@ export default function Home() {
       </div>
 
       <div className="max-w-[1260px] mx-auto px-4 pb-8">
-        <TokenGrid tokens={paginatedTokens} viewMode={viewMode} />
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        {isLoading && (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
+          </div>
+        )}
+        {error && (
+          <div className="text-center py-20 text-content-tertiary">
+            Failed to load tokens. Please try again later.
+          </div>
+        )}
+        {!isLoading && !error && (
+          <>
+            <TokenGrid tokens={paginatedTokens} viewMode={viewMode} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        )}
       </div>
     </div>
   );

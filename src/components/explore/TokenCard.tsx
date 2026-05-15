@@ -38,14 +38,24 @@ const formatPrice = (price: number) => {
   return price.toString();
 };
 
-export function TokenCard({ token }: TokenCardProps) {
-  const [now, setNow] = useState<number | null>(null);
+const parsePriceOkb = (priceOkb: string): number => {
+  const n = Number(priceOkb);
+  if (isNaN(n)) return 0;
+  return n / 1e18;
+};
 
-  useEffect(() => {
-    setNow(Date.now());
-  }, []);
+function fmtOkb(weiString: string): string {
+  const n = Number(weiString) / 1e18;
+  if (isNaN(n)) return "0";
+  if (n < 0.001) return n.toExponential(3);
+  return n.toFixed(6);
+}
 
+function MiniChartPath({ token }: { token: Token }) {
   const priceHistory = token.priceHistory;
+  if (!priceHistory || priceHistory.length < 2) {
+    return null;
+  }
   const minPrice = Math.min(...priceHistory);
   const maxPrice = Math.max(...priceHistory);
   const range = maxPrice - minPrice || 1;
@@ -55,7 +65,33 @@ export function TokenCard({ token }: TokenCardProps) {
     return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
   }).join(" ");
 
-  const isNew = now == null ? false : now - token.createdAt <= 1000 * 60 * 60 * 24;
+  const trendColor = (token.priceChange24h ?? 0) >= 0 ? "#00FF88" : "#FF4D4D";
+
+  return (
+    <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="w-full h-full">
+      <path 
+        d={chartPath} 
+        fill="none" 
+        stroke={trendColor} 
+        strokeWidth="1.5" 
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
+export function TokenCard({ token }: TokenCardProps) {
+  const [now, setNow] = useState<number | null>(null);
+  const priceNum = token.price ?? parsePriceOkb(token.priceOkb);
+
+  useEffect(() => {
+    setNow(Date.now());
+  }, []);
+
+  const isGraduated = token.isGraduated ?? (token.progress >= 100);
+  const isNew = token.createdAt != null && now != null ? now - token.createdAt <= 1000 * 60 * 60 * 24 : false;
+  const priceChange = token.priceChange24h ?? 0;
+  const volumeDisplay = token.volume24h ?? (token.volume24hOkb ? fmtOkb(token.volume24hOkb) + " OKB" : "--");
 
   return (
     <Link 
@@ -64,7 +100,6 @@ export function TokenCard({ token }: TokenCardProps) {
     >
       {/* Card Header */}
       <div className="flex items-start gap-3">
-        {/* Logo Placeholder */}
         <div 
           className="w-10 h-10 rounded-lg flex items-center justify-center font-sans font-bold text-[14.4px] text-white border border-[#1E2028] shrink-0 tracking-[-0.02em]" 
           style={{ background: getBgColor(token.symbol) }}
@@ -72,7 +107,6 @@ export function TokenCard({ token }: TokenCardProps) {
           {token.symbol.slice(0, 2).toUpperCase()}
         </div>
         
-        {/* Title and Address */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-[6px]">
             <div className="text-[15px] font-semibold text-[#F2F4F8] overflow-hidden text-ellipsis whitespace-nowrap">
@@ -86,14 +120,15 @@ export function TokenCard({ token }: TokenCardProps) {
             <span className="font-mono text-[11px] text-[#8F94A8]/60">
               {token.address.slice(0, 6)}…{token.address.slice(-4)}
             </span>
-            <span className="text-[11px] text-[#8F94A8]/60">
-              · {now != null ? timeAgo(token.createdAt, now) : "..."}
-            </span>
+            {token.createdAt != null && now != null && (
+              <span className="text-[11px] text-[#8F94A8]/60">
+                · {timeAgo(token.createdAt, now)}
+              </span>
+            )}
           </div>
         </div>
         
-        {/* Badge */}
-        {token.isGraduated ? (
+        {isGraduated ? (
           <span className="inline-flex items-center gap-1 px-2 h-[22px] bg-[#00FF88]/10 text-[#00FF88] rounded-full text-[11px] font-medium tracking-[0.04em] uppercase shrink-0">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg> Grad
           </span>
@@ -102,8 +137,8 @@ export function TokenCard({ token }: TokenCardProps) {
             New
           </span>
         ) : (
-          <span className={cn("font-mono text-[13px] font-medium shrink-0", token.priceChange24h >= 0 ? "text-[#00FF88]" : "text-[#FF4D4D]")}>
-            {token.priceChange24h >= 0 ? "▲" : "▼"} {Math.abs(token.priceChange24h).toFixed(1)}%
+          <span className={cn("font-mono text-[13px] font-medium shrink-0", priceChange >= 0 ? "text-[#00FF88]" : "text-[#FF4D4D]")}>
+            {priceChange >= 0 ? "▲" : "▼"} {Math.abs(priceChange).toFixed(1)}%
           </span>
         )}
       </div>
@@ -137,31 +172,23 @@ export function TokenCard({ token }: TokenCardProps) {
         <div>
           <div className="text-[10px] text-[#8F94A8]/60 uppercase tracking-[0.04em] mb-1">Price</div>
           <div className="flex items-baseline gap-1">
-            <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{formatPrice(token.price)}</div>
+            <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{formatPrice(priceNum)}</div>
             <div className="font-mono text-[11px] text-[#8F94A8]/60">OKB</div>
           </div>
         </div>
         <div>
           <div className="text-[10px] text-[#8F94A8]/60 uppercase tracking-[0.04em] mb-1">MCap</div>
-          <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{token.mcap}</div>
+          <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{token.mcap ?? "--"}</div>
         </div>
         <div>
           <div className="text-[10px] text-[#8F94A8]/60 uppercase tracking-[0.04em] mb-1">24H Vol</div>
-          <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{token.volume24h}</div>
+          <div className="font-mono text-[13px] font-medium text-[#F2F4F8]">{volumeDisplay}</div>
         </div>
       </div>
 
       {/* Mini Chart */}
       <div className="w-full h-5 flex justify-center z-0 mt-2">
-        <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="w-full h-full">
-          <path 
-            d={chartPath} 
-            fill="none" 
-            stroke={token.priceChange24h >= 0 ? "#00FF88" : "#FF4D4D"} 
-            strokeWidth="1.5" 
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
+        <MiniChartPath token={token} />
       </div>
     </Link>
   );

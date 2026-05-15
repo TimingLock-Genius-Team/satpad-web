@@ -24,3 +24,28 @@ export const xLayer = defineChain({
     },
   },
 });
+
+export const hashKeyTestnet = defineChain({
+  id: 133,
+  name: "HashKey Testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "HSK",
+    symbol: "HSK",
+  },
+  rpcUrls: {
+    default: { http: ["https://hashkeychain-testnet.alt.technology"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "HashKey Explorer",
+      url: "https://hashkey-testnet-explorer.alt.technology",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 1,
+    },
+  },
+});
