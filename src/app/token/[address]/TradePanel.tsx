@@ -2,37 +2,26 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { parseUnits } from "viem";
-import { useAccount, useChainId, usePublicClient, useWalletClient, useSwitchChain } from "wagmi";
+import { useAccount, useBalance, useChainId, usePublicClient, useWalletClient, useSwitchChain } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuote } from "@/lib/api-hooks";
 import { getDefaultNetwork } from "@/lib/api";
 import { chainForSatpadNetwork } from "@/config/chains";
 import { sendPreparedTransactions } from "@/lib/wallet-txs";
+import {
+  fmtOkbDisplay,
+  fmtTokenDisplay,
+  formatBalanceDisplay,
+  formatQuoteMinReceived,
+  formatWeiForInput,
+  tradeInputAssetSymbol,
+} from "@/lib/trade-display";
 
 interface TradePanelProps {
   tokenAddress: string;
   tokenSymbol: string;
   tokenPriceOkb: string;
   progress: number;
-}
-
-function fmtOkb(wei: string): number {
-  const n = Number(wei) / 1e18;
-  return isNaN(n) ? 0 : n;
-}
-
-function fmtOkbDisplay(wei: string): string {
-  const okb = fmtOkb(wei);
-  if (okb < 0.0001) return okb.toExponential(2);
-  return okb.toFixed(6);
-}
-
-function fmtTokenDisplay(wei: string): string {
-  const n = Number(wei) / 1e18;
-  if (isNaN(n)) return "0";
-  if (n >= 1e6) return (n / 1e6).toFixed(2) + "M";
-  if (n >= 1e3) return (n / 1e3).toFixed(2) + "K";
-  return n.toFixed(2);
 }
 
 function parseHumanToWei(amount: string): bigint | null {
@@ -59,6 +48,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const [txBusy, setTxBusy] = useState(false);
 
   const isMint = tradeType === "mint";
+  const tokenAddressHex = tokenAddress as `0x${string}`;
 
   const amountWeiString = useMemo(() => {
     const wei = parseHumanToWei(amount.trim());
@@ -68,6 +58,25 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const networkKey = getDefaultNetwork();
   const targetChain = chainForSatpadNetwork(networkKey);
   const requestTxCalldata = isConnected && !!walletAddress;
+  const inputAssetSymbol = tradeInputAssetSymbol(tradeType, tokenSymbol);
+
+  const { data: nativeBalance } = useBalance({
+    address: walletAddress,
+    chainId: targetChain.id,
+    query: { enabled: isConnected && !!walletAddress && isMint },
+  });
+  const { data: tokenBalance } = useBalance({
+    address: walletAddress,
+    token: tokenAddressHex,
+    chainId: targetChain.id,
+    query: { enabled: isConnected && !!walletAddress && !isMint },
+  });
+  const activeBalance = isMint ? nativeBalance : tokenBalance;
+  const balanceLabel = formatBalanceDisplay(
+    activeBalance?.value,
+    activeBalance?.decimals ?? 18,
+    inputAssetSymbol
+  );
 
   const {
     data: quote,
@@ -76,6 +85,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   } = useQuote(
     tokenAddress,
     {
+      network: networkKey,
       side: tradeType,
       amount: amountWeiString ?? "0",
       slippageBps,
@@ -92,10 +102,9 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   };
 
   const handleSetMax = useCallback(() => {
-    const maxWei = "10000000000000000000";
-    const maxOkb = fmtOkb(maxWei);
-    setAmount(maxOkb.toFixed(6));
-  }, []);
+    if (!activeBalance?.value) return;
+    setAmount(formatWeiForInput(activeBalance.value, activeBalance.decimals));
+  }, [activeBalance?.decimals, activeBalance?.value]);
 
   const handleTrade = useCallback(async () => {
     if (!quote?.txs?.length || !walletAddress || !walletClient || !publicClient || txBusy)
@@ -132,6 +141,9 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   ]);
 
   const priceImpact = quote?.priceImpactBps ?? 0;
+  const minReceived = quote?.minOut
+    ? formatQuoteMinReceived(tradeType, quote.minOut, tokenSymbol)
+    : null;
 
   return (
     <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
@@ -160,7 +172,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
         <div className="bg-surface-base border border-border/50 p-4 rounded-input transition-colors focus-within:border-border">
           <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3 uppercase tracking-wider">
             <span>pay</span>
-            <span>bal: --</span>
+            <span>bal: {balanceLabel}</span>
           </div>
           <div className="flex items-center justify-between">
             <input
@@ -172,9 +184,10 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
             />
             <button
               onClick={handleSetMax}
+              disabled={!activeBalance?.value}
               className={`text-xs font-mono flex gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
             >
-              <span>max</span> <span className="text-content-secondary uppercase">OKB</span>
+              <span>max</span> <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
             </button>
           </div>
         </div>
@@ -214,11 +227,11 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
                 {(priceImpact / 100).toFixed(2)}%
               </span>
             </div>
-            {quote.minOut && (
+            {minReceived && (
               <div className="flex justify-between">
                 <span>min received</span>
                 <span className="text-content-primary">
-                  {fmtOkbDisplay(quote.minOut)} OKB
+                  {minReceived.amount} <span className="text-content-secondary text-[10px]">{minReceived.symbol}</span>
                 </span>
               </div>
             )}
@@ -250,7 +263,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
 
         {/* Footer Text */}
         <div className="text-[10px] text-content-tertiary/70 font-mono mt-4 text-center leading-relaxed max-w-[200px] mx-auto">
-          via Eulr Backend API · HashKey Testnet
+          via Eulr Backend API · {targetChain.name}
         </div>
       </div>
     </div>

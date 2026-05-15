@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/utils/cn";
 import { Token } from "@/types/token";
+import { timeAgo, timestampMs } from "@/lib/time-display";
 
 interface TokenCardProps {
   token: Token;
@@ -18,17 +19,6 @@ const getBgColor = (symbol: string) => {
   const g = (hash & 0x00FF00) >> 8;
   const b = hash & 0x0000FF;
   return `rgb(${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40})`;
-};
-
-const timeAgo = (timestamp: number, now: number) => {
-  const seconds = Math.floor((now - timestamp) / 1000);
-  let interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + "d ago";
-  interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + "h ago";
-  interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + "m ago";
-  return Math.floor(seconds) + "s ago";
 };
 
 const formatPrice = (price: number) => {
@@ -89,7 +79,7 @@ export function TokenCard({ token }: TokenCardProps) {
   }, []);
 
   const isGraduated = token.isGraduated ?? (token.progress >= 100);
-  const isNew = token.createdAt != null && now != null ? now - token.createdAt <= 1000 * 60 * 60 * 24 : false;
+  const isNew = token.createdAt != null && now != null ? now - timestampMs(token.createdAt) <= 1000 * 60 * 60 * 24 : false;
   const priceChange = token.priceChange24h ?? 0;
   const volumeDisplay = token.volume24h ?? (token.volume24hOkb ? fmtOkb(token.volume24hOkb) + " OKB" : "--");
 
