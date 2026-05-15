@@ -26,6 +26,23 @@ function fmtOkbCompact(wei: string): string {
   return okb.toFixed(4);
 }
 
+function parseTokenAmount(amount: string): number | null {
+  const match = amount.trim().replace(/,/g, "").match(/^(\d*\.?\d+)\s*([kmb])?$/i);
+  if (!match) return null;
+
+  const value = Number(match[1]);
+  if (!Number.isFinite(value)) return null;
+
+  const suffix = match[2]?.toLowerCase();
+  const multiplier =
+    suffix === "k" ? 1_000 :
+    suffix === "m" ? 1_000_000 :
+    suffix === "b" ? 1_000_000_000 :
+    1;
+
+  return value * multiplier;
+}
+
 function TokenDetailSkeleton() {
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -41,7 +58,7 @@ export default function TokenDetailPage() {
   const address = params.address as string;
 
   const { data: detail, isLoading: detailLoading, error: detailError } = useTokenDetail(address);
-  const { data: summary, isLoading: summaryLoading } = useTokenSummary(address);
+  const { isLoading: summaryLoading } = useTokenSummary(address);
 
   if (detailLoading || summaryLoading) {
     return <TokenDetailSkeleton />;
@@ -55,10 +72,10 @@ export default function TokenDetailPage() {
   const satoData = detail.satoData;
   const priceOkb = parseOkb(token.priceOkb);
   const volumeOkb = satoData.volume24hOkb ? parseOkb(satoData.volume24hOkb).toFixed(2) : "--";
-  const progress = token.totalAmount
-    ? (parseFloat(token.mintedAmount.replace(/[^0-9.]/g, "")) /
-        parseFloat(token.totalAmount.replace(/[^0-9.]/g, ""))) *
-      100
+  const mintedAmount = parseTokenAmount(token.mintedAmount);
+  const totalAmount = parseTokenAmount(token.totalAmount);
+  const progress = mintedAmount !== null && totalAmount !== null && totalAmount > 0
+    ? (mintedAmount / totalAmount) * 100
     : 0;
 
   return (
@@ -152,6 +169,7 @@ export default function TokenDetailPage() {
 
             {/* Chart */}
             <TokenChart
+              address={address}
               currentPrice={priceOkb}
               progressPercent={progress}
             />

@@ -45,6 +45,7 @@ export default function Home() {
   const { data: statsData } = useStats();
   const { data: tokensData, isLoading, error } = useTokens({
     tab: activeTab as "trending" | "new" | "all",
+    limit: 100,
     q: searchQuery || undefined,
   });
 

@@ -21,7 +21,7 @@ import {
 import type {
   ApiCreateValidateRequest,
   ApiCreateBuildRequest,
-  ApiMetadataUploadRequest,
+  ApiMetadataUploadBody,
 } from "./api-types";
 
 // Health
@@ -125,13 +125,18 @@ export function useQuote(
     amount: string;
     slippageBps?: number;
     includeTx?: boolean;
+    recipient?: string;
   },
   enabled?: boolean
 ) {
   return useQuery({
     queryKey: ["quote", address, params],
     queryFn: () => fetchQuote(address, params),
-    enabled: enabled ?? !!params.amount,
+    enabled:
+      enabled ??
+      (Boolean(params.amount) &&
+        params.amount !== "0" &&
+        (!params.includeTx || Boolean(params.recipient))),
   });
 }
 
@@ -175,7 +180,7 @@ export function useCreateBuild() {
 
 export function useMetadataUpload() {
   return useMutation({
-    mutationFn: (body: ApiMetadataUploadRequest) => fetchMetadataUpload(body),
+    mutationFn: (body: ApiMetadataUploadBody) => fetchMetadataUpload(body),
   });
 }
 

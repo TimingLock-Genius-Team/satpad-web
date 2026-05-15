@@ -27,11 +27,11 @@ export function Header() {
   const [copied, setCopied] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { address, isConnected, isReconnecting } = useAccount();
+  const { address, chainId, isConnected, isReconnecting } = useAccount();
   const { data: balanceData } = useBalance({
     address,
-    chainId: xLayer.id,
-    query: { enabled: isConnected },
+    chainId: chainId ?? xLayer.id,
+    query: { enabled: isConnected && !!chainId },
   });
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();

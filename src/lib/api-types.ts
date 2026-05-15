@@ -110,11 +110,10 @@ export interface ApiChartPoint {
   interval: string;
   points: Array<{
     ts: number;
-    open: string;
-    high: string;
-    low: string;
-    close: string;
-    volume: string;
+    okbCum: string;
+    priceOkb: string;
+    totalMinted: string;
+    volumeOkb: string;
   }>;
 }
 
@@ -243,11 +242,20 @@ export interface ApiMetadataUploadRequest {
   name: string;
   symbol: string;
   description: string;
-  image: string;
-  website: string;
-  twitter: string;
-  telegram: string;
+  image: string | null;
+  website: string | null;
+  twitter: string | null;
+  telegram: string | null;
 }
+
+/** POST /api/metadata (backend requires EIP-191 signature over canonical payload). */
+export type ApiMetadataUploadBody = ApiMetadataUploadRequest & {
+  wallet: string;
+  signature: string;
+  message: string;
+  nonce: string;
+  expiresAt: number;
+};
 
 export interface ApiMetadataUploadResponse {
   id: string;

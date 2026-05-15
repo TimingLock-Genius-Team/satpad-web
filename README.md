@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Satpad web (Next.js)
 
-## Getting Started
+## 本地同时看「前端 + 后端 API」（推荐）
 
-First, run the development server:
+后端（Ponder + `/api`）和本站点 **域名/端口不同** 时，浏览器会遇到 **CORS**。  
+默认配置下：**不设置** `NEXT_PUBLIC_API_BASE_URL`，前端请求走 **本站相对路径**（如 `/api/...`），由 **Next 开发服务器转发** 到 Ponder，效果类似你在后端直接打开 Swagger。
+
+1. 启动后端（仓库内 `backend/`，需 Postgres 与 `.env`，见 `backend/README.md`）：
+
+   ```bash
+   cd backend && npm install && npm run dev
+   ```
+
+   默认 API 端口为 **3333**（可用环境变量 `PORT` 修改）。
+
+2. 启动前端（**注意端口是 5000**，不是 3000）：
+
+   ```bash
+   cd web && npm install && npm run dev
+   ```
+
+3. 浏览器打开：
+
+   - 前端站点：<http://127.0.0.1:5000>
+   - 经 Next 转发的文档（与直连后端一致）：<http://127.0.0.1:5000/swagger>  
+   - 健康检查：<http://127.0.0.1:5000/health>
+
+4. 若后端 **不是** `http://127.0.0.1:3333`，在 `web/` 下建 `.env.local`（可参考 `.env.local.example`）设置：
+
+   ```bash
+   BACKEND_PROXY_TARGET=http://127.0.0.1:<你的PORT>
+   ```
+
+## 直连 API（不设代理）
+
+在 `web/.env.local` 里设置完整地址，并 **自行保证** 后端已配置 CORS 或同源：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3333
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+此时可关闭对相对路径的依赖；一般仅用于生产或特殊调试。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 构建
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build && npm start
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+生产环境若 API 在另一域名，请设置 `NEXT_PUBLIC_API_BASE_URL`；`next.config.mjs` 里的 `rewrites` 仅适合本地或你在部署平台把同域流量反代到 API 的场景。

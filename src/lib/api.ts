@@ -1,4 +1,13 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:3335";
+/**
+ * Base URL for the Bun/Ponder product API.
+ * - Leave empty (default): browser calls same origin (e.g. :5000) and Next.js rewrites proxy to the backend → no CORS in dev.
+ * - Set to full URL when the API is on another host (e.g. production).
+ *
+ * Backend default listen port is 3333 (see backend/src/config.ts); match `BACKEND_PROXY_TARGET` in next.config.mjs.
+ */
+const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL =
+  rawBase === undefined || rawBase === "" ? "" : rawBase.replace(/\/$/, "");
 const DEFAULT_NETWORK = process.env.NEXT_PUBLIC_DEFAULT_NETWORK || "hashkeytest";
 
 export function getApiBaseUrl() {

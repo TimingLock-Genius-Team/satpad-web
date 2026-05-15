@@ -1,8 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useAccount } from "wagmi";
+import { useState, useCallback, useMemo } from "react";
+import { parseUnits } from "viem";
+import { useAccount, useChainId, usePublicClient, useWalletClient, useSwitchChain } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 import { useQuote } from "@/lib/api-hooks";
+import { getDefaultNetwork } from "@/lib/api";
+import { chainForSatpadNetwork } from "@/config/chains";
+import { sendPreparedTransactions } from "@/lib/wallet-txs";
 
 interface TradePanelProps {
   tokenAddress: string;
@@ -30,13 +35,39 @@ function fmtTokenDisplay(wei: string): string {
   return n.toFixed(2);
 }
 
+function parseHumanToWei(amount: string): bigint | null {
+  if (!amount || amount === ".") return null;
+  try {
+    const wei = parseUnits(amount, 18);
+    if (wei <= BigInt(0)) return null;
+    return wei;
+  } catch {
+    return null;
+  }
+}
+
 export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const { address: walletAddress, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+  const { switchChainAsync } = useSwitchChain();
+  const queryClient = useQueryClient();
   const [tradeType, setTradeType] = useState<"mint" | "burn">("mint");
   const [amount, setAmount] = useState("");
   const [slippageBps] = useState(100);
+  const [txBusy, setTxBusy] = useState(false);
 
   const isMint = tradeType === "mint";
+
+  const amountWeiString = useMemo(() => {
+    const wei = parseHumanToWei(amount.trim());
+    return wei === null ? null : wei.toString();
+  }, [amount]);
+
+  const networkKey = getDefaultNetwork();
+  const targetChain = chainForSatpadNetwork(networkKey);
+  const requestTxCalldata = isConnected && !!walletAddress;
 
   const {
     data: quote,
@@ -46,11 +77,12 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
     tokenAddress,
     {
       side: tradeType,
-      amount: amount || "0",
+      amount: amountWeiString ?? "0",
       slippageBps,
-      includeTx: true,
+      includeTx: requestTxCalldata,
+      recipient: walletAddress,
     },
-    !!amount && amount !== "0"
+    !!amountWeiString && (!requestTxCalldata || !!walletAddress)
   );
 
   const handleAmountChange = (value: string) => {
@@ -66,12 +98,38 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   }, []);
 
   const handleTrade = useCallback(async () => {
-    if (!quote?.txs || !walletAddress) return;
-
-    // TODO: Integrate with wallet to sign and send transactions
-    // quote.txs contains the unsigned transaction data { kind, to, value, data }
-    // Use wagmi useSendTransaction or window.ethereum to send each tx in sequence
-  }, [quote, walletAddress]);
+    if (!quote?.txs?.length || !walletAddress || !walletClient || !publicClient || txBusy)
+      return;
+    try {
+      setTxBusy(true);
+      if (switchChainAsync && chainId !== targetChain.id) {
+        await switchChainAsync({ chainId: targetChain.id });
+      }
+      await sendPreparedTransactions(walletClient, publicClient, quote.txs);
+      await queryClient.invalidateQueries({ queryKey: ["tokens"] });
+      await queryClient.invalidateQueries({ queryKey: ["token-detail", tokenAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["token-summary", tokenAddress] });
+      setAmount("");
+    } catch (err) {
+      console.error(err);
+      window.alert(
+        err instanceof Error ? err.message : "Transaction failed. Check your wallet and network."
+      );
+    } finally {
+      setTxBusy(false);
+    }
+  }, [
+    quote,
+    walletAddress,
+    walletClient,
+    publicClient,
+    txBusy,
+    chainId,
+    switchChainAsync,
+    targetChain.id,
+    queryClient,
+    tokenAddress,
+  ]);
 
   const priceImpact = quote?.priceImpactBps ?? 0;
 
@@ -179,7 +237,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
         ) : (
           <button
             onClick={handleTrade}
-            disabled={quoteLoading || !!quoteError}
+            disabled={quoteLoading || !!quoteError || txBusy || !quote?.txs?.length}
             className={`w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all ${
               isMint
                 ? "bg-accent-primary text-surface-base hover:bg-accent-primary/90 shadow-[0_0_15px_rgba(0,255,136,0.15)]"

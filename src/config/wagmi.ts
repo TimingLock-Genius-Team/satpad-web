@@ -1,13 +1,14 @@
 import { http, createConfig, cookieStorage, createStorage } from "wagmi";
-import { xLayer, hashKeyTestnet } from "./chains";
+import { sepolia, xLayer, hashKeyTestnet } from "./chains";
 
 export const wagmiConfig = createConfig({
-  chains: [xLayer, hashKeyTestnet],
+  chains: [sepolia, xLayer, hashKeyTestnet],
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
   transports: {
+    [sepolia.id]: http(),
     [xLayer.id]: http(),
     [hashKeyTestnet.id]: http(),
   },

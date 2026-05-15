@@ -21,10 +21,13 @@ import {
   generateBondingCurveData,
   type ChartTimeframe,
 } from "@/types/chart";
+import { useTokenChart } from "@/lib/api-hooks";
 
 const TIMEFRAMES: ChartTimeframe[] = ["1m", "5m", "1h", "1d"];
 
 interface TokenChartProps {
+  address: string;
+  network?: string;
   currentPrice: number;
   progressPercent: number;
   className?: string;
@@ -43,7 +46,12 @@ const CHART_COLORS = {
   curveLine: "#64748B",
 };
 
-export function TokenChart({ currentPrice, progressPercent, className }: TokenChartProps) {
+function weiToOkb(value: string, fallback = 0): number {
+  const okb = Number(value) / 1e18;
+  return Number.isFinite(okb) ? okb : fallback;
+}
+
+export function TokenChart({ address, network, currentPrice, progressPercent, className }: TokenChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const areaSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
@@ -52,6 +60,12 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
 
   const [timeframe, setTimeframe] = useState<ChartTimeframe>("1h");
   const [showCurve, setShowCurve] = useState(true);
+  const { data: chartData, isLoading: chartLoading } = useTokenChart(address, {
+    network,
+    range: timeframe,
+    interval: timeframe,
+  });
+  const hasBackendPoints = Boolean(chartData?.points.length);
 
   const initChart = useCallback(() => {
     const container = containerRef.current;
@@ -60,6 +74,9 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
     if (chartRef.current) {
       chartRef.current.remove();
       chartRef.current = null;
+      areaSeriesRef.current = null;
+      volumeSeriesRef.current = null;
+      curveSeriesRef.current = null;
     }
 
     const chart = createChart(container, {
@@ -145,6 +162,25 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
     const volumeSeries = volumeSeriesRef.current;
     if (!areaSeries || !volumeSeries) return;
 
+    if (chartData?.points.length) {
+      const points = [...chartData.points].sort((a, b) => a.ts - b.ts);
+
+      const areaData: AreaData[] = points.map((point) => ({
+        time: point.ts as Time,
+        value: weiToOkb(point.priceOkb, currentPrice),
+      }));
+
+      const volumeData: HistogramData[] = points.map((point) => ({
+        time: point.ts as Time,
+        value: weiToOkb(point.volumeOkb),
+        color: CHART_COLORS.volumeUp,
+      }));
+
+      areaSeries.setData(areaData);
+      volumeSeries.setData(volumeData);
+      return;
+    }
+
     const candles = generateMockChartData(currentPrice, timeframe);
 
     const areaData: AreaData[] = candles.map((c) => ({
@@ -160,7 +196,7 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
 
     areaSeries.setData(areaData);
     volumeSeries.setData(volumeData);
-  }, [currentPrice, timeframe]);
+  }, [chartData, currentPrice, timeframe]);
 
   const updateCurve = useCallback(() => {
     const curveSeries = curveSeriesRef.current;
@@ -194,6 +230,9 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
       if (chartRef.current) {
         chartRef.current.remove();
         chartRef.current = null;
+        areaSeriesRef.current = null;
+        volumeSeriesRef.current = null;
+        curveSeriesRef.current = null;
       }
     };
   }, [initChart]);
@@ -247,20 +286,25 @@ export function TokenChart({ currentPrice, progressPercent, className }: TokenCh
             </button>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-xs font-medium text-content-secondary cursor-pointer select-none">
-          <div
-            onClick={() => setShowCurve(!showCurve)}
-            className={cn(
-              "w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer",
-              showCurve ? "bg-accent-primary text-surface-base" : "bg-transparent border border-border text-transparent"
-            )}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" className="w-3 h-3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          Theoretical curve
-        </label>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary">
+            {chartLoading ? "Loading indexed data" : hasBackendPoints ? "Indexed data" : "Simulated data"}
+          </span>
+          <label className="flex items-center gap-2 text-xs font-medium text-content-secondary cursor-pointer select-none">
+            <div
+              onClick={() => setShowCurve(!showCurve)}
+              className={cn(
+                "w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer",
+                showCurve ? "bg-accent-primary text-surface-base" : "bg-transparent border border-border text-transparent"
+              )}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" className="w-3 h-3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            Theoretical curve
+          </label>
+        </div>
       </div>
       <div className="relative w-full h-[360px]">
         <div ref={containerRef} className="w-full h-full" />

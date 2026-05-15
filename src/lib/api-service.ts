@@ -16,7 +16,7 @@ import type {
   ApiCreateValidateResponse,
   ApiCreateBuildRequest,
   ApiCreateBuildResponse,
-  ApiMetadataUploadRequest,
+  ApiMetadataUploadBody,
   ApiMetadataUploadResponse,
   ApiMetadataResponse,
   ApiHealthResponse,
@@ -113,7 +113,8 @@ export function fetchTokenHolders(
   );
 }
 
-// Quote (mint/burn)
+// Quote (mint/burn). `amount` is wei as a decimal digit string (18 decimals).
+// Backend requires `recipient` when includeTx=true (router needs calldata mint arg).
 export function fetchQuote(
   address: string,
   params: {
@@ -122,6 +123,7 @@ export function fetchQuote(
     amount: string;
     slippageBps?: number;
     includeTx?: boolean;
+    recipient?: string;
   }
 ) {
   return request<ApiQuoteResponse>(
@@ -131,6 +133,7 @@ export function fetchQuote(
       amount: params.amount,
       slippageBps: params.slippageBps ?? 100,
       includeTx: params.includeTx ? 1 : 0,
+      recipient: params.includeTx ? params.recipient : undefined,
     })}`
   );
 }
@@ -169,7 +172,7 @@ export function fetchCreateBuild(body: ApiCreateBuildRequest) {
 }
 
 // Metadata upload
-export function fetchMetadataUpload(body: ApiMetadataUploadRequest) {
+export function fetchMetadataUpload(body: ApiMetadataUploadBody) {
   return request<ApiMetadataUploadResponse>("/api/metadata", {
     method: "POST",
     body: JSON.stringify(body),

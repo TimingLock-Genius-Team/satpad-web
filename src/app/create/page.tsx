@@ -2,11 +2,15 @@
 
 import { useState, useRef, type DragEvent, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAccount, useWalletClient, usePublicClient, useSwitchChain, useChainId } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, ChevronRight, ArrowLeft, Globe, X, Send } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useCreateTokenStore } from "@/store/createToken";
 import { useMetadataUpload, useCreateBuild } from "@/lib/api-hooks";
+import { chainForSatpadNetwork } from "@/config/chains";
+import { sendPreparedTransactions } from "@/lib/wallet-txs";
+import { buildMetadataSigningMessage, randomMetadataNonce } from "@/lib/metadata-sign";
 import { getDefaultNetwork } from "@/lib/api";
 
 const STEPS = [
@@ -20,9 +24,23 @@ function isValidUrl(url: string) {
   return url.startsWith("http://") || url.startsWith("https://");
 }
 
+function normLink(s: string): string | null {
+  const t = s.trim();
+  return t.length > 0 ? t : null;
+}
+
+function firstSocialUri(twitter: string, telegram: string, website: string): string {
+  return normLink(website) || normLink(twitter) || normLink(telegram) || "";
+}
+
 export default function CreatePage() {
   const router = useRouter();
-  const { isConnected } = useAccount();
+  const queryClient = useQueryClient();
+  const { address: walletAddress, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+  const { switchChainAsync } = useSwitchChain();
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<{ name?: string; symbol?: string; twitter?: string; telegram?: string; website?: string }>({});
   const [deployStatus, setDeployStatus] = useState<"idle" | "uploading" | "building" | "success" | "error">("idle");
@@ -111,29 +129,51 @@ export default function CreatePage() {
 
   const handleDeploy = async () => {
     const network = getDefaultNetwork();
+    const chain = chainForSatpadNetwork(network);
+
+    if (!walletAddress || !walletClient || !publicClient) return;
 
     try {
-      // Step 1: Upload metadata
       setDeployStatus("uploading");
       setDeployError("");
 
       let metadataURI = store.metadataURI;
 
       if (!metadataURI) {
+        const nonce = randomMetadataNonce();
+        const expiresAt = Math.floor(Date.now() / 1000) + 900;
+        const payload = {
+          name: store.name.trim(),
+          symbol: store.symbol.trim(),
+          description: store.description.trim(),
+          image: store.image,
+          website: normLink(store.website),
+          twitter: normLink(store.twitter),
+          telegram: normLink(store.telegram),
+        };
+        const message = buildMetadataSigningMessage({
+          ...payload,
+          wallet: walletAddress as `0x${string}`,
+          nonce,
+          expiresAt,
+        });
+        const signature = await walletClient.signMessage({
+          account: walletAddress as `0x${string}`,
+          message,
+        });
+
         const metadataResult = await metadataUpload.mutateAsync({
-          name: store.name,
-          symbol: store.symbol,
-          description: store.description,
-          image: store.image || "",
-          website: store.website,
-          twitter: store.twitter,
-          telegram: store.telegram,
+          ...payload,
+          wallet: walletAddress,
+          signature,
+          message,
+          nonce,
+          expiresAt,
         });
         metadataURI = metadataResult.metadataURI;
         store.setField("metadataURI", metadataURI);
       }
 
-      // Step 2: Build transaction
       setDeployStatus("building");
 
       const buildResult = await createBuild.mutateAsync({
@@ -142,17 +182,22 @@ export default function CreatePage() {
         symbol: store.symbol,
         description: store.description,
         metadataURI,
-        socialURI: store.website || store.twitter || store.telegram || "",
+        socialURI: firstSocialUri(store.twitter, store.telegram, store.website),
         curveS: store.curveS,
       });
 
+      if (switchChainAsync && chainId !== chain.id) {
+        await switchChainAsync({ chainId: chain.id });
+      }
+
+      await sendPreparedTransactions(walletClient, publicClient, [buildResult.tx]);
+
+      await queryClient.invalidateQueries({ queryKey: ["tokens"] });
       setDeployStatus("success");
 
-      // Navigate after a short delay to the success state
       setTimeout(() => {
         store.reset();
       }, 3000);
-
     } catch (err) {
       console.error("Deploy failed:", err);
       setDeployStatus("error");
