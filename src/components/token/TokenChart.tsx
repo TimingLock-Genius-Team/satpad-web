@@ -24,6 +24,15 @@ import {
 import { useTokenChart } from "@/lib/api-hooks";
 
 const TIMEFRAMES: ChartTimeframe[] = ["1m", "5m", "1h", "1d"];
+const BACKEND_TIMEFRAME_PARAMS: Record<
+  ChartTimeframe,
+  { range: string; interval: string }
+> = {
+  "1m": { range: "24h", interval: "5m" },
+  "5m": { range: "24h", interval: "5m" },
+  "1h": { range: "7d", interval: "1h" },
+  "1d": { range: "30d", interval: "1d" },
+};
 
 interface TokenChartProps {
   address: string;
@@ -60,10 +69,11 @@ export function TokenChart({ address, network, currentPrice, progressPercent, cl
 
   const [timeframe, setTimeframe] = useState<ChartTimeframe>("1h");
   const [showCurve, setShowCurve] = useState(true);
+  const backendTimeframeParams = BACKEND_TIMEFRAME_PARAMS[timeframe];
   const { data: chartData, isLoading: chartLoading } = useTokenChart(address, {
     network,
-    range: timeframe,
-    interval: timeframe,
+    range: backendTimeframeParams.range,
+    interval: backendTimeframeParams.interval,
   });
   const hasBackendPoints = Boolean(chartData?.points.length);
 

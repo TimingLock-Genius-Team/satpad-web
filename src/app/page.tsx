@@ -7,10 +7,15 @@ import { TokenGrid } from "@/components/explore/TokenGrid";
 import { Pagination } from "@/components/explore/Pagination";
 import { cn } from "@/utils/cn";
 import { useTokens, useStats } from "@/lib/api-hooks";
-import type { ApiTokenListItem } from "@/lib/api-types";
+import type { ApiTokenListItem, ApiTokenTab } from "@/lib/api-types";
 import type { Token } from "@/types/token";
 
 const PAGE_SIZE = 12;
+const TOKEN_TABS = new Set<ApiTokenTab>(["trending", "new", "graduating", "all"]);
+
+function isTokenTab(tab: string): tab is ApiTokenTab {
+  return TOKEN_TABS.has(tab as ApiTokenTab);
+}
 
 function mapToken(item: ApiTokenListItem): Token {
   return {
@@ -37,14 +42,14 @@ function fmtOkb(weiString: string): string {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("trending");
+  const [activeTab, setActiveTab] = useState<ApiTokenTab>("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"comfy" | "compact">("comfy");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: statsData } = useStats();
   const { data: tokensData, isLoading, error } = useTokens({
-    tab: activeTab as "trending" | "new" | "all",
+    tab: activeTab,
     limit: 100,
     q: searchQuery || undefined,
   });
@@ -61,7 +66,7 @@ export default function Home() {
   );
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
+    if (isTokenTab(tab)) setActiveTab(tab);
     setCurrentPage(1);
     setSearchQuery("");
   };

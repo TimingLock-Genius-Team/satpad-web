@@ -7,7 +7,7 @@ import { ChevronDown, HelpCircle, Moon, Menu, X, LogOut, ExternalLink, Copy, Che
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { cn } from "@/utils/cn";
-import { xLayer } from "@/config/chains";
+import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
 
 const NAV_ITEMS = [
   { href: "/", label: "Explore" },
@@ -19,6 +19,18 @@ function formatAddress(address: string): string {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
+function chainForId(chainId?: number) {
+  switch (chainId) {
+    case xLayer.id:
+      return xLayer;
+    case hashKeyTestnet.id:
+      return hashKeyTestnet;
+    case sepolia.id:
+    default:
+      return sepolia;
+  }
+}
+
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -28,9 +40,10 @@ export function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { address, chainId, isConnected, isReconnecting } = useAccount();
+  const activeChain = chainForId(chainId);
   const { data: balanceData } = useBalance({
     address,
-    chainId: chainId ?? xLayer.id,
+    chainId: chainId ?? activeChain.id,
     query: { enabled: isConnected && !!chainId },
   });
   const { disconnect } = useDisconnect();
@@ -38,7 +51,7 @@ export function Header() {
 
   const formattedBalance = balanceData
     ? `${parseFloat(balanceData.formatted).toFixed(2)} ${balanceData.symbol}`
-    : "0 OKB";
+    : `0 ${activeChain.nativeCurrency.symbol}`;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -64,12 +77,12 @@ export function Header() {
   }, [address]);
 
   const handleViewExplorer = useCallback(() => {
-    const explorer = xLayer.blockExplorers?.default;
+    const explorer = activeChain.blockExplorers?.default;
     if (explorer && address) {
       window.open(`${explorer.url}/address/${address}`, "_blank");
     }
     setIsWalletDropdownOpen(false);
-  }, [address]);
+  }, [activeChain, address]);
 
   const handleDisconnect = useCallback(() => {
     disconnect();

@@ -9,9 +9,13 @@ import type {
   ApiChartPoint,
   ApiTrade,
   ApiHolder,
+  ApiTokenTab,
   ApiQuoteResponse,
   ApiPortfolioResponse,
   ApiPortfolioHistoryItem,
+  ApiPortfolioTaxEvent,
+  ApiPortfolioTaxLot,
+  ApiPortfolioTaxSummary,
   ApiCreateValidateRequest,
   ApiCreateValidateResponse,
   ApiCreateBuildRequest,
@@ -59,7 +63,7 @@ export function fetchStats(network?: string) {
 // Tokens list
 export function fetchTokens(params: {
   network?: string;
-  tab?: "trending" | "new" | "all";
+  tab?: ApiTokenTab;
   limit?: number;
   cursor?: string;
   q?: string;
@@ -152,6 +156,46 @@ export function fetchPortfolioHistory(
 ) {
   return request<ApiPaginatedResponse<ApiPortfolioHistoryItem>>(
     `/api/portfolio/${wallet}/history${qs({ network: params.network || getDefaultNetwork(), limit: params.limit, cursor: params.cursor })}`
+  );
+}
+
+export function fetchPortfolioTaxLots(
+  wallet: string,
+  params: { network?: string; token?: string; limit?: number; cursor?: string }
+) {
+  return request<ApiPaginatedResponse<ApiPortfolioTaxLot>>(
+    `/api/portfolio/${wallet}/tax-lots${qs({
+      network: params.network || getDefaultNetwork(),
+      token: params.token,
+      limit: params.limit,
+      cursor: params.cursor,
+    })}`
+  );
+}
+
+export function fetchPortfolioTaxEvents(
+  wallet: string,
+  params: { network?: string; token?: string; limit?: number; cursor?: string }
+) {
+  return request<ApiPaginatedResponse<ApiPortfolioTaxEvent>>(
+    `/api/portfolio/${wallet}/tax-events${qs({
+      network: params.network || getDefaultNetwork(),
+      token: params.token,
+      limit: params.limit,
+      cursor: params.cursor,
+    })}`
+  );
+}
+
+export function fetchPortfolioTaxSummary(
+  wallet: string,
+  params: { network?: string; token?: string }
+) {
+  return request<ApiPortfolioTaxSummary>(
+    `/api/portfolio/${wallet}/tax-summary${qs({
+      network: params.network || getDefaultNetwork(),
+      token: params.token,
+    })}`
   );
 }
 

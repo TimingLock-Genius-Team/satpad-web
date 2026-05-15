@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const backendOrigin =
-  process.env.BACKEND_PROXY_TARGET || "http://127.0.0.1:3333";
+  process.env.BACKEND_PROXY_TARGET || "http://127.0.0.1:3340";
 
 const nextConfig = {
   images: {

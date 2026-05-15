@@ -35,10 +35,10 @@ export interface ApiConfig {
     };
   };
   abis: {
-    factory: { entries: number };
-    router: { entries: number };
-    token: { entries: number };
-    hook: { entries: number };
+    factory: number;
+    router: number;
+    token: number;
+    hook: number;
   };
 }
 
@@ -50,32 +50,40 @@ export interface ApiStats {
   totalTrades: number;
 }
 
+export type ApiTokenTab = "trending" | "new" | "graduating" | "all";
+
 export interface ApiTokenListItem {
   address: string;
   name: string;
   symbol: string;
   creator: string;
+  description?: string;
+  avatarUrl?: string | null;
   price?: number;
   priceOkb: string;
   progress: number;
   reserve: string;
+  isGraduated?: boolean;
+  createdAt?: number;
+  mcap?: string | null;
   volume24h?: string;
   volume24hOkb: string;
+  priceChange24h?: number | null;
+  priceHistory?: number[];
   mintedAmount?: string;
   totalAmount?: string;
   curve?: {
+    k?: string;
+    s?: string;
     curveS: number;
     feeBps: number;
+    selfDeprecationBps?: number;
     maxBuyOkb: string;
   };
 }
 
 export interface ApiTokenDetail {
-  token: {
-    address: string;
-    name: string;
-    symbol: string;
-    priceOkb: string;
+  token: ApiTokenListItem & {
     priceHistory: number[];
     mintedAmount: string;
     totalAmount: string;
@@ -84,9 +92,19 @@ export interface ApiTokenDetail {
   router: string;
   metadataURI: string;
   socialURI: string;
+  socials?: {
+    website: string | null;
+    twitter: string | null;
+    telegram: string | null;
+  };
   satoData: {
     holders: number;
+    maxSupply?: string;
+    circulatingSupply?: string;
     marketPriceOkb: string;
+    burnPriceOkb?: string | null;
+    mintPriceOkb?: string | null;
+    marketCapOkb?: string | null;
     reserveOkb: string;
     volume24hOkb: string;
     txns24h: number;
@@ -120,12 +138,15 @@ export interface ApiChartPoint {
 export interface ApiTrade {
   txHash: string;
   logIndex: number;
+  token: string;
   user: string;
+  recipient: string;
   side: "buy" | "sell";
   grossOkb: string;
   netOkb: string;
   feeOkb: string;
   tokens: string;
+  newOkbCum: string;
   blockNumber: string;
   ts: number;
 }
@@ -140,12 +161,13 @@ export interface ApiQuoteTx {
   kind: "buy" | "sell" | "approve" | "createToken";
   to: string;
   value: string;
-  data?: string;
+  data: string;
 }
 
 export interface ApiQuoteResponse {
   network: string;
   chainId: number;
+  token: string;
   side: "mint" | "burn";
   amountIn: string;
   amountOut: string;
@@ -153,8 +175,9 @@ export interface ApiQuoteResponse {
   minOut: string;
   priceImpactBps: number;
   maxBuyOkb?: string;
-  mintPriceOkb?: string;
-  burnPriceOkb?: string;
+  mintPriceOkb?: string | null;
+  burnPriceOkb?: string | null;
+  hook: string;
   router: string;
   blockNumber: string;
   txs: ApiQuoteTx[];
@@ -168,10 +191,15 @@ export interface ApiHolding {
   realizedPnlOkb: string;
   name: string;
   symbol: string;
+  avatarUrl?: string | null;
   currentPriceOkb: string;
   currentValueOkb: string;
   unrealizedPnlOkb: string;
   pnlPercent: string;
+  taxMethod?: string;
+  knownCostBasisOkb?: string;
+  unknownBasisTokens?: string;
+  lotCount?: number;
   explorerUrl: string;
   tradeUrl: string;
 }
@@ -196,6 +224,50 @@ export interface ApiPortfolioHistoryItem {
   okbAmount: string;
   tokenAmount: string;
   explorerUrl: string;
+}
+
+export interface ApiPortfolioTaxLot {
+  id: string;
+  token: string;
+  acquiredAt: number;
+  acquiredBlock: string;
+  sourceType: "buy" | "sell" | string;
+  sourceTxHash: string;
+  sourceLogIndex: number;
+  originalQuantity: string;
+  remainingQuantity: string;
+  originalCostBasisOkb: string;
+  remainingCostBasisOkb: string;
+  basisStatus: "known" | "unknown" | string;
+}
+
+export interface ApiPortfolioTaxEvent {
+  type: "DISPOSAL" | "TRANSFER";
+  txHash: string;
+  logIndex: number;
+  ts: number;
+  token: string;
+  quantity: string;
+  costBasisOkb: string;
+  realizedPnlOkb: string | null;
+  from: string | null;
+  to: string | null;
+  taxable: boolean;
+}
+
+export interface ApiPortfolioTaxSummary {
+  wallet: string;
+  network: string;
+  method: string;
+  realizedPnlOkb: string;
+  knownProceedsOkb: string;
+  costBasisDisposedOkb: string;
+  feesOkb: string;
+  disposals: number;
+  unknownBasisTokens: string;
+  openLots: number;
+  openKnownCostBasisOkb: string;
+  openUnknownBasisTokens: string;
 }
 
 export interface ApiCreateValidateRequest {

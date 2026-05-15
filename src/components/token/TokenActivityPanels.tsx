@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { formatUnits } from "viem";
 import { useTokenHolders, useTokenTrades } from "@/lib/api-hooks";
 import type { ApiHolder, ApiTrade } from "@/lib/api-types";
 
@@ -9,9 +11,60 @@ interface TokenActivityPanelsProps {
 }
 
 function fmtEth(wei: string): string {
-  const n = Number(wei) / 1e18;
-  if (Number.isNaN(n)) return "0";
-  return n < 0.0001 ? n.toExponential(2) : n.toFixed(4);
+  let amount: bigint;
+  const zero = BigInt(0);
+
+  try {
+    amount = BigInt(wei);
+  } catch {
+    return "0";
+  }
+
+  if (amount === zero) return "0";
+
+  const sign = amount < zero ? "-" : "";
+  const decimal = formatUnits(amount < zero ? -amount : amount, 18);
+
+  return `${sign}${fmtDecimal(decimal)}`;
+}
+
+function fmtDecimal(decimal: string): string {
+  const [whole, fraction = ""] = decimal.split(".");
+
+  if (whole === "0" && /^0*$/.test(fraction)) return "0";
+  if (whole === "0" && fraction.slice(0, 4).padEnd(4, "0") === "0000") {
+    return fmtSmallDecimal(fraction);
+  }
+
+  if (whole.length >= 13) return fmtCompact(whole, fraction, 12, "T");
+  if (whole.length >= 10) return fmtCompact(whole, fraction, 9, "B");
+  if (whole.length >= 7) return fmtCompact(whole, fraction, 6, "M");
+  if (whole.length >= 4) return fmtCompact(whole, fraction, 3, "K");
+
+  return `${whole}.${fraction.padEnd(4, "0").slice(0, 4)}`;
+}
+
+function fmtSmallDecimal(fraction: string): string {
+  const firstNonZero = fraction.search(/[1-9]/);
+  if (firstNonZero === -1) return "0";
+
+  const significant = fraction.slice(firstNonZero, firstNonZero + 3).padEnd(3, "0");
+  return `${significant[0]}.${significant.slice(1)}e-${firstNonZero + 1}`;
+}
+
+function fmtCompact(
+  whole: string,
+  fraction: string,
+  exponent: number,
+  suffix: string
+): string {
+  const decimalAt = whole.length - exponent;
+  const leading = whole.slice(0, decimalAt);
+  const compactFraction = `${whole.slice(decimalAt)}${fraction}`
+    .slice(0, 2)
+    .replace(/0+$/, "");
+
+  return `${leading}${compactFraction ? `.${compactFraction}` : ""}${suffix}`;
 }
 
 function shortAddress(address: string): string {
@@ -35,7 +88,7 @@ function PanelShell({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-4 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm min-w-0">
@@ -91,7 +144,11 @@ function TradesPanel({
                     {fmtEth(trade.netOkb)} OKB net / {fmtEth(trade.grossOkb)} gross
                   </div>
                 </div>
-                <div className="font-mono text-content-secondary">
+                <div
+                  className="font-mono text-content-secondary"
+                  title={trade.user}
+                  aria-label={`User ${trade.user}`}
+                >
                   {shortAddress(trade.user)}
                 </div>
                 <div className="text-right text-content-tertiary">
@@ -132,7 +189,11 @@ function HoldersPanel({
               key={`${holder.holder}-${holder.lastBlock}`}
               className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
             >
-              <div className="font-mono text-content-secondary truncate">
+              <div
+                className="font-mono text-content-secondary truncate"
+                title={holder.holder}
+                aria-label={`Holder ${holder.holder}`}
+              >
                 {shortAddress(holder.holder)}
               </div>
               <div className="font-mono text-content-primary text-right">

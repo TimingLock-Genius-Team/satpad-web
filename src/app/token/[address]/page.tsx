@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { TradePanel } from "./TradePanel";
 import { TokenChart } from "@/components/token/TokenChart";
+import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
 import { BitcoinIssuanceChart } from "@/components/token/BitcoinIssuanceChart";
 import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
 import { Copy, ExternalLink, Send, Globe } from "lucide-react";
@@ -263,6 +264,8 @@ export default function TokenDetailPage() {
             </div>
           </div>
         </div>
+
+        <TokenActivityPanels address={address} />
 
         {/* Issuance Comparison */}
         <div className="pt-2">

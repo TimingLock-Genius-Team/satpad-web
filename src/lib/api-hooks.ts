@@ -13,6 +13,9 @@ import {
   fetchQuote,
   fetchPortfolio,
   fetchPortfolioHistory,
+  fetchPortfolioTaxEvents,
+  fetchPortfolioTaxLots,
+  fetchPortfolioTaxSummary,
   fetchCreateValidate,
   fetchCreateBuild,
   fetchMetadataUpload,
@@ -22,6 +25,7 @@ import type {
   ApiCreateValidateRequest,
   ApiCreateBuildRequest,
   ApiMetadataUploadBody,
+  ApiTokenTab,
 } from "./api-types";
 
 // Health
@@ -51,7 +55,7 @@ export function useStats(network?: string) {
 // Tokens list
 export function useTokens(params: {
   network?: string;
-  tab?: "trending" | "new" | "all";
+  tab?: ApiTokenTab;
   limit?: number;
   cursor?: string;
   q?: string;
@@ -157,6 +161,39 @@ export function usePortfolioHistory(
   return useQuery({
     queryKey: ["portfolio-history", wallet, params],
     queryFn: () => fetchPortfolioHistory(wallet!, params || {}),
+    enabled: !!wallet,
+  });
+}
+
+export function usePortfolioTaxLots(
+  wallet?: string,
+  params?: { network?: string; token?: string; limit?: number; cursor?: string }
+) {
+  return useQuery({
+    queryKey: ["portfolio-tax-lots", wallet, params],
+    queryFn: () => fetchPortfolioTaxLots(wallet!, params || {}),
+    enabled: !!wallet,
+  });
+}
+
+export function usePortfolioTaxEvents(
+  wallet?: string,
+  params?: { network?: string; token?: string; limit?: number; cursor?: string }
+) {
+  return useQuery({
+    queryKey: ["portfolio-tax-events", wallet, params],
+    queryFn: () => fetchPortfolioTaxEvents(wallet!, params || {}),
+    enabled: !!wallet,
+  });
+}
+
+export function usePortfolioTaxSummary(
+  wallet?: string,
+  params?: { network?: string; token?: string }
+) {
+  return useQuery({
+    queryKey: ["portfolio-tax-summary", wallet, params],
+    queryFn: () => fetchPortfolioTaxSummary(wallet!, params || {}),
     enabled: !!wallet,
   });
 }
