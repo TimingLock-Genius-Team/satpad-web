@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
@@ -25,6 +26,7 @@ function fmtOkb(weiString: string): string {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<ApiTokenTab>("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"comfy" | "compact">("comfy");
@@ -100,7 +102,10 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="px-6 py-3 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all hover:bg-accent-primary/90 hover:-translate-y-0.5 shadow-[0_0_15px_rgb(var(--accent-primary)_/_15%)] hover:shadow-[0_0_20px_rgb(var(--accent-primary)_/_30%)]">
+            <button
+              onClick={() => router.push("/create")}
+              className="px-6 py-3 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all hover:bg-accent-primary/90 hover:-translate-y-0.5 shadow-[0_0_15px_rgb(var(--accent-primary)_/_15%)] hover:shadow-[0_0_20px_rgb(var(--accent-primary)_/_30%)]"
+            >
               Launch a token
             </button>
             <a href="/docs" className="text-content-primary hover:text-accent-primary font-medium transition-colors flex items-center gap-2 group text-sm">

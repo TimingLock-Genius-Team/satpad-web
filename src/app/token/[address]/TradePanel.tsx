@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { parseUnits } from "viem";
+import { Loader2 } from "lucide-react";
 import { useAccount, useBalance, useChainId, usePublicClient, useWalletClient, useSwitchChain } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuote } from "@/lib/api-hooks";
@@ -35,6 +36,8 @@ function parseHumanToWei(amount: string): bigint | null {
   }
 }
 
+type TxStage = "idle" | "confirming" | "success";
+
 export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const { address: walletAddress, isConnected } = useAccount();
   const chainId = useChainId();
@@ -45,10 +48,11 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const [tradeType, setTradeType] = useState<"mint" | "burn">("mint");
   const [amount, setAmount] = useState("");
   const [slippageBps] = useState(100);
-  const [txBusy, setTxBusy] = useState(false);
+  const [txStage, setTxStage] = useState<TxStage>("idle");
 
   const isMint = tradeType === "mint";
   const tokenAddressHex = tokenAddress as `0x${string}`;
+  const txBusy = txStage !== "idle";
 
   const amountWeiString = useMemo(() => {
     const wei = parseHumanToWei(amount.trim());
@@ -96,21 +100,22 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   );
 
   const handleAmountChange = (value: string) => {
+    if (txBusy) return;
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
     }
   };
 
   const handleSetMax = useCallback(() => {
-    if (!activeBalance?.value) return;
+    if (!activeBalance?.value || txBusy) return;
     setAmount(formatWeiForInput(activeBalance.value, activeBalance.decimals));
-  }, [activeBalance?.decimals, activeBalance?.value]);
+  }, [activeBalance?.decimals, activeBalance?.value, txBusy]);
 
   const handleTrade = useCallback(async () => {
     if (!quote?.txs?.length || !walletAddress || !walletClient || !publicClient || txBusy)
       return;
     try {
-      setTxBusy(true);
+      setTxStage("confirming");
       if (switchChainAsync && chainId !== targetChain.id) {
         await switchChainAsync({ chainId: targetChain.id });
       }
@@ -118,14 +123,17 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
       await queryClient.invalidateQueries({ queryKey: ["tokens"] });
       await queryClient.invalidateQueries({ queryKey: ["token-detail", tokenAddress] });
       await queryClient.invalidateQueries({ queryKey: ["token-summary", tokenAddress] });
+      setTxStage("success");
       setAmount("");
+      setTimeout(() => {
+        setTxStage("idle");
+      }, 2000);
     } catch (err) {
       console.error(err);
+      setTxStage("idle");
       window.alert(
         err instanceof Error ? err.message : "Transaction failed. Check your wallet and network."
       );
-    } finally {
-      setTxBusy(false);
     }
   }, [
     quote,
@@ -145,21 +153,28 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
     ? formatQuoteMinReceived(tradeType, quote.minOut, tokenSymbol)
     : null;
 
+  const mintLabel = `mint ${tokenSymbol}`;
+  const burnLabel = `burn ${tokenSymbol}`;
+  const actionLabel = isMint ? mintLabel : burnLabel;
+  const buttonState = getButtonState({ isConnected, amount, quoteLoading, quoteError, txStage, quote, actionLabel });
+
   return (
     <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
       {/* Tabs */}
       <div className="flex w-full mb-6 border border-border rounded-input overflow-hidden text-sm font-semibold tracking-wide">
         <button
-          onClick={() => { setTradeType("mint"); setAmount(""); }}
-          className={`flex-1 py-3 transition-colors uppercase text-xs ${
+          onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); } }}
+          disabled={txBusy}
+          className={`flex-1 py-3 transition-colors uppercase text-xs disabled:opacity-50 ${
             isMint ? "bg-surface-highlight text-accent-primary" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
           }`}
         >
           mint
         </button>
         <button
-          onClick={() => { setTradeType("burn"); setAmount(""); }}
-          className={`flex-1 py-3 border-l border-border transition-colors uppercase text-xs ${
+          onClick={() => { if (!txBusy) { setTradeType("burn"); setAmount(""); } }}
+          disabled={txBusy}
+          className={`flex-1 py-3 border-l border-border transition-colors uppercase text-xs disabled:opacity-50 ${
             !isMint ? "bg-surface-highlight text-accent-danger" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
           }`}
         >
@@ -169,32 +184,35 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
 
       <div className="flex flex-col gap-3">
         {/* Input Area */}
-        <div className="bg-surface-base border border-border/50 p-4 rounded-input transition-colors focus-within:border-border">
-          <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3 uppercase tracking-wider">
-            <span>pay</span>
-            <span>bal: {balanceLabel}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <input
-              type="text"
-              placeholder="0.0"
-              value={amount}
-              onChange={(e) => handleAmountChange(e.target.value)}
-              className="bg-transparent outline-none text-2xl text-content-primary w-1/2 placeholder:text-content-tertiary font-mono"
-            />
-            <button
-              onClick={handleSetMax}
-              disabled={!activeBalance?.value}
-              className={`text-xs font-mono flex gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
-            >
-              <span>max</span> <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
-            </button>
+        <div className={txBusy ? "opacity-50 pointer-events-none" : ""}>
+          <div className="bg-surface-base border border-border/50 p-4 rounded-input transition-colors focus-within:border-border">
+            <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3 uppercase tracking-wider">
+              <span>pay</span>
+              <span>bal: {balanceLabel}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <input
+                type="text"
+                placeholder="0.0"
+                value={amount}
+                onChange={(e) => handleAmountChange(e.target.value)}
+                className="bg-transparent outline-none text-2xl text-content-primary w-1/2 placeholder:text-content-tertiary font-mono"
+              />
+              <button
+                onClick={handleSetMax}
+                disabled={!activeBalance?.value || txBusy}
+                className={`text-xs font-mono flex gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight disabled:opacity-50 ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
+              >
+                <span>max</span> <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Quote Info Box */}
         {quoteLoading && amount && amount !== "0" && (
-          <div className="text-xs text-content-tertiary text-center py-2">
+          <div className="flex items-center justify-center gap-2 text-xs text-content-tertiary py-2">
+            <Loader2 className="w-3 h-3 animate-spin" />
             Fetching quote...
           </div>
         )}
@@ -204,62 +222,57 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
           </div>
         )}
         {quote && amount && amount !== "0" && (
-          <div className="text-xs font-mono text-content-secondary space-y-2 mt-2 bg-surface-highlight/30 p-3 rounded-input">
-            <div className="flex justify-between">
-              <span>{isMint ? "minting" : "burning"}</span>
-              <span className="text-content-primary">
-                {fmtTokenDisplay(isMint ? quote.amountOut : quote.amountIn)} <span className="text-content-secondary text-[10px]">{tokenSymbol}</span>
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>for</span>
-              <span className="text-content-primary">
-                {fmtOkbDisplay(isMint ? quote.amountIn : quote.amountOut)} <span className="text-content-secondary text-[10px]">OKB</span>
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>fee</span>
-              <span className="text-content-primary">{fmtOkbDisplay(quote.fee)} OKB</span>
-            </div>
-            <div className="flex justify-between pt-2 border-t border-border/30">
-              <span>price impact</span>
-              <span className={priceImpact > 5 ? "text-accent-danger" : "text-content-primary"}>
-                {(priceImpact / 100).toFixed(2)}%
-              </span>
-            </div>
-            {minReceived && (
+          <div className={txBusy ? "opacity-50" : ""}>
+            <div className="text-xs font-mono text-content-secondary space-y-2 mt-2 bg-surface-highlight/30 p-3 rounded-input">
               <div className="flex justify-between">
-                <span>min received</span>
+                <span>{isMint ? "minting" : "burning"}</span>
                 <span className="text-content-primary">
-                  {minReceived.amount} <span className="text-content-secondary text-[10px]">{minReceived.symbol}</span>
+                  {fmtTokenDisplay(isMint ? quote.amountOut : quote.amountIn)} <span className="text-content-secondary text-[10px]">{tokenSymbol}</span>
                 </span>
               </div>
-            )}
+              <div className="flex justify-between">
+                <span>for</span>
+                <span className="text-content-primary">
+                  {fmtOkbDisplay(isMint ? quote.amountIn : quote.amountOut)} <span className="text-content-secondary text-[10px]">OKB</span>
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>fee</span>
+                <span className="text-content-primary">{fmtOkbDisplay(quote.fee)} OKB</span>
+              </div>
+              <div className="flex justify-between pt-2 border-t border-border/30">
+                <span>price impact</span>
+                <span className={priceImpact > 5 ? "text-accent-danger" : "text-content-primary"}>
+                  {(priceImpact / 100).toFixed(2)}%
+                </span>
+              </div>
+              {minReceived && (
+                <div className="flex justify-between">
+                  <span>min received</span>
+                  <span className="text-content-primary">
+                    {minReceived.amount} <span className="text-content-secondary text-[10px]">{minReceived.symbol}</span>
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Action Button */}
-        {!isConnected ? (
-          <button className="w-full py-3.5 bg-surface-highlight border border-border/50 text-content-tertiary font-semibold uppercase tracking-widest text-xs rounded-input cursor-not-allowed transition-colors">
-            Connect Wallet
-          </button>
-        ) : !amount || amount === "0" ? (
-          <button className="w-full py-3.5 bg-surface-highlight border border-border/50 text-content-tertiary font-semibold uppercase tracking-widest text-xs rounded-input cursor-not-allowed transition-colors">
-            Enter an amount
-          </button>
-        ) : (
-          <button
-            onClick={handleTrade}
-            disabled={quoteLoading || !!quoteError || txBusy || !quote?.txs?.length}
-            className={`w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all ${
-              isMint
+        <button
+          onClick={handleTrade}
+          disabled={buttonState.disabled}
+          className={`w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all flex items-center justify-center gap-2 ${
+            txStage === "success"
+              ? "bg-accent-success text-white"
+              : isMint
                 ? "bg-accent-primary text-surface-base hover:bg-accent-primary/90 shadow-[0_0_15px_rgba(0,255,136,0.15)]"
                 : "bg-accent-danger text-white hover:bg-accent-danger/90 shadow-[0_0_15px_rgba(239,68,68,0.15)]"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {quoteLoading ? "Fetching quote..." : isMint ? "mint " + tokenSymbol : "burn " + tokenSymbol}
-          </button>
-        )}
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {txStage === "confirming" && <Loader2 className="w-4 h-4 animate-spin" />}
+          {buttonState.label}
+        </button>
 
         {/* Footer Text */}
         <div className="text-[10px] text-content-tertiary/70 font-mono mt-4 text-center leading-relaxed max-w-[200px] mx-auto">
@@ -268,4 +281,36 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
       </div>
     </div>
   );
+}
+
+function getButtonState(opts: {
+  isConnected: boolean;
+  amount: string;
+  quoteLoading: boolean;
+  quoteError: unknown;
+  txStage: TxStage;
+  quote: unknown;
+  actionLabel: string;
+}) {
+  const { isConnected, amount, quoteLoading, quoteError, txStage, quote, actionLabel } = opts;
+
+  if (!isConnected) {
+    return { disabled: true, label: "Connect Wallet" };
+  }
+  if (txStage === "success") {
+    return { disabled: true, label: "Success ✓" };
+  }
+  if (txStage === "confirming") {
+    return { disabled: true, label: "Confirm in wallet..." };
+  }
+  if (!amount || amount === "0") {
+    return { disabled: true, label: "Enter an amount" };
+  }
+  if (quoteLoading) {
+    return { disabled: true, label: "Fetching quote..." };
+  }
+  if (quoteError || !(quote as { txs?: unknown[] } | null | undefined)?.txs?.length) {
+    return { disabled: true, label: "Unavailable" };
+  }
+  return { disabled: false, label: actionLabel };
 }
