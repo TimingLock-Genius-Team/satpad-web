@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useMemo } from "react";
 import {
   ComposedChart,
   Bar,
@@ -13,38 +13,39 @@ import {
   ReferenceLine,
   Cell,
 } from "recharts";
+import {
+  buildBondingCurveChartModel,
+  formatCompactTokenAmount,
+  formatOkbAmount,
+  type BondingCurveChartModel,
+} from "@/lib/bonding-curve-chart";
+import type { ApiTokenListItem } from "@/lib/api-types";
 
-const MAX_SUPPLY = 21;
+interface SatoIssuanceChartProps {
+  curve?: ApiTokenListItem["curve"];
+  reserveOkbWei?: string | null;
+  marketPriceOkbWei?: string | null;
+  mintedAmount?: string;
+  totalAmount?: string;
+}
 
-const chartData = [
-  { epoch: 0, reward: 29000, supply: 0, showLabel: true, label: "29k" },
-  { epoch: 1, reward: 14500, supply: 10.5 },
-  { epoch: 2, reward: 6000, supply: 15.75, showLabel: true, label: "6k" },
-  { epoch: 3, reward: 2500, supply: 18.375 },
-  { epoch: 4, reward: 1000, supply: 19.6875, isCurrent: true, showLabel: true, label: "1k" },
-  { epoch: 5, reward: 500, supply: 20.34375 },
-  { epoch: 6, reward: 321, supply: 20.671875, showLabel: true, label: "321" },
-  { epoch: 7, reward: 100, supply: 20.8359375 },
-  { epoch: 8, supply: 20.91796875 },
-];
-
-const xTickLabels: Record<number, string> = {
-  0: "0",
-  2: "750",
-  4: "1500",
-  6: "2250",
-  8: "\u221E",
+type SatoIssuancePoint = {
+  reserveOkb: number;
+  supplyTokens: number;
+  issuancePerOkb: number;
+  isCurrent?: boolean;
 };
 
-const currentPoint = chartData.find((d) => d.isCurrent);
-const currentEpoch = currentPoint?.epoch ?? 4;
+function issuancePerOkb(priceOkb: number): number {
+  return priceOkb > 0 && Number.isFinite(priceOkb) ? 1 / priceOkb : 0;
+}
 
 function CustomTooltip({
   active,
   payload,
 }: {
   active?: boolean;
-  payload?: { dataKey?: string | number; value?: number; payload?: (typeof chartData)[number] }[];
+  payload?: { dataKey?: string | number; value?: number; payload?: SatoIssuancePoint }[];
 }) {
   if (!active || !payload || payload.length === 0) return null;
 
@@ -54,23 +55,19 @@ function CustomTooltip({
   return (
     <div className="bg-[#111] border border-[#333] p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
       <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5">
-        <span className="text-content-secondary">epoch</span>
+        <span className="text-content-secondary">reserve</span>
         <span className="text-content-primary text-right">
-          {xTickLabels[data.epoch] ?? data.epoch}
+          {formatOkbAmount(data.reserveOkb)} OKB
         </span>
 
-        {data.reward != null && (
-          <>
-            <span className="text-content-secondary">reward</span>
-            <span className="text-accent-primary text-right">
-              {data.reward.toLocaleString()}
-            </span>
-          </>
-        )}
+        <span className="text-content-secondary">issuance</span>
+        <span className="text-accent-primary text-right">
+          {formatCompactTokenAmount(data.issuancePerOkb)} / OKB
+        </span>
 
         <span className="text-content-secondary">supply</span>
         <span className="text-accent-primary text-right">
-          {data.supply.toFixed(1)}m
+          {formatCompactTokenAmount(data.supplyTokens)}
         </span>
       </div>
     </div>
@@ -81,38 +78,36 @@ function CustomBarLabel(props: {
   x?: number;
   y?: number;
   width?: number;
-  height?: number;
   value?: number;
-  index?: number;
+  payload?: SatoIssuancePoint;
 }) {
-  const { x = 0, y = 0, width = 0, index = 0 } = props;
-  const entry = chartData[index];
-  if (!entry?.showLabel) return null;
+  const { x = 0, y = 0, width = 0, value = 0, payload } = props;
+  if (!payload?.isCurrent) return null;
 
-  const isCurrent = entry.isCurrent;
+  const label = formatCompactTokenAmount(value);
 
   return (
     <text
       x={x + width / 2}
       y={y - 6}
-      fill={isCurrent ? "#00ff88" : "#64748B"}
+      fill="#00ff88"
       textAnchor="middle"
       fontSize={11}
       fontFamily="monospace"
-      fontWeight={isCurrent ? 600 : 400}
+      fontWeight={600}
     >
-      {entry.label}
+      {label}
     </text>
   );
 }
 
-const CurrentDot = (props: {
+function CurrentDot(props: {
   cx?: number;
   cy?: number;
-  index?: number;
-}) => {
-  const { cx = 0, cy = 0, index } = props;
-  if (index !== chartData.findIndex((d) => d.isCurrent)) return null;
+  payload?: SatoIssuancePoint;
+}) {
+  const { cx = 0, cy = 0, payload } = props;
+  if (!payload?.isCurrent) return null;
   return (
     <circle
       cx={cx}
@@ -123,9 +118,49 @@ const CurrentDot = (props: {
       strokeWidth={2.5}
     />
   );
-};
+}
 
-export const SatoIssuanceChart = () => {
+function buildIssuanceData(model: BondingCurveChartModel): SatoIssuancePoint[] {
+  const sampled = model.points.map((point) => ({
+    reserveOkb: point.reserveOkb,
+    supplyTokens: point.supplyTokens,
+    issuancePerOkb: issuancePerOkb(point.priceOkb),
+  }));
+
+  return [
+    ...sampled,
+    {
+      reserveOkb: model.current.reserveOkb,
+      supplyTokens: model.current.supplyTokens,
+      issuancePerOkb: issuancePerOkb(model.current.priceOkb),
+      isCurrent: true,
+    },
+  ].sort((a, b) => a.reserveOkb - b.reserveOkb);
+}
+
+export const SatoIssuanceChart = ({
+  curve,
+  reserveOkbWei,
+  marketPriceOkbWei,
+  mintedAmount,
+  totalAmount,
+}: SatoIssuanceChartProps) => {
+  const model = useMemo(
+    () => buildBondingCurveChartModel({
+      curve,
+      reserveOkbWei,
+      marketPriceOkbWei,
+      mintedAmount,
+      totalAmount,
+      pointCount: 9,
+    }),
+    [curve, reserveOkbWei, marketPriceOkbWei, mintedAmount, totalAmount]
+  );
+  const chartData = useMemo(() => buildIssuanceData(model), [model]);
+  const maxIssuancePerOkb = Math.max(...chartData.map((point) => point.issuancePerOkb), 1);
+  const currentIssuance = issuancePerOkb(model.current.priceOkb);
+  const xTicks = [0, 0.25, 0.5, 0.75, 1].map((tick) => model.maxReserveOkb * tick);
+
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="w-full h-[260px] bg-[#0a0a0a]/50 rounded-xl overflow-hidden">
@@ -141,32 +176,32 @@ export const SatoIssuanceChart = () => {
             />
 
             <XAxis
-              dataKey="epoch"
+              dataKey="reserveOkb"
               type="number"
-              domain={[-0.5, 8]}
+              domain={[0, model.maxReserveOkb]}
               tick={{ fill: "#64748B", fontSize: 11, fontFamily: "monospace" }}
               tickLine={false}
               axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
-              ticks={[0, 2, 4, 6, 8]}
-              tickFormatter={(v) => xTickLabels[v] ?? String(v)}
+              ticks={xTicks}
+              tickFormatter={(v) => formatOkbAmount(Number(v))}
             />
 
             <YAxis
               yAxisId="left"
               orientation="left"
-              domain={[0, MAX_SUPPLY]}
+              domain={[0, model.maxSupplyTokens]}
               tick={{ fill: "#64748B", fontSize: 10, fontFamily: "monospace" }}
               tickLine={false}
               axisLine={false}
-              ticks={[0, 21]}
-              tickFormatter={(v) => (v === 0 ? "0" : `${v}m`)}
+              ticks={[0, model.maxSupplyTokens]}
+              tickFormatter={(v) => formatCompactTokenAmount(Number(v))}
               width={35}
             />
 
             <YAxis
               yAxisId="right"
               orientation="right"
-              domain={[0, 32000]}
+              domain={[0, maxIssuancePerOkb * 1.1]}
               tick={false}
               axisLine={false}
               width={1}
@@ -179,7 +214,7 @@ export const SatoIssuanceChart = () => {
 
             <ReferenceLine
               yAxisId="left"
-              y={MAX_SUPPLY}
+              y={model.maxSupplyTokens}
               stroke="rgba(100,116,139,0.5)"
               strokeWidth={1}
               strokeDasharray="4 4"
@@ -194,7 +229,7 @@ export const SatoIssuanceChart = () => {
 
             <ReferenceLine
               yAxisId="left"
-              x={currentEpoch}
+              x={model.current.reserveOkb}
               stroke="#00ff88"
               strokeWidth={1}
               strokeDasharray="4 4"
@@ -202,7 +237,7 @@ export const SatoIssuanceChart = () => {
             />
 
             <Bar
-              dataKey="reward"
+              dataKey="issuancePerOkb"
               yAxisId="right"
               barSize={18}
               radius={[2, 2, 0, 0]}
@@ -219,7 +254,7 @@ export const SatoIssuanceChart = () => {
             <Line
               yAxisId="left"
               type="monotone"
-              dataKey="supply"
+              dataKey="supplyTokens"
               stroke="#00ff88"
               strokeWidth={2.5}
               dot={<CurrentDot />}
@@ -232,7 +267,7 @@ export const SatoIssuanceChart = () => {
       </div>
 
       <p className="text-[10px] text-content-tertiary font-mono text-center uppercase tracking-wider">
-        cumulative eth (0 to ∞)
+        cumulative OKB · now {formatCompactTokenAmount(currentIssuance)} tokens/OKB
       </p>
     </div>
   );

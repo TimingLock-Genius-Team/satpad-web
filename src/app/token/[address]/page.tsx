@@ -5,10 +5,10 @@ import { notFound } from "next/navigation";
 import { TradePanel } from "./TradePanel";
 import { TokenChart } from "@/components/token/TokenChart";
 import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
-import { BitcoinIssuanceChart } from "@/components/token/BitcoinIssuanceChart";
+import { TokenPriceTimeChart } from "@/components/token/TokenPriceTimeChart";
 import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
 import { Copy, ExternalLink, Send, Globe } from "lucide-react";
-import { useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
+import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -64,6 +64,7 @@ export default function TokenDetailPage() {
 
   const { data: detail, isLoading: detailLoading, error: detailError } = useTokenDetail(address);
   const { isLoading: summaryLoading } = useTokenSummary(address);
+  const { data: chart } = useTokenChart(address, { range: "24h", interval: "10m" });
 
   if (detailLoading || summaryLoading) {
     return <TokenDetailSkeleton />;
@@ -279,30 +280,39 @@ export default function TokenDetailPage() {
 
         <TokenActivityPanels address={address} />
 
-        {/* Issuance Comparison */}
+        {/* Price and Issuance */}
         <div className="pt-2">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1.5 h-3.5 bg-accent-primary rounded-sm" />
-            <h2 className="text-content-primary font-bold tracking-widest uppercase text-xs">issuance comparison</h2>
+            <h2 className="text-content-primary font-bold tracking-widest uppercase text-xs">price and issuance</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             <div className="flex flex-col gap-3 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">bitcoin issuance</span>
-                <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">3.125 btc/block</span></span>
+                <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
+                <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span></span>
               </div>
               <div className="flex-1">
-                <BitcoinIssuanceChart />
+                <TokenPriceTimeChart
+                  points={chart?.points}
+                  currentPriceOkbWei={satoData.marketPriceOkb}
+                />
               </div>
             </div>
 
             <div className="flex flex-col gap-3 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>
-                <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">1k sato/eth</span></span>
+                <span className="text-content-tertiary text-[10px]">unit: <span className="text-content-primary font-mono font-medium">tokens/OKB</span></span>
               </div>
               <div className="flex-1">
-                <SatoIssuanceChart />
+                <SatoIssuanceChart
+                  curve={token.curve}
+                  reserveOkbWei={satoData.reserveOkb}
+                  marketPriceOkbWei={satoData.marketPriceOkb}
+                  mintedAmount={token.mintedAmount}
+                  totalAmount={token.totalAmount}
+                />
               </div>
             </div>
           </div>
