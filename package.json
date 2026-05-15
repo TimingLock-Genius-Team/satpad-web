@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@rainbow-me/rainbowkit": "^2.1.0",
     "@tanstack/react-query": "^5.100.10",
     "clsx": "^2.1.1",
