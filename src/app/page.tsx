@@ -7,7 +7,8 @@ import { TokenGrid } from "@/components/explore/TokenGrid";
 import { Pagination } from "@/components/explore/Pagination";
 import { cn } from "@/utils/cn";
 import { useTokens, useStats } from "@/lib/api-hooks";
-import type { ApiTokenListItem, ApiTokenTab } from "@/lib/api-types";
+import { mapApiTokenToToken } from "@/lib/token-display";
+import type { ApiTokenTab } from "@/lib/api-types";
 import type { Token } from "@/types/token";
 
 const PAGE_SIZE = 12;
@@ -15,24 +16,6 @@ const TOKEN_TABS = new Set<ApiTokenTab>(["trending", "new", "graduating", "all"]
 
 function isTokenTab(tab: string): tab is ApiTokenTab {
   return TOKEN_TABS.has(tab as ApiTokenTab);
-}
-
-function mapToken(item: ApiTokenListItem): Token {
-  return {
-    address: item.address,
-    name: item.name,
-    symbol: item.symbol,
-    creator: item.creator,
-    priceOkb: item.priceOkb,
-    progress: item.progress,
-    reserve: item.reserve,
-    mintedAmount: item.mintedAmount ?? "--",
-    totalAmount: item.totalAmount ?? "--",
-    volume24hOkb: item.volume24hOkb,
-    volume24h: item.volume24h,
-    price: item.price,
-    curve: item.curve,
-  };
 }
 
 function fmtOkb(weiString: string): string {
@@ -55,7 +38,7 @@ export default function Home() {
   });
 
   const tokens: Token[] = useMemo(
-    () => (tokensData?.items ?? []).map(mapToken),
+    () => (tokensData?.items ?? []).map(mapApiTokenToToken),
     [tokensData]
   );
 

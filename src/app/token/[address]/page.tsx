@@ -27,6 +27,10 @@ function fmtOkbCompact(wei: string): string {
   return okb.toFixed(4);
 }
 
+function fmtOptionalOkbCompact(wei: string | null | undefined): string {
+  return wei ? `${fmtOkbCompact(wei)} OKB` : "--";
+}
+
 function parseTokenAmount(amount: string): number | null {
   const match = amount.trim().replace(/,/g, "").match(/^(\d*\.?\d+)\s*([kmb])?$/i);
   if (!match) return null;
@@ -72,6 +76,10 @@ export default function TokenDetailPage() {
   const token = detail.token;
   const satoData = detail.satoData;
   const volumeOkb = satoData.volume24hOkb ? parseOkb(satoData.volume24hOkb).toFixed(2) : "--";
+  const maxSupply = satoData.maxSupply ?? token.totalAmount;
+  const circulatingSupply = satoData.circulatingSupply ?? token.mintedAmount;
+  const fdMarketCapOkb = token.mcap ?? "--";
+  const circulatingMarketCapOkb = fmtOptionalOkbCompact(satoData.marketCapOkb);
   const mintedAmount = parseTokenAmount(token.mintedAmount);
   const totalAmount = parseTokenAmount(token.totalAmount);
   const progress = mintedAmount !== null && totalAmount !== null && totalAmount > 0
@@ -204,11 +212,11 @@ export default function TokenDetailPage() {
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">SUPPLY</div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-content-secondary">max</span>
-                  <span className="text-content-primary font-mono font-medium">{token.totalAmount}</span>
+                  <span className="text-content-primary font-mono font-medium">{maxSupply}</span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-content-secondary">circulating</span>
-                  <span className="text-content-primary font-mono font-medium">{token.mintedAmount}</span>
+                  <span className="text-content-primary font-mono font-medium">{circulatingSupply}</span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-content-secondary">holders</span>
@@ -234,11 +242,11 @@ export default function TokenDetailPage() {
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">VALUATION</div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-content-secondary">mcap (fd)</span>
-                  <span className="text-content-primary font-mono font-medium">--</span>
+                  <span className="text-content-primary font-mono font-medium">{fdMarketCapOkb}</span>
                 </div>
                 <div className="flex justify-between items-baseline">
                   <span className="text-content-secondary">mcap (circ)</span>
-                  <span className="text-content-primary font-mono font-medium">--</span>
+                  <span className="text-content-primary font-mono font-medium">{circulatingMarketCapOkb}</span>
                 </div>
               </div>
 
