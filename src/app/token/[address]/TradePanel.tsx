@@ -49,10 +49,12 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const [amount, setAmount] = useState("");
   const [slippageBps] = useState(100);
   const [txStage, setTxStage] = useState<TxStage>("idle");
+  const [txError, setTxError] = useState<string | null>(null);
+  const [txErrorExpanded, setTxErrorExpanded] = useState(false);
 
   const isMint = tradeType === "mint";
   const tokenAddressHex = tokenAddress as `0x${string}`;
-  const txBusy = txStage !== "idle";
+  const txBusy = txStage === "confirming";
 
   const amountWeiString = useMemo(() => {
     const wei = parseHumanToWei(amount.trim());
@@ -103,6 +105,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
     if (txBusy) return;
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
+      setTxError(null);
     }
   };
 
@@ -131,9 +134,9 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
     } catch (err) {
       console.error(err);
       setTxStage("idle");
-      window.alert(
-        err instanceof Error ? err.message : "Transaction failed. Check your wallet and network."
-      );
+      const msg =
+        err instanceof Error ? err.message : "Transaction failed.";
+      setTxError(msg);
     }
   }, [
     quote,
@@ -156,14 +159,14 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const mintLabel = `mint ${tokenSymbol}`;
   const burnLabel = `burn ${tokenSymbol}`;
   const actionLabel = isMint ? mintLabel : burnLabel;
-  const buttonState = getButtonState({ isConnected, amount, quoteLoading, quoteError, txStage, quote, actionLabel });
+  const buttonState = getButtonState({ isConnected, amount, quoteLoading, quoteError, txStage, txError, quote, actionLabel });
 
   return (
     <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
       {/* Tabs */}
       <div className="flex w-full mb-6 border border-border rounded-input overflow-hidden text-sm font-semibold tracking-wide">
         <button
-          onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); } }}
+          onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); setTxError(null); } }}
           disabled={txBusy}
           className={`flex-1 py-3 transition-colors uppercase text-xs disabled:opacity-50 ${
             isMint ? "bg-surface-highlight text-accent-primary" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
@@ -172,7 +175,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
           mint
         </button>
         <button
-          onClick={() => { if (!txBusy) { setTradeType("burn"); setAmount(""); } }}
+          onClick={() => { if (!txBusy) { setTradeType("burn"); setAmount(""); setTxError(null); } }}
           disabled={txBusy}
           className={`flex-1 py-3 border-l border-border transition-colors uppercase text-xs disabled:opacity-50 ${
             !isMint ? "bg-surface-highlight text-accent-danger" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
@@ -258,6 +261,25 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
           </div>
         )}
 
+        {/* Tx Error */}
+        {txError && (
+          <div className="bg-accent-danger/10 border border-accent-danger/30 rounded-input p-3">
+            <p className="text-accent-danger text-xs leading-relaxed break-all">
+              {txErrorExpanded || txError.length <= 200
+                ? txError
+                : txError.slice(0, 200) + "..."}
+            </p>
+            {txError.length > 200 && (
+              <button
+                onClick={() => setTxErrorExpanded(!txErrorExpanded)}
+                className="text-accent-danger/70 text-[10px] mt-1 hover:text-accent-danger underline"
+              >
+                {txErrorExpanded ? "Show less" : "Show full error"}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Action Button */}
         <button
           onClick={handleTrade}
@@ -289,10 +311,11 @@ function getButtonState(opts: {
   quoteLoading: boolean;
   quoteError: unknown;
   txStage: TxStage;
+  txError: string | null;
   quote: unknown;
   actionLabel: string;
 }) {
-  const { isConnected, amount, quoteLoading, quoteError, txStage, quote, actionLabel } = opts;
+  const { isConnected, amount, quoteLoading, quoteError, txStage, txError, quote, actionLabel } = opts;
 
   if (!isConnected) {
     return { disabled: true, label: "Connect Wallet" };
@@ -302,6 +325,9 @@ function getButtonState(opts: {
   }
   if (txStage === "confirming") {
     return { disabled: true, label: "Confirm in wallet..." };
+  }
+  if (txError) {
+    return { disabled: true, label: "Transaction failed" };
   }
   if (!amount || amount === "0") {
     return { disabled: true, label: "Enter an amount" };
