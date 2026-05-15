@@ -9,6 +9,7 @@ import { TokenPriceTimeChart } from "@/components/token/TokenPriceTimeChart";
 import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
 import { Copy, ExternalLink, Send, Globe } from "lucide-react";
 import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
+import { resolveIpfsUrl } from "@/lib/ipfs";
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -76,6 +77,8 @@ export default function TokenDetailPage() {
 
   const token = detail.token;
   const satoData = detail.satoData;
+  const socials = detail.socials;
+  const avatarSrc = resolveIpfsUrl(token.avatarUrl);
   const volumeOkb = satoData.volume24hOkb ? parseOkb(satoData.volume24hOkb).toFixed(2) : "--";
   const maxSupply = satoData.maxSupply ?? token.totalAmount;
   const circulatingSupply = satoData.circulatingSupply ?? token.mintedAmount;
@@ -101,9 +104,13 @@ export default function TokenDetailPage() {
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                   <div className="relative group flex-shrink-0">
                     <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-surface-highlight to-surface border border-border/50 flex items-center justify-center shadow-inner overflow-hidden">
-                      <span className="text-4xl font-bold text-content-primary tracking-tighter">
-                        {token.symbol.substring(0, 2)}
-                      </span>
+                      {avatarSrc ? (
+                        <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-4xl font-bold text-content-primary tracking-tighter">
+                          {token.symbol.substring(0, 2)}
+                        </span>
+                      )}
                       <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-accent-primary/50 rounded-tl-2xl" />
                       <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-accent-primary/50 rounded-br-2xl" />
                     </div>
@@ -133,19 +140,27 @@ export default function TokenDetailPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-start">
-                  <div className="flex bg-surface-base rounded-lg border border-border/50 shadow-sm p-1">
-                    <a href="#" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="X (Twitter)">
-                      <XIcon className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Telegram">
-                      <Send className="w-4 h-4" />
-                    </a>
-                    <a href="#" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Website">
-                      <Globe className="w-4 h-4" />
-                    </a>
+                {(socials?.twitter || socials?.telegram || socials?.website) && (
+                  <div className="flex items-center gap-2 self-start">
+                    <div className="flex bg-surface-base rounded-lg border border-border/50 shadow-sm p-1">
+                      {socials?.twitter && (
+                        <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="X (Twitter)">
+                          <XIcon className="w-4 h-4" />
+                        </a>
+                      )}
+                      {socials?.telegram && (
+                        <a href={socials.telegram} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Telegram">
+                          <Send className="w-4 h-4" />
+                        </a>
+                      )}
+                      {socials?.website && (
+                        <a href={socials.website} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Website">
+                          <Globe className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Progress Section */}

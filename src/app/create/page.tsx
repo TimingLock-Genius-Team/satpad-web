@@ -12,6 +12,7 @@ import { chainForSatpadNetwork } from "@/config/chains";
 import { sendPreparedTransactions } from "@/lib/wallet-txs";
 import { buildMetadataSigningMessage, randomMetadataNonce } from "@/lib/metadata-sign";
 import { getDefaultNetwork } from "@/lib/api";
+import { uploadImageToIPFS, isPinataConfigured } from "@/lib/ipfs";
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -46,6 +47,7 @@ export default function CreatePage() {
   const [deployStatus, setDeployStatus] = useState<"idle" | "uploading" | "building" | "success" | "error">("idle");
   const [deployError, setDeployError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageFileRef = useRef<File | null>(null);
   const store = useCreateTokenStore();
 
   const metadataUpload = useMetadataUpload();
@@ -104,6 +106,8 @@ export default function CreatePage() {
       alert("Image must be less than 1MB.");
       return;
     }
+    imageFileRef.current = file;
+    store.setField("imageIpfsUri", null);
     const reader = new FileReader();
     reader.onload = (e) => {
       store.setField("image", (e.target?.result as string) ?? null);
@@ -124,6 +128,8 @@ export default function CreatePage() {
 
   const clearImage = () => {
     store.setField("image", null);
+    store.setField("imageIpfsUri", null);
+    imageFileRef.current = null;
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -140,13 +146,27 @@ export default function CreatePage() {
       let metadataURI = store.metadataURI;
 
       if (!metadataURI) {
+        const hasPinata = isPinataConfigured();
+
+        let imageForMetadata: string | null = store.imageIpfsUri;
+
+        if (!imageForMetadata && imageFileRef.current && hasPinata) {
+          const result = await uploadImageToIPFS(imageFileRef.current);
+          imageForMetadata = result.ipfsUri;
+          store.setField("imageIpfsUri", result.ipfsUri);
+        }
+
+        if (!imageForMetadata) {
+          imageForMetadata = store.image;
+        }
+
         const nonce = randomMetadataNonce();
         const expiresAt = Math.floor(Date.now() / 1000) + 900;
         const payload = {
           name: store.name.trim(),
           symbol: store.symbol.trim(),
           description: store.description.trim(),
-          image: store.image,
+          image: imageForMetadata,
           website: normLink(store.website),
           twitter: normLink(store.twitter),
           telegram: normLink(store.telegram),
@@ -552,7 +572,7 @@ export default function CreatePage() {
                     type="number"
                     value={store.curveS}
                     onChange={(e) => store.setField("curveS", Number(e.target.value))}
-                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm"
+                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
                     min={1}
                     max={100}
                   />
@@ -708,7 +728,7 @@ export default function CreatePage() {
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
                   <div className="w-10 h-10 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
                   <p className="text-content-secondary text-[14px] font-medium">
-                    {deployStatus === "uploading" ? "Uploading metadata..." : "Building transaction..."}
+                    {deployStatus === "uploading" ? "Uploading to IPFS & signing metadata..." : "Building transaction..."}
                   </p>
                   <p className="text-content-tertiary text-[12px]">
                     Please do not close this page.
@@ -803,11 +823,17 @@ export default function CreatePage() {
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}
-              {currentStep === 4 && isConnected && (
+              {currentStep === 4 && isConnected && deployStatus !== "error" && (
                 <button
                   type="button"
                   onClick={handleDeploy}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5 text-[13px]"
+                  disabled={isLoading}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] text-[13px]",
+                    isLoading
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-accent-primary/90 hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5"
+                  )}
                 >
                   Deploy
                   <ChevronRight className="w-4 h-4" />

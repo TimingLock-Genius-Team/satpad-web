@@ -5,6 +5,7 @@ export interface CreateTokenState {
   symbol: string;
   description: string;
   image: string | null;
+  imageIpfsUri: string | null;
   twitter: string;
   telegram: string;
   website: string;
@@ -19,6 +20,7 @@ const initialState = {
   symbol: "",
   description: "",
   image: null as string | null,
+  imageIpfsUri: null as string | null,
   twitter: "",
   telegram: "",
   website: "",
