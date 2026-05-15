@@ -5,6 +5,8 @@ import { Copy, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 
+import { timeAgo } from "@/lib/time-display";
+
 function fmtOkb(wei: string): number {
   const n = Number(wei) / 1e18;
   return isNaN(n) ? 0 : n;
@@ -34,14 +36,6 @@ const getBgColor = (sym: string) => {
   const b = hash & 0x0000FF;
   return `rgb(${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40})`;
 };
-
-function formatTimeAgo(ts: number): string {
-  const seconds = Math.floor(Date.now() / 1000 - ts);
-  if (seconds < 60) return `${seconds}s ago`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
-}
 
 function shortAddr(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
@@ -261,7 +255,7 @@ export default function PortfolioPage() {
                     const isBuy = item.type === "BUY";
                     return (
                       <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
-                        <td className="px-6 py-4 text-content-tertiary">{formatTimeAgo(item.ts)}</td>
+                        <td className="px-6 py-4 text-content-tertiary">{timeAgo(item.ts, Date.now())}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div

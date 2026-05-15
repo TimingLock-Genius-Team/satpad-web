@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn } from "@/utils/cn";
 import { Token } from "@/types/token";
 import { timeAgo, timestampMs } from "@/lib/time-display";
+import { resolveIpfsUrl } from "@/lib/ipfs";
 
 interface TokenCardProps {
   token: Token;
@@ -82,6 +83,7 @@ export function TokenCard({ token }: TokenCardProps) {
   const isNew = token.createdAt != null && now != null ? now - timestampMs(token.createdAt) <= 1000 * 60 * 60 * 24 : false;
   const priceChange = token.priceChange24h ?? 0;
   const volumeDisplay = token.volume24h ?? (token.volume24hOkb ? fmtOkb(token.volume24hOkb) + " OKB" : "--");
+  const avatarSrc = resolveIpfsUrl(token.avatarUrl);
 
   return (
     <Link 
@@ -90,11 +92,15 @@ export function TokenCard({ token }: TokenCardProps) {
     >
       {/* Card Header */}
       <div className="flex items-start gap-3">
-        <div 
-          className="w-10 h-10 rounded-lg flex items-center justify-center font-sans font-bold text-[14.4px] text-white border border-[#1E2028] shrink-0 tracking-[-0.02em]" 
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center font-sans font-bold text-[14.4px] text-white border border-[#1E2028] shrink-0 tracking-[-0.02em] overflow-hidden"
           style={{ background: getBgColor(token.symbol) }}
         >
-          {token.symbol.slice(0, 2).toUpperCase()}
+          {avatarSrc ? (
+            <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover" />
+          ) : (
+            token.symbol.slice(0, 2).toUpperCase()
+          )}
         </div>
         
         <div className="flex-1 min-w-0">

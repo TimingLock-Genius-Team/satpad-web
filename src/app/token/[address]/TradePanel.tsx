@@ -193,13 +193,13 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
               <span>pay</span>
               <span>bal: {balanceLabel}</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <input
                 type="text"
                 placeholder="0.0"
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
-                className="bg-transparent outline-none text-2xl text-content-primary w-1/2 placeholder:text-content-tertiary font-mono"
+                className="bg-transparent outline-none text-2xl text-content-primary flex-1 min-w-0 placeholder:text-content-tertiary font-mono"
               />
               <button
                 onClick={handleSetMax}
