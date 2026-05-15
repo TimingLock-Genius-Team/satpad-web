@@ -1,327 +1,186 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import {
-  createChart,
-  AreaSeries,
-  HistogramSeries,
-  LineSeries,
-  ColorType,
-  CrosshairMode,
-  type IChartApi,
-  type ISeriesApi,
-  type AreaData,
-  type HistogramData,
-  type LineData,
-  type Time,
-} from "lightweight-charts";
+import { useMemo } from "react";
 import { cn } from "@/utils/cn";
 import {
-  generateMockChartData,
-  generateBondingCurveData,
-  type ChartTimeframe,
-} from "@/types/chart";
-import { useTokenChart } from "@/lib/api-hooks";
-
-const TIMEFRAMES: ChartTimeframe[] = ["1m", "5m", "1h", "1d"];
-const BACKEND_TIMEFRAME_PARAMS: Record<
-  ChartTimeframe,
-  { range: string; interval: string }
-> = {
-  "1m": { range: "24h", interval: "5m" },
-  "5m": { range: "24h", interval: "5m" },
-  "1h": { range: "7d", interval: "1h" },
-  "1d": { range: "30d", interval: "1d" },
-};
+  buildBondingCurveChartModel,
+  formatCompactTokenAmount,
+  formatOkbAmount,
+  formatOkbPrice,
+  weiToUnits,
+  type BondingCurveChartModel,
+} from "@/lib/bonding-curve-chart";
+import type { ApiTokenListItem } from "@/lib/api-types";
 
 interface TokenChartProps {
-  address: string;
-  network?: string;
-  currentPrice: number;
+  curve?: ApiTokenListItem["curve"];
+  reserveOkbWei?: string | null;
+  marketPriceOkbWei?: string | null;
+  burnPriceOkbWei?: string | null;
+  mintPriceOkbWei?: string | null;
+  mintedAmount?: string;
+  totalAmount?: string;
   progressPercent: number;
   className?: string;
 }
 
 const CHART_COLORS = {
-  bg: "transparent",
-  grid: "rgba(30, 34, 48, 0.4)",
-  text: "#64748B",
-  crosshair: "rgba(160, 170, 191, 0.2)",
-  line: "#00FF88",
-  areaTop: "rgba(0, 255, 136, 0.2)",
-  areaBottom: "rgba(0, 255, 136, 0)",
-  volumeUp: "#00FF88",
-  volumeDown: "#EF4444",
-  curveLine: "#64748B",
+  supply: "#38E8A2",
+  price: "#F5B942",
+  current: "#EC4899",
+  grid: "rgba(148, 163, 184, 0.18)",
+  border: "rgba(148, 163, 184, 0.28)",
+  text: "#8B93A7",
 };
 
-function weiToOkb(value: string, fallback = 0): number {
-  const okb = Number(value) / 1e18;
-  return Number.isFinite(okb) ? okb : fallback;
+const CHART = {
+  width: 900,
+  height: 360,
+  left: 58,
+  right: 64,
+  top: 30,
+  bottom: 44,
+};
+
+function createLinePath(points: Array<{ x: number; y: number }>): string {
+  return points.map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
 }
 
-export function TokenChart({ address, network, currentPrice, progressPercent, className }: TokenChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
-  const areaSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
-  const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
-  const curveSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+function buildSvg(model: BondingCurveChartModel) {
+  const plotWidth = CHART.width - CHART.left - CHART.right;
+  const plotHeight = CHART.height - CHART.top - CHART.bottom;
+  const xScale = (reserveOkb: number) => CHART.left + (reserveOkb / model.maxReserveOkb) * plotWidth;
+  const supplyY = (supplyTokens: number) => CHART.top + (1 - supplyTokens / model.maxSupplyTokens) * plotHeight;
+  const priceY = (priceOkb: number) => CHART.top + (1 - priceOkb / model.maxPriceOkb) * plotHeight;
+  const supplyPoints = model.points.map((point) => ({ x: xScale(point.reserveOkb), y: supplyY(point.supplyTokens) }));
+  const pricePoints = model.points.map((point) => ({ x: xScale(point.reserveOkb), y: priceY(point.priceOkb) }));
+  const currentX = xScale(model.current.reserveOkb);
+  const currentSupplyY = supplyY(model.current.supplyTokens);
+  const currentPriceY = priceY(model.current.priceOkb);
+  const baseline = CHART.height - CHART.bottom;
 
-  const [timeframe, setTimeframe] = useState<ChartTimeframe>("1h");
-  const [showCurve, setShowCurve] = useState(true);
-  const backendTimeframeParams = BACKEND_TIMEFRAME_PARAMS[timeframe];
-  const { data: chartData, isLoading: chartLoading } = useTokenChart(address, {
-    network,
-    range: backendTimeframeParams.range,
-    interval: backendTimeframeParams.interval,
-  });
-  const hasBackendPoints = Boolean(chartData?.points.length);
+  return {
+    plotWidth,
+    plotHeight,
+    baseline,
+    xScale,
+    supplyY,
+    priceY,
+    supplyPath: createLinePath(supplyPoints),
+    supplyAreaPath: `${createLinePath(supplyPoints)} L${xScale(model.maxReserveOkb).toFixed(2)} ${baseline} L${CHART.left} ${baseline} Z`,
+    pricePath: createLinePath(pricePoints),
+    currentX,
+    currentSupplyY,
+    currentPriceY,
+  };
+}
 
-  const initChart = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
+function LegendDot({ color }: { color: string }) {
+  return <span className="inline-block h-0.5 w-4 rounded-full" style={{ backgroundColor: color }} />;
+}
 
-    if (chartRef.current) {
-      chartRef.current.remove();
-      chartRef.current = null;
-      areaSeriesRef.current = null;
-      volumeSeriesRef.current = null;
-      curveSeriesRef.current = null;
-    }
-
-    const chart = createChart(container, {
-      layout: {
-        background: { type: ColorType.Solid, color: CHART_COLORS.bg },
-        textColor: CHART_COLORS.text,
-      },
-      grid: {
-        vertLines: { visible: false },
-        horzLines: { color: CHART_COLORS.grid, style: 1 },
-      },
-      crosshair: {
-        mode: CrosshairMode.Magnet,
-        vertLine: {
-          color: CHART_COLORS.crosshair,
-          labelBackgroundColor: "#121318",
-        },
-        horzLine: {
-          color: CHART_COLORS.crosshair,
-          labelBackgroundColor: "#121318",
-        },
-      },
-      leftPriceScale: {
-        visible: true,
-        borderColor: "transparent",
-        scaleMargins: { top: 0.1, bottom: 0.25 },
-      },
-      rightPriceScale: {
-        visible: false,
-      },
-      timeScale: {
-        borderColor: "transparent",
-        timeVisible: true,
-        secondsVisible: false,
-        tickMarkFormatter: (time: number) => {
-          const date = new Date(time * 1000);
-          return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
-        },
-      },
-      localization: {
-        priceFormatter: (price: number) => {
-          if (price < 0.001) {
-            return price.toExponential(1);
-          }
-          return price.toString();
-        },
-      },
-      handleScroll: { vertTouchDrag: false },
-    });
-
-    chartRef.current = chart;
-
-    const areaSeries = chart.addSeries(AreaSeries, {
-      priceScaleId: "left",
-      lineColor: CHART_COLORS.line,
-      topColor: CHART_COLORS.areaTop,
-      bottomColor: CHART_COLORS.areaBottom,
-      lineWidth: 2,
-      priceLineVisible: false,
-      lastValueVisible: false,
-      crosshairMarkerVisible: true,
-      crosshairMarkerRadius: 4,
-      crosshairMarkerBorderColor: "#00FF88",
-      crosshairMarkerBackgroundColor: "#00FF88",
-    });
-    areaSeriesRef.current = areaSeries;
-
-    const volumeSeries = chart.addSeries(HistogramSeries, {
-      priceFormat: { type: "volume" },
-      priceScaleId: "",
-      priceLineVisible: false,
-      lastValueVisible: false,
-    });
-    volumeSeriesRef.current = volumeSeries;
-
-    volumeSeries.priceScale().applyOptions({
-      scaleMargins: { top: 0.85, bottom: 0 },
-    });
-  }, []);
-
-  const updateData = useCallback(() => {
-    const areaSeries = areaSeriesRef.current;
-    const volumeSeries = volumeSeriesRef.current;
-    if (!areaSeries || !volumeSeries) return;
-
-    if (chartData?.points.length) {
-      const points = [...chartData.points].sort((a, b) => a.ts - b.ts);
-
-      const areaData: AreaData[] = points.map((point) => ({
-        time: point.ts as Time,
-        value: weiToOkb(point.priceOkb, currentPrice),
-      }));
-
-      const volumeData: HistogramData[] = points.map((point) => ({
-        time: point.ts as Time,
-        value: weiToOkb(point.volumeOkb),
-        color: CHART_COLORS.volumeUp,
-      }));
-
-      areaSeries.setData(areaData);
-      volumeSeries.setData(volumeData);
-      return;
-    }
-
-    const candles = generateMockChartData(currentPrice, timeframe);
-
-    const areaData: AreaData[] = candles.map((c) => ({
-      time: c.time as Time,
-      value: c.close,
-    }));
-
-    const volumeData: HistogramData[] = candles.map((c) => ({
-      time: c.time as Time,
-      value: c.volume,
-      color: c.close >= c.open ? CHART_COLORS.volumeUp : CHART_COLORS.volumeDown,
-    }));
-
-    areaSeries.setData(areaData);
-    volumeSeries.setData(volumeData);
-  }, [chartData, currentPrice, timeframe]);
-
-  const updateCurve = useCallback(() => {
-    const curveSeries = curveSeriesRef.current;
-    if (!curveSeries || !showCurve) return;
-
-    const curveData = generateBondingCurveData(currentPrice, progressPercent, timeframe);
-    const lineData: LineData[] = curveData.map((d) => ({
-      time: d.time as Time,
-      value: d.value,
-    }));
-    curveSeries.setData(lineData);
-  }, [currentPrice, progressPercent, timeframe, showCurve]);
-
-  useEffect(() => {
-    initChart();
-
-    const handleResize = () => {
-      if (containerRef.current && chartRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        chartRef.current.applyOptions({ width, height });
-      }
-    };
-
-    const observer = new ResizeObserver(handleResize);
-    if (containerRef.current) {
-      observer.observe(containerRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-      if (chartRef.current) {
-        chartRef.current.remove();
-        chartRef.current = null;
-        areaSeriesRef.current = null;
-        volumeSeriesRef.current = null;
-        curveSeriesRef.current = null;
-      }
-    };
-  }, [initChart]);
-
-  useEffect(() => {
-    updateData();
-  }, [updateData]);
-
-  useEffect(() => {
-    const chart = chartRef.current;
-    if (!chart) return;
-
-    if (showCurve) {
-      if (!curveSeriesRef.current) {
-        const curveSeries = chart.addSeries(LineSeries, {
-          priceScaleId: "left",
-          color: CHART_COLORS.curveLine,
-          lineWidth: 2,
-          lineStyle: 2,
-          priceLineVisible: false,
-          lastValueVisible: false,
-          crosshairMarkerVisible: false,
-        });
-        curveSeriesRef.current = curveSeries;
-      }
-      updateCurve();
-    } else {
-      if (curveSeriesRef.current) {
-        chart.removeSeries(curveSeriesRef.current);
-        curveSeriesRef.current = null;
-      }
-    }
-  }, [showCurve, updateCurve]);
+export function TokenChart({
+  curve,
+  reserveOkbWei,
+  marketPriceOkbWei,
+  burnPriceOkbWei,
+  mintPriceOkbWei,
+  mintedAmount,
+  totalAmount,
+  progressPercent,
+  className,
+}: TokenChartProps) {
+  const model = useMemo(() => buildBondingCurveChartModel({
+    curve,
+    reserveOkbWei,
+    marketPriceOkbWei,
+    mintedAmount,
+    totalAmount,
+  }), [curve, reserveOkbWei, marketPriceOkbWei, mintedAmount, totalAmount]);
+  const svg = useMemo(() => buildSvg(model), [model]);
+  const burnPrice = burnPriceOkbWei ? formatOkbPrice(weiToUnits(burnPriceOkbWei)) : "--";
+  const mintPrice = mintPriceOkbWei ? formatOkbPrice(weiToUnits(mintPriceOkbWei)) : "--";
+  const driftTokens = Math.max(model.maxSupplyTokens - model.current.supplyTokens, 0);
+  const xTicks = [0, 0.25, 0.5, 0.75, 1];
+  const yTicks = [0, 0.25, 0.5, 0.75, 1];
 
   return (
-    <div className={cn("bg-[#121318] rounded-xl border border-border p-4", className)}>
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1 bg-[#1A1D24] p-1 rounded-lg border border-border/50">
-          {TIMEFRAMES.map((tf) => (
-            <button
-              key={tf}
-              onClick={() => setTimeframe(tf)}
-              className={cn(
-                "px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                timeframe === tf
-                  ? "bg-[#252A36] text-content-primary"
-                  : "text-content-tertiary hover:text-content-secondary"
-              )}
-            >
-              {tf}
-            </button>
-          ))}
+    <div className={cn("bg-[#0D0F13] rounded-xl border border-border p-4 md:p-5", className)}>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-3 text-xs font-mono">
+        <div className="flex items-center gap-4 text-content-secondary">
+          <span>curve</span>
+          <span className="flex items-center gap-2"><LegendDot color={CHART_COLORS.supply} /> supply</span>
+          <span className="flex items-center gap-2"><LegendDot color={CHART_COLORS.price} /> price</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary">
-            {chartLoading ? "Loading indexed data" : hasBackendPoints ? "Indexed data" : "Simulated data"}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-content-tertiary">
+          <span>
+            supply <span className="text-accent-primary">{formatCompactTokenAmount(model.current.supplyTokens)}</span> of{" "}
+            <span className="text-content-secondary">{formatCompactTokenAmount(model.maxSupplyTokens)}</span> forward
+            <span className="text-pink-400"> (drift {formatCompactTokenAmount(driftTokens)})</span>
           </span>
-          <label className="flex items-center gap-2 text-xs font-medium text-content-secondary cursor-pointer select-none">
-            <div
-              onClick={() => setShowCurve(!showCurve)}
-              className={cn(
-                "w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer",
-                showCurve ? "bg-accent-primary text-surface-base" : "bg-transparent border border-border text-transparent"
-              )}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" className="w-3 h-3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-            </div>
-            Theoretical curve
-          </label>
+          <span>price <span className="text-pink-400">{formatOkbPrice(model.current.priceOkb)} OKB</span></span>
+          <span className="border border-border/70 px-2 py-1 text-content-secondary">
+            burn <span className="text-pink-400">{burnPrice}</span> / mint <span className="text-accent-primary">{mintPrice}</span>
+          </span>
         </div>
       </div>
-      <div className="relative w-full h-[360px]">
-        <div ref={containerRef} className="w-full h-full" />
-        <div className="absolute left-0 bottom-[18%] text-[10px] font-mono text-content-tertiary pointer-events-none bg-[#121318] pl-1 pr-2 z-10">
-          VOL
-        </div>
+
+      <div className="relative overflow-hidden rounded-lg border border-border/40 bg-[#0B0D10]">
+        <svg viewBox={`0 0 ${CHART.width} ${CHART.height}`} className="block h-[360px] w-full" role="img" aria-label="Bonding curve supply and price chart">
+          <defs>
+            <linearGradient id="supplyFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor={CHART_COLORS.supply} stopOpacity="0.22" />
+              <stop offset="100%" stopColor={CHART_COLORS.supply} stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+
+          <rect x={CHART.left} y={CHART.top} width={svg.plotWidth} height={svg.plotHeight} fill="transparent" stroke={CHART_COLORS.border} />
+
+          {yTicks.map((tick) => {
+            const y = CHART.top + tick * svg.plotHeight;
+            const supplyLabel = formatCompactTokenAmount(model.maxSupplyTokens * (1 - tick));
+            const priceLabel = formatOkbPrice(model.maxPriceOkb * (1 - tick));
+            return (
+              <g key={`y-${tick}`}>
+                <line x1={CHART.left} x2={CHART.width - CHART.right} y1={y} y2={y} stroke={CHART_COLORS.grid} strokeDasharray={tick === 0 ? "0" : "3 5"} />
+                <text x={CHART.left - 8} y={y + 4} textAnchor="end" fill={CHART_COLORS.supply} fontSize="12" fontFamily="monospace">{supplyLabel}</text>
+                <text x={CHART.width - CHART.right + 8} y={y + 4} textAnchor="start" fill={CHART_COLORS.price} fontSize="12" fontFamily="monospace">{priceLabel}</text>
+              </g>
+            );
+          })}
+
+          {xTicks.map((tick) => {
+            const x = CHART.left + tick * svg.plotWidth;
+            return (
+              <g key={`x-${tick}`}>
+                <line x1={x} x2={x} y1={CHART.top} y2={svg.baseline} stroke={CHART_COLORS.grid} strokeDasharray="2 6" opacity={tick === 0 || tick === 1 ? 0 : 1} />
+                <text x={x} y={CHART.height - 15} textAnchor="middle" fill={CHART_COLORS.text} fontSize="11" fontFamily="monospace">
+                  {formatOkbAmount(model.maxReserveOkb * tick)}
+                </text>
+              </g>
+            );
+          })}
+
+          <path d={svg.supplyAreaPath} fill="url(#supplyFill)" />
+          <path d={svg.supplyPath} fill="none" stroke={CHART_COLORS.supply} strokeWidth="2.5" />
+          <path d={svg.pricePath} fill="none" stroke={CHART_COLORS.price} strokeWidth="2.2" />
+
+          <line x1={svg.currentX} x2={svg.currentX} y1={CHART.top} y2={svg.baseline} stroke={CHART_COLORS.grid} strokeDasharray="3 5" />
+          <circle cx={svg.currentX} cy={svg.currentSupplyY} r="6" fill="#0B0D10" stroke={CHART_COLORS.supply} strokeWidth="2.5" />
+          <circle cx={svg.currentX} cy={svg.currentPriceY} r="5" fill={CHART_COLORS.current} stroke="#0B0D10" strokeWidth="2" />
+          <circle cx={svg.xScale(model.maxReserveOkb)} cy={svg.supplyY(model.maxSupplyTokens * 0.999)} r="3" fill={CHART_COLORS.price} />
+          <text x={CHART.width - CHART.right + 6} y={CHART.top + 5} fill={CHART_COLORS.price} fontSize="13" fontFamily="monospace">∞</text>
+
+          <text x={CHART.width / 2} y={CHART.height - 3} textAnchor="middle" fill={CHART_COLORS.text} fontSize="11" fontFamily="monospace">
+            cumulative OKB
+          </text>
+        </svg>
       </div>
+
+      <p className="mt-3 text-[11px] leading-relaxed text-content-tertiary font-mono">
+        {formatCompactTokenAmount(model.maxSupplyTokens)} pure-math asymptote that the curve approaches but never touches.
+        Minting continues indefinitely; price grows exponentially with cumulative OKB. Current progress: {progressPercent.toFixed(1)}%.
+      </p>
     </div>
   );
 }

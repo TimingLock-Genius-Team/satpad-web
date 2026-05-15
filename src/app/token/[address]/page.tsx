@@ -71,7 +71,6 @@ export default function TokenDetailPage() {
 
   const token = detail.token;
   const satoData = detail.satoData;
-  const priceOkb = parseOkb(token.priceOkb);
   const volumeOkb = satoData.volume24hOkb ? parseOkb(satoData.volume24hOkb).toFixed(2) : "--";
   const mintedAmount = parseTokenAmount(token.mintedAmount);
   const totalAmount = parseTokenAmount(token.totalAmount);
@@ -170,8 +169,13 @@ export default function TokenDetailPage() {
 
             {/* Chart */}
             <TokenChart
-              address={address}
-              currentPrice={priceOkb}
+              curve={token.curve}
+              reserveOkbWei={satoData.reserveOkb}
+              marketPriceOkbWei={satoData.marketPriceOkb}
+              burnPriceOkbWei={satoData.burnPriceOkb}
+              mintPriceOkbWei={satoData.mintPriceOkb}
+              mintedAmount={token.mintedAmount}
+              totalAmount={token.totalAmount}
               progressPercent={progress}
             />
           </div>
