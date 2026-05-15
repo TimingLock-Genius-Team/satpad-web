@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, HelpCircle, Moon, Menu, X, LogOut, ExternalLink, Copy, Check, Wallet } from "lucide-react";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { ChevronDown, HelpCircle, Moon, Menu, X, LogOut, ExternalLink, Copy, Check, Wallet, Repeat } from "lucide-react";
+import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { cn } from "@/utils/cn";
 import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
@@ -48,6 +48,7 @@ export function Header() {
   });
   const { disconnect } = useDisconnect();
   const { openConnectModal } = useConnectModal();
+  const { openChainModal } = useChainModal();
 
   const formattedBalance = balanceData
     ? `${parseFloat(balanceData.formatted).toFixed(2)} ${balanceData.symbol}`
@@ -156,12 +157,16 @@ export function Header() {
               </button>
 
               {isWalletDropdownOpen && address && (
-                <div className="absolute top-[calc(100%+8px)] right-0 w-[240px] bg-surface-elevated border border-border rounded-2xl shadow-2xl z-50 origin-top-right">
-                  <div className="px-4 pt-4 pb-3 border-b border-border/50">
-                    <div className="text-[11px] text-content-tertiary font-semibold uppercase tracking-[0.15em] mb-1.5">CONNECTED</div>
-                    <div className="text-[15px] text-content-primary font-bold tracking-tight font-mono">{formatAddress(address)}</div>
-                  </div>
-                  <div className="p-2 flex flex-col gap-0.5">
+                <div className="absolute top-[calc(100%+8px)] left-0 w-full min-w-[200px] bg-surface-elevated border border-border rounded-2xl shadow-2xl z-50 origin-top-left">
+                  <div className="p-2 pt-3 flex flex-col gap-0.5">
+                    <button
+                      onClick={() => { openChainModal?.(); setIsWalletDropdownOpen(false); }}
+                      className="w-full text-left px-3 py-2.5 text-[14px] font-medium text-content-secondary hover:text-content-primary hover:bg-surface-highlight rounded-xl transition-colors duration-200 flex items-center gap-2"
+                    >
+                      <Repeat className="w-4 h-4" />
+                      <span className="flex-1">Switch network</span>
+                      <span className="text-[11px] text-content-tertiary font-mono">{activeChain.name}</span>
+                    </button>
                     <button
                       onClick={handleCopyAddress}
                       className="w-full text-left px-3 py-2.5 text-[14px] font-medium text-content-secondary hover:text-content-primary hover:bg-surface-highlight rounded-xl transition-colors duration-200 flex items-center gap-2"
