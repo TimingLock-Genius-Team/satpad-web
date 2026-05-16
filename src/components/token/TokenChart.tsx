@@ -168,8 +168,6 @@ export function TokenChart({
           <line x1={svg.currentX} x2={svg.currentX} y1={CHART.top} y2={svg.baseline} stroke={CHART_COLORS.grid} strokeDasharray="3 5" />
           <circle cx={svg.currentX} cy={svg.currentSupplyY} r="6" fill="#0B0D10" stroke={CHART_COLORS.supply} strokeWidth="2.5" />
           <circle cx={svg.currentX} cy={svg.currentPriceY} r="5" fill={CHART_COLORS.current} stroke="#0B0D10" strokeWidth="2" />
-          <circle cx={svg.xScale(model.maxReserveOkb)} cy={svg.supplyY(model.maxSupplyTokens * 0.999)} r="3" fill={CHART_COLORS.price} />
-          <text x={CHART.width - CHART.right + 6} y={CHART.top + 5} fill={CHART_COLORS.price} fontSize="13" fontFamily="monospace">∞</text>
 
           <text x={CHART.width / 2} y={CHART.height - 3} textAnchor="middle" fill={CHART_COLORS.text} fontSize="11" fontFamily="monospace">
             cumulative OKB
