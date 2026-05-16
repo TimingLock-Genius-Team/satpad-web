@@ -76,11 +76,12 @@ function fmtTime(ts: number): string {
   const date = new Date(ts * 1000);
   if (Number.isNaN(date.getTime())) return "--";
 
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
 }
 

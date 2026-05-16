@@ -170,7 +170,7 @@ export default function TokenDetailPage() {
     ? (mintedAmount / totalAmount) * 100
     : 0;
   const isGraduated = Boolean(token.isGraduated);
-  const isMigrated = Boolean(token.isMigrated || detail.migration.isMigrated);
+  const isMigrated = Boolean(token.isMigrated || detail?.migration?.isMigrated);
   const uniswapUrl = `https://app.uniswap.org/swap?outputCurrency=${address}&chain=${activeChain.id}`;
 
   return (
