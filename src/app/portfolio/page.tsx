@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Check, Copy, ExternalLink, Wallet } from "lucide-react";
+import { Pagination } from "@/components/explore/Pagination";
 import { useAccount } from "wagmi";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 
@@ -106,9 +107,13 @@ function PortfolioSkeleton() {
   );
 }
 
+const TABLE_PAGE_SIZE = 10;
+
 export default function PortfolioPage() {
   const { address: walletAddress, isConnected, isReconnecting } = useAccount();
   const [activeTab, setActiveTab] = useState<"holdings" | "history">("holdings");
+  const [holdingsPage, setHoldingsPage] = useState(1);
+  const [historyPage, setHistoryPage] = useState(1);
 
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio(
     isConnected ? walletAddress : undefined
@@ -156,6 +161,17 @@ export default function PortfolioPage() {
   const history = historyData?.items ?? [];
 
   const isLoading = portfolioLoading || historyLoading;
+
+  const holdingsTotalPages = Math.max(1, Math.ceil(holdings.length / TABLE_PAGE_SIZE));
+  const paginatedHoldings = holdings.slice(
+    (holdingsPage - 1) * TABLE_PAGE_SIZE,
+    holdingsPage * TABLE_PAGE_SIZE
+  );
+  const historyTotalPages = Math.max(1, Math.ceil(history.length / TABLE_PAGE_SIZE));
+  const paginatedHistory = history.slice(
+    (historyPage - 1) * TABLE_PAGE_SIZE,
+    historyPage * TABLE_PAGE_SIZE
+  );
 
   return (
     <div className="flex-1 w-full max-w-[1260px] mx-auto px-4 py-8 flex flex-col min-h-0">
@@ -222,7 +238,7 @@ export default function PortfolioPage() {
           {/* Tabs */}
           <div className="flex items-center gap-6 border-b border-border mb-6">
             <button
-              onClick={() => setActiveTab("holdings")}
+              onClick={() => { setActiveTab("holdings"); setHoldingsPage(1); }}
               className={`pb-3 border-b-2 font-medium cursor-pointer transition-colors ${
                 activeTab === "holdings"
                   ? "border-accent-success text-content-primary"
@@ -232,7 +248,7 @@ export default function PortfolioPage() {
               Holdings
             </button>
             <button
-              onClick={() => setActiveTab("history")}
+              onClick={() => { setActiveTab("history"); setHistoryPage(1); }}
               className={`pb-3 border-b-2 font-medium cursor-pointer transition-colors ${
                 activeTab === "history"
                   ? "border-accent-success text-content-primary"
@@ -245,6 +261,7 @@ export default function PortfolioPage() {
 
           {/* Holdings Table */}
           {activeTab === "holdings" && (
+            <>
             <div className="bg-transparent rounded-xl border border-border overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>
@@ -267,7 +284,7 @@ export default function PortfolioPage() {
                       </td>
                     </tr>
                   )}
-                  {holdings.map((h, idx) => {
+                  {paginatedHoldings.map((h, idx) => {
                     const pnlOkb = fmtOkb(h.unrealizedPnlOkb);
                     const isPositive = pnlOkb >= 0;
                     return (
@@ -322,10 +339,17 @@ export default function PortfolioPage() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={holdingsPage}
+              totalPages={holdingsTotalPages}
+              onPageChange={setHoldingsPage}
+            />
+            </>
           )}
 
           {/* History Table */}
           {activeTab === "history" && (
+            <>
             <div className="bg-transparent rounded-xl border border-border overflow-x-auto">
               <table className="w-full text-sm text-left whitespace-nowrap">
                 <thead>
@@ -347,7 +371,7 @@ export default function PortfolioPage() {
                       </td>
                     </tr>
                   )}
-                  {history.map((item, idx) => {
+                  {paginatedHistory.map((item, idx) => {
                     const okbVal = fmtOkb(item.okbAmount);
                     const displayType = toTradeSide(item.type);
                     const isMint = displayType === "mint";
@@ -397,6 +421,12 @@ export default function PortfolioPage() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={historyPage}
+              totalPages={historyTotalPages}
+              onPageChange={setHistoryPage}
+            />
+            </>
           )}
         </>
       )}

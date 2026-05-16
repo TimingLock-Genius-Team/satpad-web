@@ -197,7 +197,7 @@ export default function TokenDetailPage() {
                   </div>
 
                   <div className="flex flex-col pt-1">
-                    <div className="flex items-end gap-4 mb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
                       <h1 className="text-3xl md:text-4xl font-bold text-content-primary tracking-tight leading-none">
                         {token.name}
                       </h1>
