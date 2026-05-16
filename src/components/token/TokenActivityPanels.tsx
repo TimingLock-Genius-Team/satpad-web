@@ -124,7 +124,7 @@ function TradesPanel({
       ) : trades.length === 0 ? (
         <div className="text-sm text-content-tertiary">No indexed trades yet</div>
       ) : (
-        <div className="max-h-[420px] overflow-y-auto -mr-3 pr-3">
+        <div className="max-h-[210px] overflow-y-auto -mr-3 pr-3">
           <div className="divide-y divide-border/50">
             {trades.map((trade) => {
               const side = toTradeSide(trade.side);
@@ -187,7 +187,7 @@ function HoldersPanel({
       ) : holders.length === 0 ? (
         <div className="text-sm text-content-tertiary">No indexed holders yet</div>
       ) : (
-        <div className="max-h-[420px] overflow-y-auto -mr-3 pr-3">
+        <div className="max-h-[210px] overflow-y-auto -mr-3 pr-3">
           <div className="divide-y divide-border/50">
             {holders.map((holder) => (
               <div
