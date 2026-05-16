@@ -64,6 +64,7 @@ export interface ApiTokenListItem {
   progress: number;
   reserve: string;
   isGraduated?: boolean;
+  isMigrated?: boolean;
   createdAt?: number;
   mcap?: string | null;
   volume24h?: string;
@@ -96,6 +97,17 @@ export interface ApiTokenDetail {
     website: string | null;
     twitter: string | null;
     telegram: string | null;
+  };
+  migration: {
+    isMigrated: boolean;
+    target: string | null;
+    pool: string | null;
+    liquidity: string | null;
+    okbAmount: string | null;
+    tokenAmount: string | null;
+    blockNumber: string | null;
+    txHash: string | null;
+    logIndex: number | null;
   };
   satoData: {
     holders: number;
