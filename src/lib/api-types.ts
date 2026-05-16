@@ -231,7 +231,7 @@ export interface ApiPortfolioHistoryItem {
     symbol: string;
     avatarUrl: string | null;
   };
-  type: "BUY" | "SELL";
+  type: "BUY" | "SELL" | "TRANSFER_IN" | "TRANSFER_OUT";
   okb: string;
   okbAmount: string;
   tokenAmount: string;

@@ -397,6 +397,12 @@ export default function PortfolioPage() {
                     const okbVal = fmtOkb(item.okbAmount);
                     const displayType = toTradeSide(item.type);
                     const isMint = displayType === "mint";
+                    const isBurn = displayType === "burn";
+                    const isTransferIn = item.type === "TRANSFER_IN";
+                    const isTransferOut = item.type === "TRANSFER_OUT";
+                    const hasOkbFlow = isMint || isBurn;
+                    const okbPrefix = isMint ? "-" : isBurn ? "+" : "";
+                    const tokenPrefix = isMint || isTransferIn ? "+" : isBurn || isTransferOut ? "-" : "";
                     return (
                       <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
                         <td className="px-6 py-4 text-content-tertiary">{timeAgo(item.ts, Date.now())}</td>
@@ -421,11 +427,11 @@ export default function PortfolioPage() {
                             {displayType}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 font-mono font-medium ${isMint ? "text-content-secondary" : "text-accent-success"}`}>
-                          {isMint ? "-" : "+"}{okbVal.toFixed(4)} OKB
+                        <td className={`px-6 py-4 font-mono font-medium ${isMint ? "text-content-secondary" : isBurn ? "text-accent-success" : "text-content-tertiary"}`}>
+                          {okbPrefix}{okbVal.toFixed(4)} OKB
                         </td>
-                        <td className={`px-6 py-4 font-mono font-medium ${isMint ? "text-accent-success" : "text-content-secondary"}`}>
-                          {isMint ? "+" : "-"}{fmtTokenBalance(item.tokenAmount)} {item.token.symbol}
+                        <td className={`px-6 py-4 font-mono font-medium ${isMint || isTransferIn ? "text-accent-success" : hasOkbFlow || isTransferOut ? "text-content-secondary" : "text-content-tertiary"}`}>
+                          {tokenPrefix}{fmtTokenBalance(item.tokenAmount)} {item.token.symbol}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <a
