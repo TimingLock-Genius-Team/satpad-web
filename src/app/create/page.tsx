@@ -13,6 +13,7 @@ import { sendPreparedTransactions } from "@/lib/wallet-txs";
 import { buildMetadataSigningMessage, randomMetadataNonce } from "@/lib/metadata-sign";
 import { getDefaultNetwork } from "@/lib/api";
 import { uploadImageToIPFS, isPinataConfigured } from "@/lib/ipfs";
+import { CurvePreview } from "@/components/create/CurvePreview";
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -559,49 +560,69 @@ export default function CreatePage() {
 
           {/* ============ Step 3: Curve ============ */}
           {currentStep === 3 && (
-            <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-4">
-              <h3 className="text-content-primary text-[14px] font-semibold mb-1">
-                Bonding Curve Configuration
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
-                    Curve S
-                  </p>
-                  <input
-                    type="number"
-                    value={store.curveS}
-                    onChange={(e) => store.setField("curveS", Number(e.target.value))}
-                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
-                    min={1}
-                    max={100}
-                  />
-                </div>
-                <div>
-                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
-                    Total Supply
-                  </p>
-                  <p className="text-content-primary text-[14px] font-medium font-mono">
-                    21,000,000 tokens
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
-                    Curve Type
-                  </p>
-                  <p className="text-content-primary text-[14px] font-medium">
-                    Exponential Bonding Curve
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
-                    Graduation Threshold
-                  </p>
-                  <p className="text-content-primary text-[14px] font-medium font-mono">
-                    100,000 OKB reserve
-                  </p>
+            <div className="space-y-5">
+              <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-4">
+                <h3 className="text-content-primary text-[14px] font-semibold mb-1">
+                  Bonding Curve Configuration
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[11px] text-content-tertiary mb-1">
+                      Curve S
+                    </p>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={store.curveS || ""}
+                      onChange={(e) => {
+                        let val = e.target.value.replace(/\D/g, ""); // 移除非数字字符
+                        val = val.replace(/^0+/, ""); // 移除前导零
+                        if (val === "") {
+                          store.setField("curveS", 0);
+                        } else {
+                          const num = Number(val);
+                          if (num <= 100) {
+                            store.setField("curveS", num);
+                          }
+                        }
+                      }}
+                      onBlur={() => {
+                        // 失去焦点时，确保值在 1-100 之间
+                        const finalVal = Math.max(1, Math.min(100, store.curveS));
+                        store.setField("curveS", finalVal);
+                      }}
+                      className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-content-tertiary mb-1">
+                      Total Supply
+                    </p>
+                    <p className="text-content-primary text-[14px] font-medium font-mono">
+                      21,000,000 tokens
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-content-tertiary mb-1">
+                      Curve Type
+                    </p>
+                    <p className="text-content-primary text-[14px] font-medium">
+                      Exponential Bonding Curve
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] text-content-tertiary mb-1">
+                      Graduation Threshold
+                    </p>
+                    <p className="text-content-primary text-[14px] font-medium font-mono">
+                      100,000 OKB reserve
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Curve Preview */}
+              <CurvePreview curveS={store.curveS} />
             </div>
           )}
 
