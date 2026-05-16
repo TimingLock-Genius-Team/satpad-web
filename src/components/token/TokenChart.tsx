@@ -106,22 +106,34 @@ export function TokenChart({
 
   return (
     <div className={cn("bg-surface rounded-xl border border-border p-4 md:p-5", className)}>
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-3 text-xs font-mono">
-        <div className="flex items-center gap-4 text-content-secondary">
-          <span>curve</span>
-          <span className="flex items-center gap-2"><LegendDot color={CHART_COLORS.supply} /> supply</span>
-          <span className="flex items-center gap-2"><LegendDot color={CHART_COLORS.price} /> price</span>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4 text-[11px] font-mono overflow-x-auto overflow-y-hidden scrollbar-hide select-none">
+        <div className="flex items-center text-content-secondary shrink-0">
+          <span className="text-content-tertiary uppercase tracking-wider text-[10px] mr-3">curve</span>
+          <div className="flex items-center gap-2.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
+            <span className="flex items-center gap-1.5"><LegendDot color={CHART_COLORS.supply} /> <span className="opacity-80">supply</span></span>
+            <div className="w-[1px] h-3 bg-border/40" />
+            <span className="flex items-center gap-1.5"><LegendDot color={CHART_COLORS.price} /> <span className="opacity-80">price</span></span>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-content-tertiary">
-          <span>
-            supply <span className="text-accent-primary">{formatCompactTokenAmount(model.current.supplyTokens)}</span> of{" "}
-            <span className="text-content-secondary">{formatCompactTokenAmount(model.maxSupplyTokens)}</span> forward
-            <span className="text-pink-400"> (drift {formatCompactTokenAmount(driftTokens)})</span>
-          </span>
-          <span>price <span className="text-pink-400">{formatOkbPrice(model.current.priceOkb)} OKB</span></span>
-          <span className="border border-border/70 px-2 py-1 text-content-secondary">
-            burn <span className="text-pink-400">{burnPrice}</span> / mint <span className="text-accent-primary">{mintPrice}</span>
-          </span>
+        <div className="flex items-center gap-2 text-content-tertiary whitespace-nowrap shrink-0">
+          <div className="flex items-center gap-1.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
+            <span className="opacity-60">supply</span>
+            <span className="text-accent-primary font-medium">{formatCompactTokenAmount(model.current.supplyTokens)}</span>
+            <span className="opacity-40">/</span>
+            <span className="text-content-secondary">{formatCompactTokenAmount(model.maxSupplyTokens)}</span>
+            <span className="text-pink-400/90 ml-0.5">(drift {formatCompactTokenAmount(driftTokens)})</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
+            <span className="opacity-60">price</span>
+            <span className="text-pink-400 font-medium">{formatOkbPrice(model.current.priceOkb)} <span className="text-[9px] opacity-70">OKB</span></span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
+            <span className="opacity-60">burn</span>
+            <span className="text-pink-400 font-medium">{burnPrice}</span>
+            <span className="opacity-40">/</span>
+            <span className="opacity-60">mint</span>
+            <span className="text-accent-primary font-medium">{mintPrice}</span>
+          </div>
         </div>
       </div>
 
