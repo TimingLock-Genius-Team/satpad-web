@@ -17,9 +17,20 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.5" },
         },
+        "glow-pulse": {
+          "0%, 100%": {
+            opacity: "0.4",
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: "1",
+            transform: "scale(1.6)",
+          },
+        },
       },
       animation: {
         "brand-pulse": "brand-pulse 2s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 2.4s ease-in-out infinite",
       },
       colors: {
         surface: {

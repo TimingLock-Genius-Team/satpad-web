@@ -254,7 +254,7 @@ export default function TokenDetailPage() {
                 {/* Bottom Section */}
                 <div className="flex flex-col gap-1 mt-4 sm:mt-0">
                   <div className="flex justify-between items-center text-[13px]">
-                    <span className="text-content-tertiary flex-shrink-0">created by:</span>
+                    <span className="text-content-tertiary flex-shrink-0">address:</span>
                     <div className="flex items-center min-w-0 overflow-hidden ml-2 bg-surface-base rounded-md border border-border/50">
                       <div 
                         className="flex items-center gap-1.5 text-content-primary cursor-pointer group truncate px-2 py-1 hover:bg-surface-highlight transition-colors flex-1"
@@ -284,11 +284,53 @@ export default function TokenDetailPage() {
                   {/* Progress Bar */}
                   <div className="flex flex-col gap-1.5 mt-1.5">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-2 bg-surface-base -skew-x-12 overflow-hidden rounded-sm border border-border/30">
-                        <div
-                          className="h-full bg-accent-primary transition-all duration-1000 ease-out"
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
+                      <div className="flex-1 relative">
+                        {/* Bar background with grad notch highlight */}
+                        <div className="h-2.5 bg-surface-base -skew-x-12 overflow-visible rounded-sm border border-border/30 relative">
+                          {/* 80% graduation zone highlight strip */}
+                          <div
+                            className="absolute top-0 h-full w-[3px] bg-accent-primary/15 z-0"
+                            style={{ left: '80%' }}
+                          />
+                          <div
+                            className="h-full bg-accent-primary transition-all duration-1000 ease-out relative z-10"
+                            style={{ width: `${Math.min(progress, 100)}%` }}
+                          />
+                        </div>
+                        {/* Graduation beacon marker at 80% */}
+                        <div className="absolute inset-0 pointer-events-none z-20" style={{ top: '-28px', height: 'calc(100% + 28px)' }}>
+                          <div className="absolute flex flex-col items-center" style={{ left: '80%', transform: 'translateX(-50%)' }}>
+                            {/* GRAD label */}
+                            <span
+                              className="text-[10px] font-bold text-accent-primary tracking-[0.15em] uppercase mb-0.5"
+                              style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+                            >
+                              GRAD
+                            </span>
+                            {/* Glow ring behind diamond */}
+                            <div
+                              className="w-5 h-5 rounded-full animate-glow-pulse absolute"
+                              style={{
+                                top: '12px',
+                                background: 'radial-gradient(circle, rgba(46,232,144,0.5) 0%, transparent 70%)',
+                              }}
+                            />
+                            {/* Diamond pin */}
+                            <div
+                              className="w-2 h-2 bg-accent-primary rotate-45 flex-shrink-0 relative z-10"
+                              style={{
+                                boxShadow: '0 0 6px rgba(46,232,144,0.6), 0 0 12px rgba(46,232,144,0.3)',
+                              }}
+                            />
+                            {/* Dashed guideline down to bar */}
+                            <div className="flex flex-col items-center gap-1 mt-0.5">
+                              <div className="w-px h-1.5 bg-accent-primary/60" />
+                              <div className="w-px h-1.5 bg-accent-primary/40" />
+                              <div className="w-px h-1.5 bg-accent-primary/25" />
+                              <div className="w-px h-2 bg-accent-primary/15" />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <span className="text-accent-primary text-[13px] font-bold w-16 text-right">
                         {progress.toFixed(3)}%
