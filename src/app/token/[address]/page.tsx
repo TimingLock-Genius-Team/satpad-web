@@ -169,6 +169,9 @@ export default function TokenDetailPage() {
   const progress = mintedAmount !== null && totalAmount !== null && totalAmount > 0
     ? (mintedAmount / totalAmount) * 100
     : 0;
+  const isGraduated = Boolean(token.isGraduated);
+  const isMigrated = Boolean(token.isMigrated || detail.migration.isMigrated);
+  const uniswapUrl = `https://app.uniswap.org/swap?outputCurrency=${address}&chain=${activeChain.id}`;
 
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -301,6 +304,9 @@ export default function TokenDetailPage() {
               tokenSymbol={token.symbol}
               tokenPriceOkb={token.priceOkb}
               progress={progress}
+              isGraduated={isGraduated}
+              isMigrated={isMigrated}
+              uniswapUrl={uniswapUrl}
             />
           </div>
         </div>

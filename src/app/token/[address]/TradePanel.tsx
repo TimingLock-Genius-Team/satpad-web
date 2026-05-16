@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { parseUnits } from "viem";
-import { Loader2 } from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
 import { useAccount, useBalance, useChainId, usePublicClient, useWalletClient, useSwitchChain } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuote } from "@/lib/api-hooks";
-import { getDefaultNetwork } from "@/lib/api";
+import { ApiError, getDefaultNetwork } from "@/lib/api";
 import { chainForSatpadNetwork } from "@/config/chains";
 import { sendPreparedTransactions } from "@/lib/wallet-txs";
 import {
@@ -23,6 +23,9 @@ interface TradePanelProps {
   tokenSymbol: string;
   tokenPriceOkb: string;
   progress: number;
+  isGraduated?: boolean;
+  isMigrated?: boolean;
+  uniswapUrl?: string;
 }
 
 function parseHumanToWei(amount: string): bigint | null {
@@ -38,7 +41,19 @@ function parseHumanToWei(amount: string): bigint | null {
 
 type TxStage = "idle" | "confirming" | "success";
 
-export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
+function apiErrorMessage(error: unknown): string | null {
+  if (error instanceof ApiError && error.data && typeof error.data === "object" && "message" in error.data) {
+    const message = (error.data as { message?: unknown }).message;
+    return typeof message === "string" ? message : error.message;
+  }
+  return error instanceof Error ? error.message : null;
+}
+
+function isMovedToUniswapError(error: unknown): boolean {
+  return apiErrorMessage(error)?.toLowerCase().includes("moved to uniswap") ?? false;
+}
+
+export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isMigrated = false, uniswapUrl }: TradePanelProps) {
   const { address: walletAddress, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: walletClient } = useWalletClient();
@@ -53,6 +68,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const [txErrorExpanded, setTxErrorExpanded] = useState(false);
 
   const isMint = tradeType === "mint";
+  const mintClosed = isGraduated || isMigrated;
   const tokenAddressHex = tokenAddress as `0x${string}`;
   const txBusy = txStage === "confirming";
 
@@ -65,6 +81,14 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const targetChain = chainForSatpadNetwork(networkKey);
   const requestTxCalldata = isConnected && !!walletAddress;
   const inputAssetSymbol = tradeInputAssetSymbol(tradeType, tokenSymbol);
+
+  useEffect(() => {
+    if (mintClosed && tradeType === "mint") {
+      setTradeType("burn");
+      setAmount("");
+      setTxError(null);
+    }
+  }, [mintClosed, tradeType]);
 
   const { data: nativeBalance } = useBalance({
     address: walletAddress,
@@ -98,7 +122,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
       includeTx: requestTxCalldata,
       recipient: walletAddress,
     },
-    !!amountWeiString && (!requestTxCalldata || !!walletAddress)
+    !!amountWeiString && (!requestTxCalldata || !!walletAddress) && !(isMint && mintClosed)
   );
 
   const handleAmountChange = (value: string) => {
@@ -155,6 +179,8 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
   const minReceived = quote?.minOut
     ? formatQuoteMinReceived(tradeType, quote.minOut, tokenSymbol)
     : null;
+  const quoteMovedToUniswap = isMovedToUniswapError(quoteError);
+  const quoteErrorMessage = apiErrorMessage(quoteError);
 
   const mintLabel = `mint ${tokenSymbol}`;
   const burnLabel = `burn ${tokenSymbol}`;
@@ -163,27 +189,62 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
 
   return (
     <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
+      {isMigrated || quoteMovedToUniswap ? (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-input border border-accent-primary/30 bg-accent-primary/10 p-4">
+            <div className="text-xs font-bold uppercase tracking-widest text-accent-primary mb-2">
+              migrated to Uniswap
+            </div>
+            <p className="text-sm text-content-secondary leading-relaxed">
+              Bonding-curve trading is closed after migration. Continue trading this token on Uniswap.
+            </p>
+          </div>
+          <a
+            href={uniswapUrl ?? "https://app.uniswap.org"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all flex items-center justify-center gap-2 bg-accent-primary text-surface-base hover:bg-accent-primary/90"
+          >
+            Open Uniswap
+            <ExternalLink className="w-4 h-4" />
+          </a>
+          <div className="text-[10px] text-content-tertiary/70 font-mono mt-1 text-center leading-relaxed max-w-[240px] mx-auto">
+            Eulr mint is permanently disabled after migration.
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Tabs */}
       <div className="flex w-full mb-6 border border-border rounded-input overflow-hidden text-sm font-semibold tracking-wide">
-        <button
-          onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); setTxError(null); } }}
-          disabled={txBusy}
-          className={`flex-1 py-3 transition-colors uppercase text-xs disabled:opacity-50 ${
-            isMint ? "bg-surface-highlight text-accent-primary" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
-          }`}
-        >
-          mint
-        </button>
+        {!mintClosed && (
+          <button
+            onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); setTxError(null); } }}
+            disabled={txBusy}
+            className={`flex-1 py-3 transition-colors uppercase text-xs disabled:opacity-50 ${
+              isMint ? "bg-surface-highlight text-accent-primary" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
+            }`}
+          >
+            mint
+          </button>
+        )}
         <button
           onClick={() => { if (!txBusy) { setTradeType("burn"); setAmount(""); setTxError(null); } }}
           disabled={txBusy}
-          className={`flex-1 py-3 border-l border-border transition-colors uppercase text-xs disabled:opacity-50 ${
+          className={`flex-1 py-3 ${mintClosed ? "" : "border-l border-border"} transition-colors uppercase text-xs disabled:opacity-50 ${
             !isMint ? "bg-surface-highlight text-accent-danger" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
           }`}
         >
           burn
         </button>
       </div>
+      {mintClosed && (
+        <div className="mb-4 rounded-input border border-border/50 bg-surface-base p-3 text-xs text-content-secondary leading-relaxed">
+          <div className="text-content-primary font-bold uppercase tracking-widest mb-1">
+            Graduated, migration pending
+          </div>
+          Minting is closed. Burning on the Eulr curve remains available until migration completes.
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         {/* Input Area */}
@@ -221,7 +282,7 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
         )}
         {quoteError && amount && amount !== "0" && (
           <div className="text-xs text-accent-danger text-center py-2">
-            Failed to get quote
+            {quoteErrorMessage ?? "Failed to get quote"}
           </div>
         )}
         {quote && amount && amount !== "0" && (
@@ -301,6 +362,8 @@ export function TradePanel({ tokenAddress, tokenSymbol }: TradePanelProps) {
           via Eulr Backend API · {targetChain.name}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
