@@ -1,0 +1,94 @@
+import { defineChain } from "viem";
+
+const sepoliaDefaultRpc =
+  process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
+const hashkeyTestnetDefaultRpc =
+  process.env.NEXT_PUBLIC_HASHKEYTEST_RPC_URL || "https://hashkeychain-testnet.alt.technology";
+const xLayerDefaultRpc = process.env.NEXT_PUBLIC_XLAYER_RPC_URL || "https://rpc.xlayer.tech";
+
+export const sepolia = defineChain({
+  id: 11155111,
+  name: "Sepolia",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Sepolia Ether",
+    symbol: "ETH",
+  },
+  rpcUrls: {
+    default: { http: [sepoliaDefaultRpc] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Sepolia Etherscan",
+      url: "https://sepolia.etherscan.io",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 751532,
+    },
+  },
+});
+
+export const xLayer = defineChain({
+  id: 196,
+  name: "XLayer",
+  nativeCurrency: {
+    decimals: 18,
+    name: "OKB",
+    symbol: "OKB",
+  },
+  rpcUrls: {
+    default: { http: [xLayerDefaultRpc] },
+  },
+  blockExplorers: {
+    default: {
+      name: "OKX Explorer",
+      url: "https://www.okx.com/explorer/xlayer",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 47416,
+    },
+  },
+});
+
+export const hashKeyTestnet = defineChain({
+  id: 133,
+  name: "HashKey Testnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "HSK",
+    symbol: "HSK",
+  },
+  rpcUrls: {
+    default: { http: [hashkeyTestnetDefaultRpc] },
+  },
+  blockExplorers: {
+    default: {
+      name: "HashKey Explorer",
+      url: "https://hashkey-testnet-explorer.alt.technology",
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
+      blockCreated: 1,
+    },
+  },
+});
+
+export function chainForSatpadNetwork(network: string) {
+  switch (network) {
+    case "sepolia":
+      return sepolia;
+    case "xlayer":
+      return xLayer;
+    case "hashkeytest":
+    default:
+      return hashKeyTestnet;
+  }
+}

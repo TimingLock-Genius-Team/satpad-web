@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+:root {
+  /* Dark theme — refined palette with subtle blue undertones */
+  --surface-base: 7 8 13;       /* #07080D */
+  --surface: 13 15 22;          /* #0D0F16 */
+  --surface-elevated: 18 20 30; /* #12141E */
+  --surface-highlight: 25 28 40;/* #191C28 */
+
+  --text-primary: 236 239 245;  /* #ECEFF5 */
+  --text-secondary: 148 156 176;/* #949CB0 */
+  --text-tertiary: 94 104 126;  /* #5E687E */
+
+  --border-default: 22 25 36;   /* #161924 */
+  --border-hover: 35 39 54;     /* #232736 */
+
+  --accent-primary: 46 232 144; /* #2EE890 */
+  --accent-success: 46 232 144; /* #2EE890 */
+  --accent-warning: 245 158 11; /* #F59E0B */
+  --accent-danger: 239 68 68;   /* #EF4444 */
+
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-pill: 9999px;
+}
+
+body {
+  background-color: rgb(var(--surface-base));
+  color: rgb(var(--text-primary));
+}
+
+/* 
+ * ----------------------------------------------------
+ * Custom Scrollbar
+ * A refined, low-contrast scrollbar that blends with 
+ * the dark theme. Uses a border trick for a "floating" 
+ * effect on webkit browsers.
+ * ----------------------------------------------------
+ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--surface-highlight)) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--surface-highlight));
+  border-radius: var(--radius-pill);
+  /* Creates a floating effect by matching the body background */
+  border: 4px solid rgb(var(--surface-base));
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--text-tertiary));
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Global focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid rgb(var(--accent-primary)) !important;
+  outline-offset: 2px;
+}
+
+input:focus,
+textarea:focus,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+}
+
+/* RainbowKit connect modal — force black text for readability */
+[data-rk] {
+  --rk-colors-modalText: #000000;
+  --rk-colors-modalTextSecondary: #1a1a1a;
+  --rk-colors-modalTextDim: #555555;
+}
