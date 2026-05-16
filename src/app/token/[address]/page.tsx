@@ -196,111 +196,109 @@ export default function TokenDetailPage() {
           {/* Left Column */}
           <div className="flex flex-col gap-8 min-w-0">
             {/* Token Header */}
-            <div className="border border-border p-6 rounded-card bg-surface flex flex-col gap-8">
-
-              <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
-                <div className="flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="relative group flex-shrink-0">
-                    <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-surface-highlight to-surface border border-border/50 flex items-center justify-center shadow-inner overflow-hidden">
-                      {avatarSrc ? (
-                        <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-4xl font-bold text-content-primary tracking-tighter">
-                          {token.symbol.substring(0, 2)}
-                        </span>
-                      )}
-                      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-accent-primary/50 rounded-tl-2xl" />
-                      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-accent-primary/50 rounded-br-2xl" />
-                    </div>
+            <div className="bg-surface p-3.5 sm:p-4 rounded-xl flex flex-col sm:flex-row gap-4 sm:gap-5 border border-border shadow-sm">
+              {/* Left: Avatar */}
+              <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0">
+                {avatarSrc ? (
+                  <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover rounded-xl" />
+                ) : (
+                  <div className="w-full h-full bg-surface-highlight rounded-xl flex items-center justify-center text-4xl font-bold text-content-primary">
+                    {token.symbol.substring(0, 2)}
                   </div>
+                )}
+              </div>
 
-                  <div className="flex flex-col pt-1">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-                      <h1 className="text-3xl md:text-4xl font-bold text-content-primary tracking-tight leading-none">
-                        {token.name}
-                      </h1>
-                      <div className="px-2.5 py-1 bg-surface-base border border-border/80 rounded-md text-xs font-mono text-accent-primary font-bold shadow-sm">
+              {/* Right: Info */}
+              <div className="flex flex-col flex-1 justify-between min-w-0 py-0.5">
+                {/* Top Section */}
+                <div>
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex items-center gap-2.5 truncate">
+                      <h1 className="text-[32px] font-bold text-content-primary truncate leading-none">{token.name}</h1>
+                      <div className="px-1.5 py-0.5 bg-surface-highlight rounded text-[11px] font-mono font-bold text-content-secondary border border-border/50 flex items-center justify-center h-fit transform -translate-y-[1px]">
                         ${token.symbol}
                       </div>
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-0 text-xs font-mono bg-surface-base border border-border/50 rounded-lg overflow-hidden shadow-sm">
-                      <div 
-                        className="px-3 py-2 border-r border-border/50 flex items-center gap-2 group cursor-pointer hover:bg-surface-highlight transition-colors"
-                        onClick={handleCopyAddress}
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={handleRefresh}
+                        className="p-1 text-content-tertiary hover:text-content-primary transition-colors"
+                        title="Refresh data"
                       >
-                        <span className="text-content-secondary group-hover:text-content-primary transition-colors">
+                        <RefreshCw className={cn("w-3.5 h-3.5", refreshing && "animate-spin")} />
+                      </button>
+                      <div className="px-2 py-0.5 bg-accent-primary/10 text-accent-primary text-xs font-bold rounded">
+                        Live
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-1 flex items-center gap-2">
+                    {!isGraduated && (
+                      <span className="px-2 py-0.5 bg-accent-primary/10 text-accent-primary text-[11px] font-semibold rounded">
+                        Meme
+                      </span>
+                    )}
+                    {(socials?.twitter || socials?.telegram || socials?.website) && (
+                      <div className="flex items-center gap-2 text-content-tertiary ml-1">
+                        {socials?.twitter && <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><XIcon className="w-3 h-3" /></a>}
+                        {socials?.telegram && <a href={socials.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Send className="w-3 h-3" /></a>}
+                        {socials?.website && <a href={socials.website} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Globe className="w-3 h-3" /></a>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Section */}
+                <div className="flex flex-col gap-1 mt-4 sm:mt-0">
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-content-tertiary flex-shrink-0">created by:</span>
+                    <div className="flex items-center min-w-0 overflow-hidden ml-2 bg-surface-base rounded-md border border-border/50">
+                      <div 
+                        className="flex items-center gap-1.5 text-content-primary cursor-pointer group truncate px-2 py-1 hover:bg-surface-highlight transition-colors flex-1"
+                        onClick={handleCopyAddress}
+                        title={token.address}
+                      >
+                        <span className="truncate group-hover:text-accent-primary transition-colors font-mono text-[12px]">
                           {token.address}
                         </span>
-                        {copied ? (
-                          <Check className="w-3 h-3 text-accent-primary" />
-                        ) : (
-                          <Copy className="w-3 h-3 text-content-tertiary group-hover:text-content-primary transition-colors" />
-                        )}
+                        {copied ? <Check className="w-3 h-3 text-accent-primary flex-shrink-0" /> : <Copy className="w-3 h-3 text-content-tertiary group-hover:text-accent-primary transition-all flex-shrink-0" />}
                       </div>
+                      <div className="w-[1px] h-3.5 bg-border/50 flex-shrink-0" />
                       <div 
-                        className="px-3 py-2 text-content-tertiary flex items-center gap-2 cursor-pointer hover:bg-surface-highlight transition-colors"
+                        className="text-content-tertiary cursor-pointer hover:text-content-primary hover:bg-surface-highlight transition-all p-1.5 flex-shrink-0"
                         onClick={handleViewExplorer}
+                        title="View on Explorer"
                       >
-                        <ExternalLink className="w-3 h-3 hover:text-content-primary transition-colors" />
+                        <ExternalLink className="w-3.5 h-3.5" />
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-2 self-start">
-                  {(socials?.twitter || socials?.telegram || socials?.website) && (
-                    <div className="flex bg-surface-base rounded-lg border border-border/50 shadow-sm p-1">
-                      {socials?.twitter && (
-                        <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="X (Twitter)">
-                          <XIcon className="w-4 h-4" />
-                        </a>
-                      )}
-                      {socials?.telegram && (
-                        <a href={socials.telegram} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Telegram">
-                          <Send className="w-4 h-4" />
-                        </a>
-                      )}
-                      {socials?.website && (
-                        <a href={socials.website} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="Website">
-                          <Globe className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
-                  )}
-                  <button
-                    onClick={handleRefresh}
-                    className="p-2 text-content-tertiary hover:text-accent-primary hover:bg-surface-highlight rounded-md transition-all"
-                    title="Refresh data"
-                  >
-                    <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Progress Section */}
-              <div className="flex flex-col gap-4 p-5 rounded-xl bg-surface-base/80 border border-border/40">
-                <div className="flex justify-between items-end">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-mono font-bold text-content-primary tracking-tight leading-none">
-                      {progress.toFixed(1)}%
-                    </span>
-                    <span className="text-[10px] text-content-tertiary font-medium">Minted</span>
+                  <div className="flex justify-between items-center text-[13px]">
+                    <span className="text-content-tertiary">Market Cap:</span>
+                    <span className="text-content-primary font-medium">{circulatingMarketCapOkb}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="font-mono text-sm text-content-secondary mb-1">
-                      <span className="text-content-primary font-medium">{token.mintedAmount}</span> / {token.totalAmount}
-                    </div>
-                  </div>
-                </div>
 
-                <div className="h-2.5 w-full bg-surface-highlight rounded-full overflow-hidden relative border border-border/30 shadow-inner">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-accent-primary transition-all duration-1000 ease-out relative"
-                    style={{ width: `${Math.min(progress, 100)}%` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
-                    <div className="absolute top-0 right-0 w-8 h-full bg-gradient-to-l from-white/40 to-transparent blur-[1px]" />
+                  {/* Progress Bar */}
+                  <div className="flex flex-col gap-1.5 mt-1.5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 h-2 bg-surface-base -skew-x-12 overflow-hidden rounded-sm border border-border/30">
+                        <div
+                          className="h-full bg-accent-primary transition-all duration-1000 ease-out"
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                      <span className="text-accent-primary text-[13px] font-bold w-16 text-right">
+                        {progress.toFixed(3)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[11px] text-content-tertiary">
+                      <span>Minted</span>
+                      <span className="font-mono">
+                        <span className="text-content-primary">{token.mintedAmount}</span> / {token.totalAmount}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -268,9 +268,10 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
               <button
                 onClick={handleSetMax}
                 disabled={!activeBalance?.value || txBusy}
-                className={`text-xs font-mono flex gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight disabled:opacity-50 ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
+                className={`text-xs font-mono flex items-baseline justify-center gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight disabled:opacity-50 ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
               >
-                <span>max</span> <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
+                <span>max</span>
+                <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
               </button>
             </div>
           </div>
