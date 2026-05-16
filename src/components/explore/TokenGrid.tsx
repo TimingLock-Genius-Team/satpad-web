@@ -5,13 +5,18 @@ import { cn } from "@/utils/cn";
 interface TokenGridProps {
   tokens: Token[];
   viewMode?: "comfy" | "compact";
+  totalCount?: number;
+  emptyMessage?: string;
 }
 
-export function TokenGrid({ tokens, viewMode = "comfy" }: TokenGridProps) {
+export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage }: TokenGridProps) {
   if (tokens.length === 0) {
     return (
       <div className="py-20 text-center">
-        <p className="text-content-secondary mb-4">No tokens found.</p>
+        <p className="text-content-secondary mb-2">{emptyMessage ?? "No tokens found."}</p>
+        {emptyMessage && (
+          <p className="text-content-tertiary text-xs">Try a different search term or browse the tabs.</p>
+        )}
       </div>
     );
   }
@@ -20,7 +25,7 @@ export function TokenGrid({ tokens, viewMode = "comfy" }: TokenGridProps) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <div aria-live="polite" className="text-[13px] text-content-tertiary">
-          <span className="font-mono text-content-secondary">{tokens.length}</span> tokens
+          <span className="font-mono text-content-secondary">{totalCount ?? tokens.length}</span> tokens
         </div>
         <div className="flex items-center gap-[6px] text-[11px] text-content-tertiary">
           <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-brand-pulse"></span>

@@ -85,7 +85,7 @@ export default function Home() {
   const [viewMode, setViewMode] = useState<"comfy" | "compact">("comfy");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: statsData } = useStats();
+  const { data: statsData, error: statsError } = useStats();
   const { data: tokensData, isLoading, error } = useTokens({
     tab: activeTab,
     limit: 100,
@@ -148,25 +148,33 @@ export default function Home() {
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Tokens Live</div>
               <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
-                {statsData ? statsData.tokensLive : "--"}
+                {statsData ? statsData.tokensLive : statsError ? (
+                  <span className="text-accent-danger/60 text-sm font-medium">Failed to load</span>
+                ) : "--"}
               </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">24H Volume</div>
               <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8] flex items-baseline gap-2">
-                {statsData ? fmtOkb(statsData.volume24hOkb) : "--"} <span className="text-base md:text-lg font-medium text-[#8F94A8]">OKB</span>
+                {statsData ? fmtOkb(statsData.volume24hOkb) : statsError ? (
+                  <span className="text-accent-danger/60 text-sm font-medium">Failed to load</span>
+                ) : "--"} <span className="text-base md:text-lg font-medium text-[#8F94A8]">OKB</span>
               </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Graduated</div>
               <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
-                {statsData ? statsData.graduated : "--"}
+                {statsData ? statsData.graduated : statsError ? (
+                  <span className="text-accent-danger/60 text-sm font-medium">Failed to load</span>
+                ) : "--"}
               </div>
             </div>
             <div className="bg-[#12131A] rounded-xl p-4 md:p-5 border border-[#1E2028] h-[92px]">
               <div className="text-[#8F94A8] text-[11px] font-semibold tracking-wider mb-2 uppercase">Total Trades</div>
               <div className="text-2xl md:text-3xl font-bold text-[#F2F4F8]">
-                {statsData ? statsData.totalTrades.toLocaleString() : "--"}
+                {statsData ? statsData.totalTrades.toLocaleString() : statsError ? (
+                  <span className="text-accent-danger/60 text-sm font-medium">Failed to load</span>
+                ) : "--"}
               </div>
             </div>
           </div>
@@ -236,7 +244,12 @@ export default function Home() {
         )}
         {!isLoading && !error && (
           <>
-            <TokenGrid tokens={paginatedTokens} viewMode={viewMode} />
+            <TokenGrid
+              tokens={paginatedTokens}
+              viewMode={viewMode}
+              totalCount={tokens.length}
+              emptyMessage={searchQuery ? `No results for "${searchQuery}"` : undefined}
+            />
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

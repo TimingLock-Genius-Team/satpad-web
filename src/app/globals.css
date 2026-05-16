@@ -81,6 +81,12 @@ body {
   background: transparent;
 }
 
+/* Global focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid rgb(var(--accent-primary)) !important;
+  outline-offset: 2px;
+}
+
 /* RainbowKit connect modal — force black text for readability */
 [data-rk] {
   --rk-colors-modalText: #000000;

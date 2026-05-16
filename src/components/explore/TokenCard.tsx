@@ -45,7 +45,11 @@ function fmtOkb(weiString: string): string {
 function MiniChartPath({ token }: { token: Token }) {
   const priceHistory = token.priceHistory;
   if (!priceHistory || priceHistory.length < 2) {
-    return null;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="h-px w-3/4 bg-border/40" />
+      </div>
+    );
   }
   const minPrice = Math.min(...priceHistory);
   const maxPrice = Math.max(...priceHistory);

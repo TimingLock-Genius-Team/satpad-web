@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { Check, Copy, ExternalLink, Wallet } from "lucide-react";
 import { Pagination } from "@/components/explore/Pagination";
 import { useAccount } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 
 import { timeAgo } from "@/lib/time-display";
@@ -111,14 +112,15 @@ const TABLE_PAGE_SIZE = 10;
 
 export default function PortfolioPage() {
   const { address: walletAddress, isConnected, isReconnecting } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const [activeTab, setActiveTab] = useState<"holdings" | "history">("holdings");
   const [holdingsPage, setHoldingsPage] = useState(1);
   const [historyPage, setHistoryPage] = useState(1);
 
-  const { data: portfolio, isLoading: portfolioLoading } = usePortfolio(
+  const { data: portfolio, isLoading: portfolioLoading, error: portfolioError } = usePortfolio(
     isConnected ? walletAddress : undefined
   );
-  const { data: historyData, isLoading: historyLoading } = usePortfolioHistory(
+  const { data: historyData, isLoading: historyLoading, error: historyError } = usePortfolioHistory(
     isConnected ? walletAddress : undefined,
     { limit: 50 }
   );
@@ -150,6 +152,12 @@ export default function PortfolioPage() {
             <p className="text-content-primary text-lg font-semibold mb-1">No wallet connected</p>
             <p className="text-content-tertiary text-sm">Connect your wallet to view your portfolio and trading history</p>
           </div>
+          <button
+            onClick={openConnectModal}
+            className="px-5 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-colors"
+          >
+            Connect Wallet
+          </button>
         </div>
       </div>
     );
@@ -161,6 +169,7 @@ export default function PortfolioPage() {
   const history = historyData?.items ?? [];
 
   const isLoading = portfolioLoading || historyLoading;
+  const loadError = portfolioError || historyError;
 
   const holdingsTotalPages = Math.max(1, Math.ceil(holdings.length / TABLE_PAGE_SIZE));
   const paginatedHoldings = holdings.slice(
@@ -198,7 +207,20 @@ export default function PortfolioPage() {
       {/* Loading */}
       {isLoading && <PortfolioSkeleton />}
 
-      {!isLoading && (
+      {/* Error */}
+      {!isLoading && loadError && (
+        <div className="flex flex-col items-center gap-4 py-20 text-center">
+          <div className="w-12 h-12 rounded-full bg-accent-danger/10 border border-accent-danger/20 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-accent-danger"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div>
+            <p className="text-content-primary text-sm font-medium mb-1">Failed to load portfolio</p>
+            <p className="text-content-tertiary text-xs">Please check your connection and try again.</p>
+          </div>
+        </div>
+      )}
+
+      {!isLoading && !loadError && (
         <>
           {/* Main Stats Card */}
           <div className="bg-surface rounded-xl border border-border p-6 md:p-8 mb-8">
@@ -358,7 +380,7 @@ export default function PortfolioPage() {
                     <th className="px-6 py-4 font-semibold">TOKEN</th>
                     <th className="px-6 py-4 font-semibold">TYPE</th>
                     <th className="px-6 py-4 font-semibold">OKB</th>
-                    <th className="px-6 py-4 font-semibold">TOKEN</th>
+                    <th className="px-6 py-4 font-semibold">AMOUNT</th>
                     <th className="px-6 py-4 font-semibold"></th>
                   </tr>
                 </thead>
