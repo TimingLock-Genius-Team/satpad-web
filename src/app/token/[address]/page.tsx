@@ -15,6 +15,7 @@ import { cn } from "@/utils/cn";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 import { useAccount } from "wagmi";
 import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
+import { buildUniswapLinks } from "@/lib/uniswap-links";
 
 function chainForId(chainId?: number) {
   switch (chainId) {
@@ -187,7 +188,7 @@ export default function TokenDetailPage() {
     : 0;
   const isGraduated = Boolean(token.isGraduated);
   const isMigrated = Boolean(token.isMigrated || detail?.migration?.isMigrated);
-  const uniswapUrl = `https://app.uniswap.org/swap?outputCurrency=${address}&chain=${activeChain.id}`;
+  const uniswapLinks = buildUniswapLinks(address);
 
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -326,7 +327,7 @@ export default function TokenDetailPage() {
               progress={progress}
               isGraduated={isGraduated}
               isMigrated={isMigrated}
-              uniswapUrl={uniswapUrl}
+              uniswapLinks={uniswapLinks}
             />
           </div>
         </div>

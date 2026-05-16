@@ -9,6 +9,7 @@ import { useQuote } from "@/lib/api-hooks";
 import { ApiError, getDefaultNetwork } from "@/lib/api";
 import { chainForSatpadNetwork } from "@/config/chains";
 import { sendPreparedTransactions } from "@/lib/wallet-txs";
+import type { UniswapLinks } from "@/lib/uniswap-links";
 import {
   fmtOkbDisplay,
   fmtTokenDisplay,
@@ -25,7 +26,7 @@ interface TradePanelProps {
   progress: number;
   isGraduated?: boolean;
   isMigrated?: boolean;
-  uniswapUrl?: string;
+  uniswapLinks?: UniswapLinks;
 }
 
 function parseHumanToWei(amount: string): bigint | null {
@@ -53,7 +54,7 @@ function isMovedToUniswapError(error: unknown): boolean {
   return apiErrorMessage(error)?.toLowerCase().includes("moved to uniswap") ?? false;
 }
 
-export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isMigrated = false, uniswapUrl }: TradePanelProps) {
+export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isMigrated = false, uniswapLinks }: TradePanelProps) {
   const { address: walletAddress, isConnected } = useAccount();
   const chainId = useChainId();
   const { data: walletClient } = useWalletClient();
@@ -203,14 +204,34 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
             </p>
           </div>
           <a
-            href={uniswapUrl ?? "https://app.uniswap.org"}
+            href={uniswapLinks?.defaultUrl ?? "https://app.uniswap.org"}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all flex items-center justify-center gap-2 bg-accent-primary text-surface-base hover:bg-accent-primary/90"
           >
-            Open Uniswap
+            Open Uniswap Pool
             <ExternalLink className="w-4 h-4" />
           </a>
+          {uniswapLinks && (
+            <div className="hidden grid-cols-2 gap-2">
+              <a
+                href={uniswapLinks.buyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 text-center text-[10px] font-semibold uppercase tracking-widest rounded-input border border-border text-content-secondary hover:text-content-primary hover:border-accent-primary/50 transition-colors"
+              >
+                Buy on Uniswap
+              </a>
+              <a
+                href={uniswapLinks.sellUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 text-center text-[10px] font-semibold uppercase tracking-widest rounded-input border border-border text-content-secondary hover:text-content-primary hover:border-accent-primary/50 transition-colors"
+              >
+                Sell on Uniswap
+              </a>
+            </div>
+          )}
           <div className="text-[10px] text-content-tertiary/70 font-mono mt-1 text-center leading-relaxed max-w-[240px] mx-auto">
             Eulr mint is permanently disabled after migration.
           </div>
