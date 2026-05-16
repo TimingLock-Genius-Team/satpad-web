@@ -150,6 +150,9 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
       await queryClient.invalidateQueries({ queryKey: ["tokens"] });
       await queryClient.invalidateQueries({ queryKey: ["token-detail", tokenAddress] });
       await queryClient.invalidateQueries({ queryKey: ["token-summary", tokenAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["token-trades", tokenAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["token-holders", tokenAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["token-chart", tokenAddress] });
       setTxStage("success");
       setAmount("");
       setTimeout(() => {

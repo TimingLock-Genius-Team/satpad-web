@@ -8,8 +8,10 @@ import { TokenChart } from "@/components/token/TokenChart";
 import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
 import { TokenPriceTimeChart } from "@/components/token/TokenPriceTimeChart";
 import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
-import { Copy, ExternalLink, Send, Globe, Check } from "lucide-react";
+import { Copy, ExternalLink, Send, Globe, Check, RefreshCw } from "lucide-react";
 import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { cn } from "@/utils/cn";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 import { useAccount } from "wagmi";
 import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
@@ -125,8 +127,10 @@ export default function TokenDetailPage() {
   const address = params.address as string;
 
   const [copied, setCopied] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { chainId } = useAccount();
   const activeChain = chainForId(chainId);
+  const queryClient = useQueryClient();
 
   const handleCopyAddress = useCallback(async () => {
     if (address) {
@@ -142,6 +146,18 @@ export default function TokenDetailPage() {
       window.open(`${explorer.url}/address/${address}`, "_blank");
     }
   }, [activeChain, address]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["token-detail", address] }),
+      queryClient.invalidateQueries({ queryKey: ["token-summary", address] }),
+      queryClient.invalidateQueries({ queryKey: ["token-chart", address] }),
+      queryClient.invalidateQueries({ queryKey: ["token-trades", address] }),
+      queryClient.invalidateQueries({ queryKey: ["token-holders", address] }),
+    ]);
+    setTimeout(() => setRefreshing(false), 600);
+  }, [address, queryClient]);
 
   const { data: detail, isLoading: detailLoading, error: detailError } = useTokenDetail(address);
   const { isLoading: summaryLoading } = useTokenSummary(address);
@@ -232,8 +248,8 @@ export default function TokenDetailPage() {
                   </div>
                 </div>
 
-                {(socials?.twitter || socials?.telegram || socials?.website) && (
-                  <div className="flex items-center gap-2 self-start">
+                <div className="flex items-center gap-2 self-start">
+                  {(socials?.twitter || socials?.telegram || socials?.website) && (
                     <div className="flex bg-surface-base rounded-lg border border-border/50 shadow-sm p-1">
                       {socials?.twitter && (
                         <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="p-2 text-content-tertiary hover:text-content-primary hover:bg-surface-highlight rounded-md transition-all" title="X (Twitter)">
@@ -251,8 +267,15 @@ export default function TokenDetailPage() {
                         </a>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
+                  <button
+                    onClick={handleRefresh}
+                    className="p-2 text-content-tertiary hover:text-accent-primary hover:bg-surface-highlight rounded-md transition-all"
+                    title="Refresh data"
+                  >
+                    <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+                  </button>
+                </div>
               </div>
 
               {/* Progress Section */}

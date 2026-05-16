@@ -72,6 +72,7 @@ export function useTokenDetail(address: string, network?: string) {
     queryKey: ["token-detail", address, network],
     queryFn: () => fetchTokenDetail(address, network),
     enabled: !!address,
+    refetchInterval: 15_000,
   });
 }
 
@@ -81,6 +82,7 @@ export function useTokenSummary(address: string, network?: string) {
     queryKey: ["token-summary", address, network],
     queryFn: () => fetchTokenSummary(address, network),
     enabled: !!address,
+    refetchInterval: 15_000,
   });
 }
 
@@ -93,6 +95,7 @@ export function useTokenChart(
     queryKey: ["token-chart", address, params],
     queryFn: () => fetchTokenChart(address, params),
     enabled: !!address,
+    refetchInterval: 60_000,
   });
 }
 
@@ -105,6 +108,7 @@ export function useTokenTrades(
     queryKey: ["token-trades", address, params],
     queryFn: () => fetchTokenTrades(address, params),
     enabled: !!address,
+    refetchInterval: 15_000,
   });
 }
 
@@ -117,6 +121,7 @@ export function useTokenHolders(
     queryKey: ["token-holders", address, params],
     queryFn: () => fetchTokenHolders(address, params),
     enabled: !!address,
+    refetchInterval: 15_000,
   });
 }
 
