@@ -124,41 +124,43 @@ function TradesPanel({
       ) : trades.length === 0 ? (
         <div className="text-sm text-content-tertiary">No indexed trades yet</div>
       ) : (
-        <div className="divide-y divide-border/50">
-          {trades.map((trade) => {
-            const side = toTradeSide(trade.side);
-            const sideClass =
-              side === "mint" ? "text-accent-success" : "text-accent-danger";
+        <div className="max-h-[420px] overflow-y-auto -mr-3 pr-3">
+          <div className="divide-y divide-border/50">
+            {trades.map((trade) => {
+              const side = toTradeSide(trade.side);
+              const sideClass =
+                side === "mint" ? "text-accent-success" : "text-accent-danger";
 
-            return (
-              <div
-                key={`${trade.txHash}-${trade.logIndex}`}
-                className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
-              >
-                <div className={`font-bold uppercase tracking-widest ${sideClass}`}>
-                  {side}
-                </div>
-                <div className="min-w-0 text-right">
-                  <div className="font-mono text-content-primary truncate">
-                    {fmtEth(trade.tokens)} tokens
-                  </div>
-                  <div className="mt-1 text-content-tertiary">
-                    {fmtEth(trade.netOkb)} OKB net / {fmtEth(trade.grossOkb)} gross
-                  </div>
-                </div>
+              return (
                 <div
-                  className="font-mono text-content-secondary"
-                  title={trade.user}
-                  aria-label={`User ${trade.user}`}
+                  key={`${trade.txHash}-${trade.logIndex}`}
+                  className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
                 >
-                  {shortAddress(trade.user)}
+                  <div className={`font-bold uppercase tracking-widest ${sideClass}`}>
+                    {side}
+                  </div>
+                  <div className="min-w-0 text-right">
+                    <div className="font-mono text-content-primary truncate">
+                      {fmtEth(trade.tokens)} tokens
+                    </div>
+                    <div className="mt-1 text-content-tertiary">
+                      {fmtEth(trade.netOkb)} OKB net / {fmtEth(trade.grossOkb)} gross
+                    </div>
+                  </div>
+                  <div
+                    className="font-mono text-content-secondary"
+                    title={trade.user}
+                    aria-label={`User ${trade.user}`}
+                  >
+                    {shortAddress(trade.user)}
+                  </div>
+                  <div className="text-right text-content-tertiary">
+                    {fmtTime(trade.ts)} · block {trade.blockNumber}
+                  </div>
                 </div>
-                <div className="text-right text-content-tertiary">
-                  {fmtTime(trade.ts)} · block {trade.blockNumber}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </PanelShell>
@@ -185,28 +187,30 @@ function HoldersPanel({
       ) : holders.length === 0 ? (
         <div className="text-sm text-content-tertiary">No indexed holders yet</div>
       ) : (
-        <div className="divide-y divide-border/50">
-          {holders.map((holder) => (
-            <div
-              key={`${holder.holder}-${holder.lastBlock}`}
-              className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
-            >
+        <div className="max-h-[420px] overflow-y-auto -mr-3 pr-3">
+          <div className="divide-y divide-border/50">
+            {holders.map((holder) => (
               <div
-                className="font-mono text-content-secondary truncate"
-                title={holder.holder}
-                aria-label={`Holder ${holder.holder}`}
+                key={`${holder.holder}-${holder.lastBlock}`}
+                className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
               >
-                {shortAddress(holder.holder)}
+                <div
+                  className="font-mono text-content-secondary truncate"
+                  title={holder.holder}
+                  aria-label={`Holder ${holder.holder}`}
+                >
+                  {shortAddress(holder.holder)}
+                </div>
+                <div className="font-mono text-content-primary text-right">
+                  {fmtEth(holder.balance)}
+                </div>
+                <div className="text-content-tertiary">balance</div>
+                <div className="text-content-tertiary text-right">
+                  last block {holder.lastBlock}
+                </div>
               </div>
-              <div className="font-mono text-content-primary text-right">
-                {fmtEth(holder.balance)}
-              </div>
-              <div className="text-content-tertiary">balance</div>
-              <div className="text-content-tertiary text-right">
-                last block {holder.lastBlock}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </PanelShell>
