@@ -2,6 +2,17 @@ import { formatUnits } from "viem";
 
 export type TradeSide = "mint" | "burn";
 
+const API_SIDE_MAP: Record<string, TradeSide> = {
+  buy: "mint",
+  sell: "burn",
+  BUY: "mint",
+  SELL: "burn",
+};
+
+export function toTradeSide(apiSide: string): TradeSide {
+  return API_SIDE_MAP[apiSide] ?? (apiSide as TradeSide);
+}
+
 export function fmtOkb(wei: string): number {
   const n = Number(wei) / 1e18;
   return Number.isNaN(n) ? 0 : n;

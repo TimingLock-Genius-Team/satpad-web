@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, HelpCircle, Moon, Menu, X, LogOut, ExternalLink, Copy, Check, Wallet, Repeat } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, ExternalLink, Copy, Check, Wallet, Repeat } from "lucide-react";
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { cn } from "@/utils/cn";
@@ -122,15 +122,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="hidden md:flex items-center gap-2">
-            <button className="p-2 text-content-secondary hover:text-content-primary hover:bg-surface-elevated rounded-full transition-colors">
-              <HelpCircle className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-content-secondary hover:text-content-primary hover:bg-surface-elevated rounded-full transition-colors">
-              <Moon className="w-5 h-5" />
-            </button>
-          </div>
-
           {isConnected || isReconnecting ? (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -247,16 +238,6 @@ export function Header() {
                 </Link>
               );
             })}
-            <div className="flex items-center gap-6 px-4 pt-4 border-t border-border mt-2">
-              <button className="flex items-center gap-2 text-content-secondary hover:text-content-primary transition-colors">
-                <HelpCircle className="w-5 h-5" />
-                <span className="font-medium">Help</span>
-              </button>
-              <button className="flex items-center gap-2 text-content-secondary hover:text-content-primary transition-colors">
-                <Moon className="w-5 h-5" />
-                <span className="font-medium">Theme</span>
-              </button>
-            </div>
           </nav>
         </div>
       )}

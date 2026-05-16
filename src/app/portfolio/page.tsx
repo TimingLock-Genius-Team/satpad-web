@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, ExternalLink } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Check, Copy, ExternalLink } from "lucide-react";
 import { useAccount } from "wagmi";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 
 import { timeAgo } from "@/lib/time-display";
+import { toTradeSide } from "@/lib/trade-display";
 
 function fmtOkb(wei: string): number {
   const n = Number(wei) / 1e18;
@@ -52,6 +53,14 @@ export default function PortfolioPage() {
     isConnected ? walletAddress : undefined,
     { limit: 50 }
   );
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyAddress = useCallback(async () => {
+    if (!walletAddress) return;
+    await navigator.clipboard.writeText(walletAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [walletAddress]);
 
   if (!isConnected) {
     return (
@@ -75,7 +84,14 @@ export default function PortfolioPage() {
         <h1 className="text-[32px] font-bold text-content-primary">Portfolio</h1>
         <div className="flex items-center gap-2 px-4 py-2 bg-surface rounded-full border border-border text-sm">
           <span className="text-content-secondary font-mono">{walletAddress ? shortAddr(walletAddress) : "..."}</span>
-          <Copy className="w-4 h-4 text-content-tertiary cursor-pointer hover:text-content-primary transition-colors" />
+          {copied ? (
+            <Check className="w-4 h-4 text-accent-primary" />
+          ) : (
+            <Copy
+              className="w-4 h-4 text-content-tertiary cursor-pointer hover:text-content-primary transition-colors"
+              onClick={handleCopyAddress}
+            />
+          )}
           <span className="text-content-tertiary ml-1">(you)</span>
         </div>
       </div>
@@ -252,7 +268,8 @@ export default function PortfolioPage() {
                   )}
                   {history.map((item, idx) => {
                     const okbVal = fmtOkb(item.okbAmount);
-                    const isBuy = item.type === "BUY";
+                    const displayType = toTradeSide(item.type);
+                    const isMint = displayType === "mint";
                     return (
                       <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
                         <td className="px-6 py-4 text-content-tertiary">{timeAgo(item.ts, Date.now())}</td>
@@ -272,16 +289,16 @@ export default function PortfolioPage() {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                            isBuy ? "bg-accent-success/10 text-accent-success" : "bg-accent-danger/10 text-accent-danger"
+                            isMint ? "bg-accent-success/10 text-accent-success" : "bg-accent-danger/10 text-accent-danger"
                           }`}>
-                            {item.type}
+                            {displayType}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 font-mono font-medium ${isBuy ? "text-content-secondary" : "text-accent-success"}`}>
-                          {isBuy ? "-" : "+"}{okbVal.toFixed(4)} OKB
+                        <td className={`px-6 py-4 font-mono font-medium ${isMint ? "text-content-secondary" : "text-accent-success"}`}>
+                          {isMint ? "-" : "+"}{okbVal.toFixed(4)} OKB
                         </td>
-                        <td className={`px-6 py-4 font-mono font-medium ${isBuy ? "text-accent-success" : "text-content-secondary"}`}>
-                          {isBuy ? "+" : "-"}{fmtTokenBalance(item.tokenAmount)} {item.token.symbol}
+                        <td className={`px-6 py-4 font-mono font-medium ${isMint ? "text-accent-success" : "text-content-secondary"}`}>
+                          {isMint ? "+" : "-"}{fmtTokenBalance(item.tokenAmount)} {item.token.symbol}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <a

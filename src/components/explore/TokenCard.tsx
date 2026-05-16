@@ -93,8 +93,8 @@ export function TokenCard({ token }: TokenCardProps) {
       {/* Card Header */}
       <div className="flex items-start gap-3">
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center font-sans font-bold text-[14.4px] text-white border border-[#1E2028] shrink-0 tracking-[-0.02em] overflow-hidden"
-          style={{ background: getBgColor(token.symbol) }}
+          className="w-10 h-10 rounded-lg flex items-center justify-center font-sans font-bold text-[14.4px] text-white border border-[#1E2028] shrink-0 tracking-[-0.02em] overflow-hidden bg-gradient-to-br from-surface-highlight to-surface"
+          style={avatarSrc ? undefined : { background: getBgColor(token.symbol) }}
         >
           {avatarSrc ? (
             <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover" />

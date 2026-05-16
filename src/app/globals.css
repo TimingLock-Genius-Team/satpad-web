@@ -80,3 +80,10 @@ body {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* RainbowKit connect modal — force black text for readability */
+[data-rk] {
+  --rk-colors-modalText: #000000;
+  --rk-colors-modalTextSecondary: #1a1a1a;
+  --rk-colors-modalTextDim: #555555;
+}

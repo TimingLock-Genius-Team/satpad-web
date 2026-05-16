@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { TradePanel } from "./TradePanel";
@@ -7,9 +8,23 @@ import { TokenChart } from "@/components/token/TokenChart";
 import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
 import { TokenPriceTimeChart } from "@/components/token/TokenPriceTimeChart";
 import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
-import { Copy, ExternalLink, Send, Globe } from "lucide-react";
+import { Copy, ExternalLink, Send, Globe, Check } from "lucide-react";
 import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
 import { resolveIpfsUrl } from "@/lib/ipfs";
+import { useAccount } from "wagmi";
+import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
+
+function chainForId(chainId?: number) {
+  switch (chainId) {
+    case xLayer.id:
+      return xLayer;
+    case hashKeyTestnet.id:
+      return hashKeyTestnet;
+    case sepolia.id:
+    default:
+      return sepolia;
+  }
+}
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -62,6 +77,25 @@ function TokenDetailSkeleton() {
 export default function TokenDetailPage() {
   const params = useParams();
   const address = params.address as string;
+
+  const [copied, setCopied] = useState(false);
+  const { chainId } = useAccount();
+  const activeChain = chainForId(chainId);
+
+  const handleCopyAddress = useCallback(async () => {
+    if (address) {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [address]);
+
+  const handleViewExplorer = useCallback(() => {
+    const explorer = activeChain.blockExplorers?.default;
+    if (explorer && address) {
+      window.open(`${explorer.url}/address/${address}`, "_blank");
+    }
+  }, [activeChain, address]);
 
   const { data: detail, isLoading: detailLoading, error: detailError } = useTokenDetail(address);
   const { isLoading: summaryLoading } = useTokenSummary(address);
@@ -127,14 +161,24 @@ export default function TokenDetailPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-0 text-xs font-mono bg-surface-base border border-border/50 rounded-lg overflow-hidden shadow-sm">
-                      <div className="px-3 py-2 border-r border-border/50 flex items-center gap-2 group cursor-pointer hover:bg-surface-highlight transition-colors">
+                      <div 
+                        className="px-3 py-2 border-r border-border/50 flex items-center gap-2 group cursor-pointer hover:bg-surface-highlight transition-colors"
+                        onClick={handleCopyAddress}
+                      >
                         <span className="text-content-secondary group-hover:text-content-primary transition-colors">
-                          {token.address.slice(0, 6)}…{token.address.slice(-4)}
+                          {token.address}
                         </span>
-                        <Copy className="w-3 h-3 text-content-tertiary group-hover:text-content-primary transition-colors" />
+                        {copied ? (
+                          <Check className="w-3 h-3 text-accent-primary" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-content-tertiary group-hover:text-content-primary transition-colors" />
+                        )}
                       </div>
-                      <div className="px-3 py-2 text-content-tertiary flex items-center gap-2">
-                        <ExternalLink className="w-3 h-3 hover:text-content-primary cursor-pointer transition-colors" />
+                      <div 
+                        className="px-3 py-2 text-content-tertiary flex items-center gap-2 cursor-pointer hover:bg-surface-highlight transition-colors"
+                        onClick={handleViewExplorer}
+                      >
+                        <ExternalLink className="w-3 h-3 hover:text-content-primary transition-colors" />
                       </div>
                     </div>
                   </div>

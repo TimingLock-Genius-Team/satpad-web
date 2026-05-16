@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { formatUnits } from "viem";
 import { useTokenHolders, useTokenTrades } from "@/lib/api-hooks";
 import type { ApiHolder, ApiTrade } from "@/lib/api-types";
+import { toTradeSide } from "@/lib/trade-display";
 
 interface TokenActivityPanelsProps {
   address: string;
@@ -124,9 +125,9 @@ function TradesPanel({
       ) : (
         <div className="divide-y divide-border/50">
           {trades.map((trade) => {
-            const side = trade.side.toLowerCase();
+            const side = toTradeSide(trade.side);
             const sideClass =
-              side === "buy" ? "text-accent-success" : "text-accent-danger";
+              side === "mint" ? "text-accent-success" : "text-accent-danger";
 
             return (
               <div
@@ -134,7 +135,7 @@ function TradesPanel({
                 className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
               >
                 <div className={`font-bold uppercase tracking-widest ${sideClass}`}>
-                  {trade.side}
+                  {side}
                 </div>
                 <div className="min-w-0 text-right">
                   <div className="font-mono text-content-primary truncate">
