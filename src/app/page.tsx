@@ -25,6 +25,59 @@ function fmtOkb(weiString: string): string {
   return n.toFixed(2);
 }
 
+function SkeletonCard() {
+  return (
+    <div className="bg-surface border border-border rounded-xl p-4 h-[220px] flex flex-col gap-3 animate-pulse">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-surface-highlight shrink-0" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 w-28 bg-surface-highlight rounded" />
+          <div className="h-3 w-40 bg-surface-highlight rounded" />
+        </div>
+        <div className="h-[22px] w-14 bg-surface-highlight rounded-full shrink-0" />
+      </div>
+      <div className="mt-1">
+        <div className="w-full h-1.5 bg-surface-highlight rounded-full" />
+        <div className="flex justify-between mt-2">
+          <div className="h-3 w-16 bg-surface-highlight rounded" />
+          <div className="h-3 w-20 bg-surface-highlight rounded" />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3 mt-auto">
+        <div className="space-y-1.5">
+          <div className="h-2.5 w-8 bg-surface-highlight rounded" />
+          <div className="h-4 w-14 bg-surface-highlight rounded" />
+        </div>
+        <div className="space-y-1.5">
+          <div className="h-2.5 w-8 bg-surface-highlight rounded" />
+          <div className="h-4 w-14 bg-surface-highlight rounded" />
+        </div>
+        <div className="space-y-1.5">
+          <div className="h-2.5 w-10 bg-surface-highlight rounded" />
+          <div className="h-4 w-14 bg-surface-highlight rounded" />
+        </div>
+      </div>
+      <div className="h-5 w-full bg-surface-highlight rounded" />
+    </div>
+  );
+}
+
+function TokenGridSkeleton() {
+  return (
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <div className="h-4 w-20 bg-surface-highlight rounded animate-pulse" />
+        <div className="h-3 w-10 bg-surface-highlight rounded animate-pulse" />
+      </div>
+      <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<ApiTokenTab>("trending");
@@ -177,14 +230,16 @@ export default function Home() {
       </div>
 
       <div className="max-w-[1260px] mx-auto px-4 py-8">
-        {isLoading && (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
-          </div>
-        )}
+        {isLoading && <TokenGridSkeleton />}
         {error && (
-          <div className="text-center py-20">
-            <p className="text-content-tertiary text-sm">Failed to load tokens. Please try again later.</p>
+          <div className="flex flex-col items-center gap-4 py-20 text-center">
+            <div className="w-12 h-12 rounded-full bg-accent-danger/10 border border-accent-danger/20 flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-accent-danger"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <p className="text-content-primary text-sm font-medium mb-1">Failed to load tokens</p>
+              <p className="text-content-tertiary text-xs">Please check your connection and try again.</p>
+            </div>
           </div>
         )}
         {!isLoading && !error && (

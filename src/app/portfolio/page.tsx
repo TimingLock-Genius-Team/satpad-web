@@ -42,8 +42,72 @@ function shortAddr(addr: string): string {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
+function SkeletonRow({ cols }: { cols: number }) {
+  return (
+    <tr className="animate-pulse">
+      {Array.from({ length: cols }).map((_, i) => (
+        <td key={i} className="px-6 py-4">
+          <div className="h-4 bg-surface-highlight rounded" />
+        </td>
+      ))}
+    </tr>
+  );
+}
+
+function PortfolioSkeleton() {
+  return (
+    <>
+      {/* Stats card skeleton */}
+      <div className="bg-surface rounded-xl border border-border p-6 md:p-8 mb-8 animate-pulse">
+        <div className="mb-8 space-y-3">
+          <div className="h-3 w-20 bg-surface-highlight rounded" />
+          <div className="h-12 w-56 bg-surface-highlight rounded" />
+        </div>
+        <div className="border-t border-border pt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="space-y-2">
+            <div className="h-3 w-20 bg-surface-highlight rounded" />
+            <div className="h-7 w-12 bg-surface-highlight rounded" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-20 bg-surface-highlight rounded" />
+            <div className="h-7 w-24 bg-surface-highlight rounded" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-16 bg-surface-highlight rounded" />
+            <div className="h-7 w-28 bg-surface-highlight rounded" />
+          </div>
+        </div>
+      </div>
+      {/* Tabs skeleton */}
+      <div className="flex items-center gap-6 border-b border-border mb-6">
+        <div className="h-8 w-20 bg-surface-highlight rounded animate-pulse" />
+        <div className="h-8 w-16 bg-surface-highlight rounded animate-pulse" />
+      </div>
+      {/* Table skeleton */}
+      <div className="rounded-xl border border-border overflow-x-auto">
+        <table className="w-full text-sm whitespace-nowrap">
+          <thead>
+            <tr className="border-b border-border">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <th key={i} className="px-6 py-4">
+                  <div className="h-3 w-14 bg-surface-highlight rounded animate-pulse" />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonRow key={i} cols={7} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
 export default function PortfolioPage() {
-  const { address: walletAddress, isConnected } = useAccount();
+  const { address: walletAddress, isConnected, isReconnecting } = useAccount();
   const [activeTab, setActiveTab] = useState<"holdings" | "history">("holdings");
 
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio(
@@ -61,6 +125,14 @@ export default function PortfolioPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [walletAddress]);
+
+  if (isReconnecting) {
+    return (
+      <div className="flex-1 w-full max-w-[1260px] mx-auto px-4 py-8 flex flex-col">
+        <PortfolioSkeleton />
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (
@@ -108,11 +180,7 @@ export default function PortfolioPage() {
       </div>
 
       {/* Loading */}
-      {isLoading && (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
-        </div>
-      )}
+      {isLoading && <PortfolioSkeleton />}
 
       {!isLoading && (
         <>

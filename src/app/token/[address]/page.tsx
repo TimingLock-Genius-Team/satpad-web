@@ -67,8 +67,54 @@ function parseTokenAmount(amount: string): number | null {
 function TokenDetailSkeleton() {
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
-      <div className="max-w-[1200px] mx-auto flex justify-center py-20">
-        <div className="w-10 h-10 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
+      <div className="max-w-[1200px] mx-auto space-y-8">
+        {/* Header skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,360px)] gap-8 items-start">
+          <div className="flex flex-col gap-8">
+            <div className="border border-border p-6 rounded-card bg-surface">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="w-24 h-24 rounded-2xl bg-surface-highlight animate-pulse" />
+                <div className="flex flex-col gap-3 pt-1 flex-1">
+                  <div className="h-9 w-48 bg-surface-highlight rounded-lg animate-pulse" />
+                  <div className="h-7 w-72 bg-surface-highlight rounded-lg animate-pulse" />
+                </div>
+              </div>
+              <div className="mt-6 p-5 rounded-xl bg-surface-base/80 border border-border/40">
+                <div className="flex justify-between items-end">
+                  <div className="h-9 w-24 bg-surface-highlight rounded animate-pulse" />
+                  <div className="h-5 w-36 bg-surface-highlight rounded animate-pulse" />
+                </div>
+                <div className="h-2.5 w-full bg-surface-highlight rounded-full mt-4 animate-pulse" />
+              </div>
+            </div>
+            {/* Chart skeleton */}
+            <div className="border border-border p-4 md:p-5 rounded-card bg-surface h-[400px] animate-pulse">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="h-4 w-16 bg-surface-highlight rounded" />
+                <div className="h-4 w-12 bg-surface-highlight rounded" />
+                <div className="h-4 w-12 bg-surface-highlight rounded" />
+              </div>
+              <div className="h-[320px] bg-surface-highlight rounded-lg" />
+            </div>
+          </div>
+          {/* Trade panel skeleton */}
+          <div className="border border-border p-6 rounded-card bg-surface h-[420px] animate-pulse">
+            <div className="flex gap-0 mb-6 rounded-input overflow-hidden">
+              <div className="flex-1 h-10 bg-surface-highlight" />
+              <div className="flex-1 h-10 bg-surface-base border-l border-border" />
+            </div>
+            <div className="h-16 bg-surface-highlight rounded-input mb-3" />
+            <div className="h-24 bg-surface-highlight/50 rounded-input mb-4" />
+            <div className="h-12 bg-surface-highlight rounded-input mt-auto" />
+          </div>
+        </div>
+        {/* Sato data skeleton */}
+        <div className="h-48 bg-surface rounded-card border border-border animate-pulse" />
+        {/* Activity panels skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+          <div className="h-64 bg-surface rounded-card border border-border animate-pulse" />
+          <div className="h-64 bg-surface rounded-card border border-border animate-pulse" />
+        </div>
       </div>
     </div>
   );
