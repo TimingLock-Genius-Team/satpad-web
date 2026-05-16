@@ -13,7 +13,7 @@ import type { ApiTokenTab } from "@/lib/api-types";
 import type { Token } from "@/types/token";
 
 const PAGE_SIZE = 12;
-const TOKEN_TABS = new Set<ApiTokenTab>(["trending", "new", "graduating", "all"]);
+const TOKEN_TABS = new Set<ApiTokenTab>(["trending", "new", "graduating", "graduated", "all"]);
 
 function isTokenTab(tab: string): tab is ApiTokenTab {
   return TOKEN_TABS.has(tab as ApiTokenTab);

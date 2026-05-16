@@ -12,6 +12,7 @@ const TABS = [
   { id: "trending", label: "Trending", Icon: Flame },
   { id: "new", label: "New", Icon: Sparkles },
   { id: "graduating", label: "Graduating soon", Icon: GraduationCap },
+  { id: "graduated", label: "Graduated", Icon: GraduationCap },
   { id: "all", label: "All", Icon: null },
 ];
 

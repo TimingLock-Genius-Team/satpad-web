@@ -50,7 +50,7 @@ export interface ApiStats {
   totalTrades: number;
 }
 
-export type ApiTokenTab = "trending" | "new" | "graduating" | "all";
+export type ApiTokenTab = "trending" | "new" | "graduating" | "graduated" | "all";
 
 export interface ApiTokenListItem {
   address: string;
