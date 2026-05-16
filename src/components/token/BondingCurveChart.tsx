@@ -89,7 +89,7 @@ function CustomTooltip({
     supply != null ? ((supply / MAX_SUPPLY) * 100).toFixed(2) : "0";
 
   return (
-    <div className="bg-[#111] border border-[#333] p-4 rounded-lg text-xs font-mono shadow-xl min-w-[180px]">
+    <div className="bg-surface-elevated border border-border p-4 rounded-lg text-xs font-mono shadow-xl min-w-[180px]">
       <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-2">
         <span className="text-content-secondary">cum. eth</span>
         <span className="text-content-primary text-right">
@@ -194,7 +194,7 @@ export function BondingCurveChart({
         </div>
       </div>
 
-      <div className="w-full h-[360px] mb-4 bg-[#0a0a0a] rounded-xl border border-border/50 overflow-hidden">
+      <div className="w-full h-[360px] mb-4 bg-surface-base rounded-xl border border-border/50 overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={data}

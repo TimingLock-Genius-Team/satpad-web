@@ -64,7 +64,7 @@ function CustomTooltip({
   if (!active || price == null || label == null) return null;
 
   return (
-    <div className="bg-[#111] border border-[#333] p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
+    <div className="bg-surface-elevated border border-border p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
       <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5">
         <span className="text-content-secondary">time</span>
         <span className="text-content-primary text-right">{formatTime(label)}</span>
@@ -82,7 +82,7 @@ export function TokenPriceTimeChart({ points, currentPriceOkbWei }: TokenPriceTi
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="w-full h-[260px] bg-[#0a0a0a]/50 rounded-xl overflow-hidden">
+      <div className="w-full h-[260px] bg-surface-base/50 rounded-xl overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 24, right: 20, left: 10, bottom: 10 }}>
             <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.05)" vertical={false} />

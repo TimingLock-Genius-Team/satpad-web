@@ -53,7 +53,7 @@ function CustomTooltip({
   if (!data) return null;
 
   return (
-    <div className="bg-[#111] border border-[#333] p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
+    <div className="bg-surface-elevated border border-border p-3 rounded-lg text-xs font-mono shadow-xl min-w-[160px]">
       <div className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5">
         <span className="text-content-secondary">reserve</span>
         <span className="text-content-primary text-right">
@@ -163,7 +163,7 @@ export const SatoIssuanceChart = ({
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="w-full h-[260px] bg-[#0a0a0a]/50 rounded-xl overflow-hidden">
+      <div className="w-full h-[260px] bg-surface-base/50 rounded-xl overflow-hidden">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart
             data={chartData}

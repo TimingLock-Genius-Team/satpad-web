@@ -23,7 +23,7 @@ export function TokenGrid({ tokens, viewMode = "comfy" }: TokenGridProps) {
           <span className="font-mono text-content-secondary">{tokens.length}</span> tokens
         </div>
         <div className="flex items-center gap-[6px] text-[11px] text-content-tertiary">
-          <span className="w-[6px] h-[6px] rounded-full bg-[#00FF88] animate-[brand-pulse_2s_ease-in-out_infinite]"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-brand-pulse"></span>
           <span className="uppercase tracking-[0.06em] font-medium">Live</span>
         </div>
       </div>

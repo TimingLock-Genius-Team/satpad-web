@@ -105,7 +105,7 @@ export function TokenChart({
   const yTicks = [0, 0.25, 0.5, 0.75, 1];
 
   return (
-    <div className={cn("bg-[#0D0F13] rounded-xl border border-border p-4 md:p-5", className)}>
+    <div className={cn("bg-surface rounded-xl border border-border p-4 md:p-5", className)}>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-3 text-xs font-mono">
         <div className="flex items-center gap-4 text-content-secondary">
           <span>curve</span>
@@ -125,7 +125,7 @@ export function TokenChart({
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-lg border border-border/40 bg-[#0B0D10]">
+      <div className="relative overflow-hidden rounded-lg border border-border/40 bg-surface-base">
         <svg viewBox={`0 0 ${CHART.width} ${CHART.height}`} className="block h-[360px] w-full" role="img" aria-label="Bonding curve supply and price chart">
           <defs>
             <linearGradient id="supplyFill" x1="0" x2="0" y1="0" y2="1">
