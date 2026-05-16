@@ -170,7 +170,7 @@ export interface ApiHolder {
 }
 
 export interface ApiQuoteTx {
-  kind: "buy" | "sell" | "approve" | "createToken";
+  kind: "buy" | "sell" | "approve" | "createToken" | "createTokenAndBuy";
   to: string;
   value: string;
   data: string;
@@ -313,6 +313,10 @@ export interface ApiCreateBuildRequest {
   metadataURI: string;
   socialURI: string;
   curveS: number;
+  /** Wei string; when set with recipient, backend builds atomic createTokenAndBuy */
+  initialBuyWei?: string;
+  recipient?: string;
+  slippageBps?: number;
 }
 
 export interface ApiCreateBuildResponse {

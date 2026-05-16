@@ -1,19 +1,29 @@
 "use client";
 
-import { useState, useRef, type DragEvent, type ChangeEvent } from "react";
+import { useState, useRef, useEffect, type DragEvent, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useWalletClient, usePublicClient, useSwitchChain, useChainId } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatEther, parseEther } from "viem";
 import { Plus, ChevronRight, ArrowLeft, Globe, X, Send } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useCreateTokenStore } from "@/store/createToken";
-import { useMetadataUpload, useCreateBuild } from "@/lib/api-hooks";
+import { useMetadataUpload, useCreateBuild, useConfig } from "@/lib/api-hooks";
 import { chainForSatpadNetwork } from "@/config/chains";
 import { sendPreparedTransactions } from "@/lib/wallet-txs";
 import { buildMetadataSigningMessage, randomMetadataNonce } from "@/lib/metadata-sign";
 import { getDefaultNetwork } from "@/lib/api";
 import { uploadImageToIPFS, isPinataConfigured } from "@/lib/ipfs";
+import {
+  CREATE_FLOW_CURVE_S_MIN,
+  CREATE_FLOW_CURVE_S_MAX,
+  LAUNCH_BUY_MAX_MINT_BPS,
+  clampCurveSForCreateFlow,
+  maxLaunchBuyGrossWei,
+  validateOptionalInitialBuyNativeInput,
+} from "@/lib/launch-buy-limits";
 import { CurvePreview } from "@/components/create/CurvePreview";
+import type { ApiCreateBuildRequest } from "@/lib/api-types";
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -21,6 +31,8 @@ const STEPS = [
   { id: 3, label: "Curve" },
   { id: 4, label: "Deploy" },
 ] as const;
+
+const INITIAL_BUY_SLIPPAGE_BPS = 100;
 
 function isValidUrl(url: string) {
   return url.startsWith("http://") || url.startsWith("https://");
@@ -48,11 +60,51 @@ export default function CreatePage() {
   const [deployStatus, setDeployStatus] = useState<"idle" | "uploading" | "building" | "success" | "error">("idle");
   const [deployError, setDeployError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const curveSInputRef = useRef<HTMLInputElement>(null);
   const imageFileRef = useRef<File | null>(null);
   const store = useCreateTokenStore();
+  const network = getDefaultNetwork();
 
   const metadataUpload = useMetadataUpload();
   const createBuild = useCreateBuild();
+  const config = useConfig(network);
+  const feeBps = config.data?.deployment.curve.feeBps ?? 30;
+  const curveSNormalized = clampCurveSForCreateFlow(store.curveS);
+  const launchBuyMaxWei = maxLaunchBuyGrossWei(curveSNormalized, feeBps);
+  const launchBuyMaxNative = Number(formatEther(launchBuyMaxWei)).toLocaleString(undefined, {
+    maximumFractionDigits: 4,
+  });
+  const initialBuyValidationError = validateOptionalInitialBuyNativeInput(store.initialBuyEth.trim(), store.curveS, feeBps);
+
+  useEffect(() => {
+    if (currentStep !== 3) return;
+    const el = curveSInputRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (document.activeElement !== el) return;
+      if (e.ctrlKey) return;
+      e.preventDefault();
+
+      const { curveS: raw, setField } = useCreateTokenStore.getState();
+      const base =
+        typeof raw === "number" &&
+        Number.isFinite(raw) &&
+        raw >= CREATE_FLOW_CURVE_S_MIN &&
+        raw <= CREATE_FLOW_CURVE_S_MAX
+          ? Math.trunc(raw)
+          : 0;
+      const delta = e.deltaY < 0 ? 1 : -1;
+      const next = Math.max(
+        CREATE_FLOW_CURVE_S_MIN,
+        Math.min(CREATE_FLOW_CURVE_S_MAX, base + delta),
+      );
+      if (next !== raw) setField("curveS", next);
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [currentStep]);
 
   const progressWidth =
     currentStep === 1
@@ -84,6 +136,12 @@ export default function CreatePage() {
       }
       setErrors(newErrors);
       if (Object.keys(newErrors).length > 0) return;
+    }
+    if (currentStep === 3) {
+      const s = clampCurveSForCreateFlow(store.curveS);
+      if (s !== store.curveS) {
+        store.setField("curveS", s);
+      }
     }
     if (currentStep < 4) {
       setCurrentStep((prev) => prev + 1);
@@ -135,7 +193,6 @@ export default function CreatePage() {
   };
 
   const handleDeploy = async () => {
-    const network = getDefaultNetwork();
     const chain = chainForSatpadNetwork(network);
 
     if (!walletAddress || !walletClient || !publicClient) return;
@@ -143,6 +200,13 @@ export default function CreatePage() {
     try {
       setDeployStatus("uploading");
       setDeployError("");
+
+      const curveSForTx = clampCurveSForCreateFlow(store.curveS);
+      const initialBuyPreflight = store.initialBuyEth.trim();
+      if (initialBuyPreflight.length > 0) {
+        const preflightErr = validateOptionalInitialBuyNativeInput(initialBuyPreflight, curveSForTx, feeBps);
+        if (preflightErr) throw new Error(preflightErr);
+      }
 
       let metadataURI = store.metadataURI;
 
@@ -197,15 +261,27 @@ export default function CreatePage() {
 
       setDeployStatus("building");
 
-      const buildResult = await createBuild.mutateAsync({
+      let buyWei = BigInt(0);
+      if (initialBuyPreflight.length > 0) {
+        buyWei = parseEther(initialBuyPreflight as `${string}`);
+      }
+
+      const buildRequest: ApiCreateBuildRequest = {
         network,
         name: store.name,
         symbol: store.symbol,
         description: store.description,
         metadataURI,
         socialURI: firstSocialUri(store.twitter, store.telegram, store.website),
-        curveS: store.curveS,
-      });
+        curveS: curveSForTx,
+      };
+      if (buyWei > BigInt(0)) {
+        buildRequest.initialBuyWei = buyWei.toString();
+        buildRequest.recipient = walletAddress as string;
+        buildRequest.slippageBps = INITIAL_BUY_SLIPPAGE_BPS;
+      }
+
+      const buildResult = await createBuild.mutateAsync(buildRequest);
 
       if (switchChainAsync && chainId !== chain.id) {
         await switchChainAsync({ chainId: chain.id });
@@ -571,6 +647,7 @@ export default function CreatePage() {
                       Curve S
                     </p>
                     <input
+                      ref={curveSInputRef}
                       type="text"
                       inputMode="numeric"
                       value={store.curveS || ""}
@@ -581,14 +658,14 @@ export default function CreatePage() {
                           store.setField("curveS", 0);
                         } else {
                           const num = Number(val);
-                          if (num <= 100) {
+                          if (num <= CREATE_FLOW_CURVE_S_MAX) {
                             store.setField("curveS", num);
                           }
                         }
                       }}
                       onBlur={() => {
-                        // 失去焦点时，确保值在 1-100 之间
-                        const finalVal = Math.max(1, Math.min(100, store.curveS));
+                        // 失去焦点时，确保值在 1–CREATE_FLOW_CURVE_S_MAX 之间
+                        const finalVal = Math.max(1, Math.min(CREATE_FLOW_CURVE_S_MAX, store.curveS));
                         store.setField("curveS", finalVal);
                       }}
                       className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
@@ -622,7 +699,54 @@ export default function CreatePage() {
               </div>
 
               {/* Curve Preview */}
-              <CurvePreview curveS={store.curveS} />
+              <CurvePreview
+                curveS={curveSNormalized}
+                feeBps={feeBps}
+                launchBuyNative={store.initialBuyEth}
+                onLaunchBuyNativeChange={(v) => store.setField("initialBuyEth", v)}
+              />
+
+              <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-3">
+                <h3 className="text-content-primary text-[14px] font-semibold">
+                  Initial purchase (optional)
+                </h3>
+                <p className="text-[11px] text-content-tertiary leading-relaxed">
+                  One atomic transaction: create the token and buy on the curve (Four.meme-style). Uses native gas
+                  token (ETH on Sepolia, OKB on X Layer).
+                </p>
+                <p className="text-[11px] text-content-tertiary leading-relaxed">
+                  Launch buy can mint at most {LAUNCH_BUY_MAX_MINT_BPS / 100}% of supply. Current max is{" "}
+                  <span className="font-mono text-content-secondary">{launchBuyMaxNative} native</span> for this curve.
+                </p>
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="text-[11px] text-content-tertiary">Amount (native)</p>
+                    <button
+                      type="button"
+                      onClick={() => store.setField("initialBuyEth", formatEther(launchBuyMaxWei))}
+                      className="text-[11px] font-semibold text-accent-primary hover:text-accent-primary/85 transition-colors tabular-nums"
+                    >
+                      Max
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="Leave empty for create-only"
+                    value={store.initialBuyEth}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/[^0-9.]/g, "");
+                      store.setField("initialBuyEth", v);
+                    }}
+                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
+                  />
+                  {initialBuyValidationError && (
+                    <p className="mt-2 text-[11px] text-accent-danger">
+                      {initialBuyValidationError}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -740,6 +864,23 @@ export default function CreatePage() {
                         <span className="text-content-secondary text-[12px] font-mono">{store.curveS}</span>
                       </div>
                     </div>
+
+                    {store.initialBuyEth.trim().length > 0 && (
+                      <div>
+                        <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-2">
+                          Initial purchase
+                        </p>
+                        <p className="text-content-secondary text-[13px] font-mono">
+                          {store.initialBuyEth.trim()} native{" "}
+                          <span className="text-content-tertiary">(single tx via factory)</span>
+                        </p>
+                        {initialBuyValidationError && (
+                          <p className="mt-2 text-[11px] text-accent-danger">
+                            {initialBuyValidationError}
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -779,7 +920,9 @@ export default function CreatePage() {
                     Token created successfully!
                   </p>
                   <p className="text-content-tertiary text-[13px] text-center max-w-sm">
-                    Your transaction has been submitted. The token will appear on the explore page shortly.
+                    {store.initialBuyEth.trim()
+                      ? "Launch and purchase are complete in one transaction. The token may take a moment to appear on Explore."
+                      : "Your transaction has been submitted. The token will appear on the explore page shortly."}
                   </p>
                   <button
                     type="button"
@@ -848,10 +991,10 @@ export default function CreatePage() {
                 <button
                   type="button"
                   onClick={handleDeploy}
-                  disabled={isLoading}
+                  disabled={isLoading || Boolean(initialBuyValidationError)}
                   className={cn(
                     "inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all text-[13px]",
-                    isLoading
+                    isLoading || initialBuyValidationError
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-accent-primary/90 hover:-translate-y-0.5"
                   )}

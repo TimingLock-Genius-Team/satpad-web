@@ -10,6 +10,8 @@ export interface CreateTokenState {
   telegram: string;
   website: string;
   curveS: number;
+  /** Native amount for optional atomic launch buy (e.g. 0.01 ETH) */
+  initialBuyEth: string;
   metadataURI: string | null;
   setField: (field: keyof CreateTokenState, value: string | number | null) => void;
   reset: () => void;
@@ -25,6 +27,7 @@ const initialState = {
   telegram: "",
   website: "",
   curveS: 25,
+  initialBuyEth: "",
   metadataURI: null as string | null,
 };
 
