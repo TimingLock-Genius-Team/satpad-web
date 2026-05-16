@@ -118,7 +118,7 @@ export default function Home() {
             </div>
           </div>
 
-         
+
         </div>
       </section>
 
@@ -128,12 +128,12 @@ export default function Home() {
           <div className="w-full md:w-auto overflow-hidden">
             <ExploreTabs activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
-          
+
           <div className="hidden md:block flex-1"></div>
 
           <div className="flex items-center justify-between gap-3 w-full md:w-auto">
             <div className="flex gap-0 border border-[#1E2028] rounded-lg overflow-hidden bg-transparent shrink-0">
-              <button 
+              <button
                 onClick={() => setViewMode("comfy")}
                 className={cn(
                   "px-[10px] py-[6px] text-xs font-medium transition-colors",
@@ -142,7 +142,7 @@ export default function Home() {
               >
                 Comfy
               </button>
-              <button 
+              <button
                 onClick={() => setViewMode("compact")}
                 className={cn(
                   "px-[10px] py-[6px] text-xs font-medium transition-colors",
@@ -156,9 +156,9 @@ export default function Home() {
             {/* Search */}
             <div className="flex items-center gap-2 bg-[#12131A] border border-[#1E2028] rounded-lg px-3 h-9 w-full md:max-w-[320px]">
               <Search className="w-4 h-4 text-content-tertiary flex-shrink-0" />
-              <input 
-                type="text" 
-                placeholder="Search name, symbol, or 0x address" 
+              <input
+                type="text"
+                placeholder="Search name, symbol, or 0x address"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className="flex-1 bg-transparent border-none focus:outline-none text-[13px] text-content-primary placeholder:text-content-tertiary min-w-0"
