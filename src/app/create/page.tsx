@@ -937,21 +937,38 @@ export default function CreatePage() {
 
               {/* Error State */}
               {deployStatus === "error" && (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-12 h-12 rounded-full bg-accent-danger/20 border border-accent-danger flex items-center justify-center">
-                    <X className="w-6 h-6 text-accent-danger" />
+                <div className="flex flex-col items-center py-8 w-full animate-in fade-in zoom-in-95 duration-400">
+                  <div className="w-14 h-14 rounded-full bg-accent-danger/10 border border-accent-danger/20 flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(239,68,68,0.15)] relative">
+                    <div className="absolute inset-0 rounded-full border border-accent-danger/40 animate-ping opacity-20 [animation-duration:2s]" />
+                    <X className="w-6 h-6 text-accent-danger relative z-10" />
                   </div>
-                  <p className="text-accent-danger text-[16px] font-semibold">
+                  
+                  <h3 className="text-content-primary text-xl font-bold mb-2">
                     Deployment failed
+                  </h3>
+                  
+                  <p className="text-content-tertiary text-[13px] mb-6 text-center max-w-md">
+                    We encountered an error while trying to deploy your token. See the details below.
                   </p>
-                  <p className="text-content-tertiary text-[13px] text-center max-w-sm">
-                    {deployError || "Something went wrong. Please try again."}
-                  </p>
+
+                  <div className="w-full bg-[#1A1112] border border-accent-danger/20 rounded-xl overflow-hidden mb-8 relative shadow-inner">
+                    <div className="bg-accent-danger/10 px-4 py-2 border-b border-accent-danger/20 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-accent-danger shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
+                      <span className="text-[10px] font-mono text-accent-danger/90 font-semibold uppercase tracking-widest">Error Log</span>
+                    </div>
+                    <div className="p-4 max-h-[180px] overflow-y-auto overflow-x-hidden custom-scrollbar">
+                      <p className="text-accent-danger/80 text-[12px] font-mono leading-relaxed break-words whitespace-pre-wrap select-text">
+                        {deployError || "Something went wrong. Please try again."}
+                      </p>
+                    </div>
+                  </div>
+
                   <button
                     type="button"
                     onClick={handleRetry}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
+                    className="inline-flex items-center gap-2 px-8 py-2.5 bg-surface border border-border text-content-primary font-semibold rounded-lg hover:bg-surface-highlight hover:border-content-tertiary transition-all text-[13px]"
                   >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     Try Again
                   </button>
                 </div>
