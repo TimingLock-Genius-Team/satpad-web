@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, Wallet } from "lucide-react";
 import { useAccount } from "wagmi";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 
@@ -64,8 +64,16 @@ export default function PortfolioPage() {
 
   if (!isConnected) {
     return (
-      <div className="w-full max-w-[1260px] mx-auto px-4 py-20 text-center">
-        <p className="text-content-tertiary text-lg">Connect your wallet to view your portfolio</p>
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        <div className="flex flex-col items-center gap-4 text-center px-4">
+          <div className="w-16 h-16 rounded-2xl bg-surface-highlight border border-border flex items-center justify-center">
+            <Wallet className="w-8 h-8 text-content-tertiary" />
+          </div>
+          <div>
+            <p className="text-content-primary text-lg font-semibold mb-1">No wallet connected</p>
+            <p className="text-content-tertiary text-sm">Connect your wallet to view your portfolio and trading history</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -78,10 +86,13 @@ export default function PortfolioPage() {
   const isLoading = portfolioLoading || historyLoading;
 
   return (
-    <div className="w-full max-w-[1260px] mx-auto px-4 py-8">
+    <div className="flex-1 w-full max-w-[1260px] mx-auto px-4 py-8 flex flex-col min-h-0">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[32px] font-bold text-content-primary">Portfolio</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-[32px] font-bold text-content-primary tracking-tight">Portfolio</h1>
+          <p className="text-content-tertiary text-sm mt-1">Your holdings and transaction history</p>
+        </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-surface rounded-full border border-border text-sm">
           <span className="text-content-secondary font-mono">{walletAddress ? shortAddr(walletAddress) : "..."}</span>
           {copied ? (
@@ -106,7 +117,7 @@ export default function PortfolioPage() {
       {!isLoading && (
         <>
           {/* Main Stats Card */}
-          <div className="bg-[#13151A] rounded-xl border border-border p-6 md:p-8 mb-8">
+          <div className="bg-surface rounded-xl border border-border p-6 md:p-8 mb-8">
             <div className="mb-8">
               <div className="text-content-tertiary text-xs font-semibold tracking-wider uppercase mb-2">
                 TOTAL VALUE
@@ -179,11 +190,12 @@ export default function PortfolioPage() {
                     <th className="px-6 py-4 font-semibold"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-[#13151A]">
+                <tbody className="divide-y divide-border bg-surface">
                   {holdings.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-content-tertiary">
-                        No holdings yet
+                      <td colSpan={7} className="px-6 py-16 text-center">
+                        <p className="text-content-tertiary text-sm">No holdings yet</p>
+                        <p className="text-content-tertiary/50 text-xs mt-1">Your tokens will appear here after your first trade</p>
                       </td>
                     </tr>
                   )}
@@ -258,11 +270,12 @@ export default function PortfolioPage() {
                     <th className="px-6 py-4 font-semibold"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-[#13151A]">
+                <tbody className="divide-y divide-border bg-surface">
                   {history.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-content-tertiary">
-                        No transaction history
+                      <td colSpan={6} className="px-6 py-16 text-center">
+                        <p className="text-content-tertiary text-sm">No transaction history</p>
+                        <p className="text-content-tertiary/50 text-xs mt-1">Your trades will appear here once you start trading</p>
                       </td>
                     </tr>
                   )}

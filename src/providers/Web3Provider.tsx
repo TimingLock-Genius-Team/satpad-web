@@ -8,8 +8,8 @@ import { wagmiConfig } from "@/config/wagmi";
 import "@rainbow-me/rainbowkit/styles.css";
 
 const appTheme = lightTheme({
-  accentColor: "#00FF88",
-  accentColorForeground: "#0A0B0E",
+  accentColor: "#000000",
+  accentColorForeground: "#FFFFFF",
   borderRadius: "medium",
   fontStack: "system",
   overlayBlur: "small",
