@@ -250,9 +250,9 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
         {/* Input Area */}
         <div className={txBusy ? "opacity-50 pointer-events-none" : ""}>
           <div className="bg-surface-base border border-border/50 p-4 rounded-input transition-colors focus-within:border-border">
-            <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3 uppercase tracking-wider">
-              <span>pay</span>
-              <span>bal: {balanceLabel}</span>
+            <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3">
+              <span>Pay</span>
+              <span>Bal: {balanceLabel}</span>
             </div>
             <div className="flex items-center justify-between gap-4">
               <input
@@ -349,8 +349,8 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
             txStage === "success"
               ? "bg-accent-success text-white"
               : isMint
-                ? "bg-accent-primary text-surface-base hover:bg-accent-primary/90 shadow-[0_0_15px_rgba(0,255,136,0.15)]"
-                : "bg-accent-danger text-white hover:bg-accent-danger/90 shadow-[0_0_15px_rgba(239,68,68,0.15)]"
+                ? "bg-accent-primary text-surface-base hover:bg-accent-primary/90"
+                : "bg-accent-danger text-white hover:bg-accent-danger/90"
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {txStage === "confirming" && <Loader2 className="w-4 h-4 animate-spin" />}

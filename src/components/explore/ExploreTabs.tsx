@@ -1,5 +1,6 @@
 "use client";
 
+import { Flame, Sparkles, GraduationCap } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 interface ExploreTabsProps {
@@ -8,10 +9,10 @@ interface ExploreTabsProps {
 }
 
 const TABS = [
-  { id: "trending", label: "Trending", icon: "🔥" },
-  { id: "new", label: "New", icon: "✨" },
-  { id: "graduating", label: "Graduating soon", icon: "🎓" },
-  { id: "all", label: "All", icon: null },
+  { id: "trending", label: "Trending", Icon: Flame },
+  { id: "new", label: "New", Icon: Sparkles },
+  { id: "graduating", label: "Graduating soon", Icon: GraduationCap },
+  { id: "all", label: "All", Icon: null },
 ];
 
 export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
@@ -19,22 +20,21 @@ export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
     <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide w-full max-w-full">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
-        
+        const IconComponent = tab.Icon;
+
         return (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "inline-flex items-center gap-[6px] px-[14px] py-2 rounded-[8px] text-[14px] leading-[1.4] font-medium transition-all whitespace-nowrap shrink-0",
+              "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] leading-[1.4] font-medium transition-all duration-200 whitespace-nowrap shrink-0",
               isActive
-                ? "bg-accent-primary/80 text-content-primary"
-                : "bg-transparent text-content-secondary hover:text-content-primary"
+                ? "bg-surface-highlight text-accent-primary ring-1 ring-accent-primary/25"
+                : "bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-highlight/50"
             )}
           >
-            {tab.icon && (
-              <span>
-                {tab.icon}
-              </span>
+            {IconComponent && (
+              <IconComponent className="w-3.5 h-3.5" />
             )}
             {tab.label}
           </button>

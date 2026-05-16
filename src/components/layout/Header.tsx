@@ -97,7 +97,7 @@ export function Header() {
       <div className="w-full max-w-[1440px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 md:gap-8">
           <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-            <span className="text-accent-primary italic drop-shadow-[0_0_8px_rgba(0,255,136,0.5)]">e</span>
+            <span className="text-accent-primary italic">e</span>
             <span className="text-content-primary">ulr</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
@@ -133,7 +133,7 @@ export function Header() {
                 onClick={() => setIsWalletDropdownOpen(!isWalletDropdownOpen)}
               >
                 <div className="hidden md:flex items-center gap-2 pr-3 border-r border-border/60">
-                  <span className="w-2 h-2 rounded-full bg-accent-primary shadow-[0_0_8px_rgba(0,255,136,0.6)]"></span>
+                  <span className="w-2 h-2 rounded-full bg-accent-primary"></span>
                   <span className="text-content-primary">{formattedBalance}</span>
                 </div>
                 <div className="flex items-center gap-1 md:gap-2 md:pl-1">

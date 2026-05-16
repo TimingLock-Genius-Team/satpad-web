@@ -763,7 +763,7 @@ export default function CreatePage() {
                   <button
                     type="button"
                     onClick={() => router.push("/")}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5 text-[13px]"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
                   >
                     View Explore
                     <ChevronRight className="w-4 h-4" />
@@ -786,7 +786,7 @@ export default function CreatePage() {
                   <button
                     type="button"
                     onClick={handleRetry}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5 text-[13px]"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
                   >
                     Try Again
                   </button>
@@ -817,7 +817,7 @@ export default function CreatePage() {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5 text-[13px]"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -829,10 +829,10 @@ export default function CreatePage() {
                   onClick={handleDeploy}
                   disabled={isLoading}
                   className={cn(
-                    "inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,136,0.15)] text-[13px]",
+                    "inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all text-[13px]",
                     isLoading
                       ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-accent-primary/90 hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:-translate-y-0.5"
+                      : "hover:bg-accent-primary/90 hover:-translate-y-0.5"
                   )}
                 >
                   Deploy

@@ -180,10 +180,9 @@ export default function TokenDetailPage() {
           {/* Left Column */}
           <div className="flex flex-col gap-8 min-w-0">
             {/* Token Header */}
-            <div className="border border-border p-6 rounded-card bg-surface shadow-sm relative overflow-hidden flex flex-col gap-8">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-accent-primary/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+            <div className="border border-border p-6 rounded-card bg-surface flex flex-col gap-8">
 
-              <div className="flex flex-col md:flex-row gap-6 justify-between items-start z-10">
+              <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
                   <div className="relative group flex-shrink-0">
                     <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-surface-highlight to-surface border border-border/50 flex items-center justify-center shadow-inner overflow-hidden">
@@ -204,7 +203,7 @@ export default function TokenDetailPage() {
                       <h1 className="text-3xl md:text-4xl font-bold text-content-primary tracking-tight leading-none">
                         {token.name}
                       </h1>
-                      <div className="px-2.5 py-1 bg-surface-base border border-border/80 rounded-md text-xs font-mono text-accent-primary font-bold tracking-widest shadow-sm">
+                      <div className="px-2.5 py-1 bg-surface-base border border-border/80 rounded-md text-xs font-mono text-accent-primary font-bold shadow-sm">
                         ${token.symbol}
                       </div>
                     </div>
@@ -257,13 +256,13 @@ export default function TokenDetailPage() {
               </div>
 
               {/* Progress Section */}
-              <div className="flex flex-col gap-4 p-5 rounded-xl bg-surface-base/80 border border-border/40 relative z-10">
+              <div className="flex flex-col gap-4 p-5 rounded-xl bg-surface-base/80 border border-border/40">
                 <div className="flex justify-between items-end">
                   <div className="flex items-baseline gap-3">
                     <span className="text-3xl font-mono font-bold text-content-primary tracking-tight leading-none">
                       {progress.toFixed(1)}%
                     </span>
-                    <span className="text-[10px] text-content-tertiary uppercase tracking-widest font-bold">Minted</span>
+                    <span className="text-[10px] text-content-tertiary font-medium">Minted</span>
                   </div>
                   <div className="text-right">
                     <div className="font-mono text-sm text-content-secondary mb-1">
@@ -315,7 +314,7 @@ export default function TokenDetailPage() {
         <div className="pt-2">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1.5 h-3.5 bg-accent-primary rounded-sm" />
-            <h2 className="text-content-primary font-bold tracking-widest uppercase text-xs">sato data</h2>
+            <h2 className="text-content-primary font-semibold text-xs">sato data</h2>
           </div>
           <div className="border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px]">
@@ -395,7 +394,7 @@ export default function TokenDetailPage() {
         <div className="pt-2">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1.5 h-3.5 bg-accent-primary rounded-sm" />
-            <h2 className="text-content-primary font-bold tracking-widest uppercase text-xs">price and issuance</h2>
+            <h2 className="text-content-primary font-semibold text-xs">price and issuance</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             <div className="flex flex-col gap-3 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">

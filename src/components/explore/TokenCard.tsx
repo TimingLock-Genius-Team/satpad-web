@@ -94,7 +94,7 @@ export function TokenCard({ token }: TokenCardProps) {
   return (
     <Link
       href={`/token/${token.address}`}
-      className="group bg-surface border border-border rounded-xl p-4 h-[220px] flex flex-col gap-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-accent-success/40 hover:shadow-[0_4px_20px_rgba(0,255,136,0.06)] relative overflow-hidden"
+      className="group bg-surface border border-border/50 rounded-xl p-4 h-[220px] flex flex-col gap-3 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:border-border-hover hover:shadow-sm relative overflow-hidden"
     >
       {/* Card Header */}
       <div className="flex items-start gap-3">
@@ -165,18 +165,18 @@ export function TokenCard({ token }: TokenCardProps) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 mt-auto">
         <div>
-          <div className="text-[10px] text-content-tertiary uppercase tracking-wider mb-1">Price</div>
+          <div className="text-[10px] text-content-tertiary mb-1">Price</div>
           <div className="flex items-baseline gap-1">
             <span className="font-mono text-[13px] font-medium text-content-primary">{formatPrice(priceNum)}</span>
             <span className="font-mono text-[11px] text-content-tertiary">OKB</span>
           </div>
         </div>
         <div>
-          <div className="text-[10px] text-content-tertiary uppercase tracking-wider mb-1">MCap</div>
+          <div className="text-[10px] text-content-tertiary mb-1">MCap</div>
           <span className="font-mono text-[13px] font-medium text-content-primary">{token.mcap ?? "--"}</span>
         </div>
         <div>
-          <div className="text-[10px] text-content-tertiary uppercase tracking-wider mb-1">24h Vol</div>
+          <div className="text-[10px] text-content-tertiary mb-1">24h Vol</div>
           <span className="font-mono text-[13px] font-medium text-content-primary">{volumeDisplay}</span>
         </div>
       </div>

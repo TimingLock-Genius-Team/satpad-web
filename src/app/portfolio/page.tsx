@@ -225,8 +225,8 @@ export default function PortfolioPage() {
           {/* Main Stats Card */}
           <div className="bg-surface rounded-xl border border-border p-6 md:p-8 mb-8">
             <div className="mb-8">
-              <div className="text-content-tertiary text-xs font-semibold tracking-wider uppercase mb-2">
-                TOTAL VALUE
+              <div className="text-content-tertiary text-xs font-medium mb-2">
+                Total Value
               </div>
               <div className="text-5xl font-mono font-bold text-content-primary tracking-tight mb-2">
                 {totalValueOkb.toFixed(4)} OKB
@@ -235,22 +235,22 @@ export default function PortfolioPage() {
 
             <div className="border-t border-border pt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
-                <div className="text-content-tertiary text-xs font-semibold tracking-wider uppercase mb-2">
-                  TOKENS HELD
+                <div className="text-content-tertiary text-xs font-medium mb-2">
+                  Tokens Held
                 </div>
                 <div className="text-xl font-mono font-bold text-content-primary">{holdings.length}</div>
               </div>
               <div>
-                <div className="text-content-tertiary text-xs font-semibold tracking-wider uppercase mb-2">
-                  REALIZED PNL
+                <div className="text-content-tertiary text-xs font-medium mb-2">
+                  Realized PnL
                 </div>
                 <div className={`text-xl font-mono font-bold ${realizedPnlOkb >= 0 ? "text-accent-success" : "text-accent-danger"}`}>
                   {realizedPnlOkb >= 0 ? "+" : ""}{realizedPnlOkb.toFixed(4)} OKB
                 </div>
               </div>
               <div>
-                <div className="text-content-tertiary text-xs font-semibold tracking-wider uppercase mb-2">
-                  WALLET
+                <div className="text-content-tertiary text-xs font-medium mb-2">
+                  Wallet
                 </div>
                 <div className="text-xl font-mono font-bold text-content-primary">{shortAddr(walletAddress || "")}</div>
               </div>

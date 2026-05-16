@@ -13,21 +13,21 @@
 }
 
 :root {
-  /* Dark theme by default as per spec */
-  --surface-base: 10 11 14;     /* #0A0B0E */
-  --surface: 18 19 24;          /* #121318 */
-  --surface-elevated: 22 24 33; /* #161821 */
-  --surface-highlight: 31 34 46;/* #1F222E */
+  /* Dark theme — refined palette with subtle blue undertones */
+  --surface-base: 7 8 13;       /* #07080D */
+  --surface: 13 15 22;          /* #0D0F16 */
+  --surface-elevated: 18 20 30; /* #12141E */
+  --surface-highlight: 25 28 40;/* #191C28 */
 
-  --text-primary: 242 244 248;  /* #F2F4F8 */
-  --text-secondary: 160 170 191;/* #A0AABF */
-  --text-tertiary: 100 116 139; /* #64748B */
+  --text-primary: 236 239 245;  /* #ECEFF5 */
+  --text-secondary: 148 156 176;/* #949CB0 */
+  --text-tertiary: 94 104 126;  /* #5E687E */
 
-  --border-default: 30 34 48;   /* #1E2230 */
-  --border-hover: 45 51 72;     /* #2D3348 */
+  --border-default: 22 25 36;   /* #161924 */
+  --border-hover: 35 39 54;     /* #232736 */
 
-  --accent-primary: 0 255 136;  /* #00FF88 */
-  --accent-success: 0 255 136;  /* #00FF88 */
+  --accent-primary: 46 232 144; /* #2EE890 */
+  --accent-success: 46 232 144; /* #2EE890 */
   --accent-warning: 245 158 11; /* #F59E0B */
   --accent-danger: 239 68 68;   /* #EF4444 */
 
@@ -85,6 +85,13 @@ body {
 *:focus-visible {
   outline: 2px solid rgb(var(--accent-primary)) !important;
   outline-offset: 2px;
+}
+
+input:focus,
+textarea:focus,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
 }
 
 /* RainbowKit connect modal — force black text for readability */
