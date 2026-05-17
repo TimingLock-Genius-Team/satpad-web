@@ -19,7 +19,7 @@ function formatAddress(address: string): string {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
-function chainForId(_chainId?: number) {
+function chainForId() {
   return getDefaultChain();
 }
 
@@ -32,7 +32,7 @@ export function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { address, chainId, isConnected, isReconnecting } = useAccount();
-  const activeChain = chainForId(chainId);
+  const activeChain = chainForId();
   const { data: balanceData } = useBalance({
     address,
     chainId: chainId ?? activeChain.id,

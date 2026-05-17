@@ -26,6 +26,8 @@ export function mapApiTokenToToken(item: ApiTokenListItem): Token {
   };
 }
 
-export default {
+const tokenDisplay = {
   mapApiTokenToToken,
 };
+
+export default tokenDisplay;

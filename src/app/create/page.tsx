@@ -414,6 +414,7 @@ export default function CreatePage() {
                   >
                     {store.image ? (
                       <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={store.image}
                           alt="Token preview"
@@ -784,6 +785,7 @@ export default function CreatePage() {
                     {/* Image + Name/Symbol */}
                     <div className="flex items-center gap-4">
                       {store.image ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={store.image}
                           alt="Token"

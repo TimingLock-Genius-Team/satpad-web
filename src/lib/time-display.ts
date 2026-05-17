@@ -13,7 +13,9 @@ export function timeAgo(timestamp: number, nowMs: number): string {
   return `${seconds}s ago`;
 }
 
-export default {
+const timeDisplay = {
   timeAgo,
   timestampMs,
 };
+
+export default timeDisplay;

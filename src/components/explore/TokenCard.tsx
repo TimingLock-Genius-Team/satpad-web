@@ -103,6 +103,7 @@ export function TokenCard({ token }: TokenCardProps) {
           style={avatarSrc ? undefined : { background: getBgColor(token.symbol) }}
         >
           {avatarSrc ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
             <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover" />
           ) : (
             token.symbol.slice(0, 2).toUpperCase()

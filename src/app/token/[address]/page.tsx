@@ -13,11 +13,10 @@ import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks"
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/utils/cn";
 import { resolveIpfsUrl } from "@/lib/ipfs";
-import { useAccount } from "wagmi";
 import { getDefaultChain } from "@/config/chains";
 import { buildUniswapLinks } from "@/lib/uniswap-links";
 
-function chainForId(_chainId?: number) {
+function chainForId() {
   return getDefaultChain();
 }
 
@@ -121,8 +120,7 @@ export default function TokenDetailPage() {
 
   const [copied, setCopied] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { chainId } = useAccount();
-  const activeChain = chainForId(chainId);
+  const activeChain = chainForId();
   const queryClient = useQueryClient();
 
   const handleCopyAddress = useCallback(async () => {
@@ -193,6 +191,7 @@ export default function TokenDetailPage() {
               {/* Left: Avatar */}
               <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0">
                 {avatarSrc ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover rounded-xl" />
                 ) : (
                   <div className="w-full h-full bg-surface-highlight rounded-xl flex items-center justify-center text-4xl font-bold text-content-primary">
