@@ -6,6 +6,7 @@ import { Pagination } from "@/components/explore/Pagination";
 import { useAccount } from "wagmi";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
+import { resolveIpfsUrl } from "@/lib/ipfs";
 
 import { timeAgo } from "@/lib/time-display";
 import { toTradeSide } from "@/lib/trade-display";
@@ -309,16 +310,26 @@ export default function PortfolioPage() {
                   {paginatedHoldings.map((h, idx) => {
                     const pnlOkb = fmtOkb(h.unrealizedPnlOkb);
                     const isPositive = pnlOkb >= 0;
+                    const hAvatarSrc = resolveIpfsUrl(h.avatarUrl);
                     return (
                       <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div
-                              className="w-8 h-8 rounded flex items-center justify-center text-white font-bold text-xs"
-                              style={{ background: getBgColor(h.symbol) }}
-                            >
-                              {h.symbol.slice(0, 2).toUpperCase()}
-                            </div>
+                            {hAvatarSrc ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={hAvatarSrc}
+                                alt={h.symbol}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                            ) : (
+                              <div
+                                className="w-8 h-8 rounded flex items-center justify-center text-white font-bold text-xs"
+                                style={{ background: getBgColor(h.symbol) }}
+                              >
+                                {h.symbol.slice(0, 2).toUpperCase()}
+                              </div>
+                            )}
                             <div>
                               <div className="font-semibold text-content-primary group-hover:text-accent-primary transition-colors">
                                 {h.name}
@@ -403,17 +414,27 @@ export default function PortfolioPage() {
                     const hasOkbFlow = isMint || isBurn;
                     const okbPrefix = isMint ? "-" : isBurn ? "+" : "";
                     const tokenPrefix = isMint || isTransferIn ? "+" : isBurn || isTransferOut ? "-" : "";
+                    const histAvatarSrc = resolveIpfsUrl(item.token.avatarUrl);
                     return (
                       <tr key={idx} className="hover:bg-surface-highlight/30 transition-colors group">
                         <td className="px-6 py-4 text-content-tertiary">{timeAgo(item.ts, Date.now())}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div
-                              className="w-6 h-6 rounded flex items-center justify-center text-white font-bold text-[10px]"
-                              style={{ background: getBgColor(item.token.symbol) }}
-                            >
-                              {item.token.symbol.slice(0, 2).toUpperCase()}
-                            </div>
+                            {histAvatarSrc ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img
+                                src={histAvatarSrc}
+                                alt={item.token.symbol}
+                                className="w-6 h-6 rounded object-cover"
+                              />
+                            ) : (
+                              <div
+                                className="w-6 h-6 rounded flex items-center justify-center text-white font-bold text-[10px]"
+                                style={{ background: getBgColor(item.token.symbol) }}
+                              >
+                                {item.token.symbol.slice(0, 2).toUpperCase()}
+                              </div>
+                            )}
                             <div className="flex items-baseline gap-1.5">
                               <span className="font-semibold text-content-primary">{item.token.name}</span>
                               <span className="text-xs text-content-tertiary">{item.token.symbol}</span>
