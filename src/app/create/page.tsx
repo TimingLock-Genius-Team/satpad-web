@@ -56,7 +56,7 @@ export default function CreatePage() {
   const publicClient = usePublicClient();
   const { switchChainAsync } = useSwitchChain();
   const [currentStep, setCurrentStep] = useState(1);
-  const [errors, setErrors] = useState<{ name?: string; symbol?: string; twitter?: string; telegram?: string; website?: string }>({});
+  const [errors, setErrors] = useState<{ image?: string; name?: string; symbol?: string; twitter?: string; telegram?: string; website?: string }>({});
   const [deployStatus, setDeployStatus] = useState<"idle" | "uploading" | "building" | "success" | "error">("idle");
   const [deployError, setDeployError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -158,13 +158,16 @@ export default function CreatePage() {
 
   const handleImageFile = (file: File) => {
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      alert("Please upload a PNG, JPG, or WebP image.");
+      setErrors((prev) => ({ ...prev, image: "Please upload a PNG, JPG, or WebP image." }));
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
     if (file.size > 1024 * 1024) {
-      alert("Image must be less than 1MB.");
+      setErrors((prev) => ({ ...prev, image: "Image must be less than 1MB." }));
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
+    setErrors((prev) => ({ ...prev, image: undefined }));
     imageFileRef.current = file;
     store.setField("imageIpfsUri", null);
     const reader = new FileReader();
@@ -189,6 +192,7 @@ export default function CreatePage() {
     store.setField("image", null);
     store.setField("imageIpfsUri", null);
     imageFileRef.current = null;
+    setErrors((prev) => ({ ...prev, image: undefined }));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -446,6 +450,14 @@ export default function CreatePage() {
                   className="hidden"
                   onChange={handleFileChange}
                 />
+                {errors.image && (
+                  <div className="mt-3 px-3 py-2.5 bg-accent-danger/10 border border-accent-danger/20 rounded-lg flex items-center gap-2.5 text-accent-danger transition-all duration-300">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <p className="text-[13px] font-medium">{errors.image}</p>
+                  </div>
+                )}
               </div>
 
               {/* Token Name */}
@@ -712,7 +724,7 @@ export default function CreatePage() {
                 </h3>
                 <p className="text-[11px] text-content-tertiary leading-relaxed">
                   One atomic transaction: create the token and buy on the curve (Four.meme-style). Uses native gas
-                  token (ETH on Sepolia, OKB on X Layer).
+                  token ( OKB on X Layer).
                 </p>
                 <p className="text-[11px] text-content-tertiary leading-relaxed">
                   Launch buy can mint at most {LAUNCH_BUY_MAX_MINT_BPS / 100}% of supply. Current max is{" "}
