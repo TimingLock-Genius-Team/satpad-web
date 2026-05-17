@@ -14,19 +14,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/utils/cn";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 import { useAccount } from "wagmi";
-import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
+import { getDefaultChain } from "@/config/chains";
 import { buildUniswapLinks } from "@/lib/uniswap-links";
 
-function chainForId(chainId?: number) {
-  switch (chainId) {
-    case xLayer.id:
-      return xLayer;
-    case hashKeyTestnet.id:
-      return hashKeyTestnet;
-    case sepolia.id:
-    default:
-      return sepolia;
-  }
+function chainForId(_chainId?: number) {
+  return getDefaultChain();
 }
 
 const XIcon = ({ className }: { className?: string }) => (

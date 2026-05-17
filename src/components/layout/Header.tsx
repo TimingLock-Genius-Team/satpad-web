@@ -7,7 +7,7 @@ import { ChevronDown, Menu, X, LogOut, ExternalLink, Copy, Check, Wallet, Repeat
 import { useConnectModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { cn } from "@/utils/cn";
-import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
+import { getDefaultChain } from "@/config/chains";
 
 const NAV_ITEMS = [
   { href: "/", label: "Explore" },
@@ -19,16 +19,8 @@ function formatAddress(address: string): string {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
-function chainForId(chainId?: number) {
-  switch (chainId) {
-    case xLayer.id:
-      return xLayer;
-    case hashKeyTestnet.id:
-      return hashKeyTestnet;
-    case sepolia.id:
-    default:
-      return sepolia;
-  }
+function chainForId(_chainId?: number) {
+  return getDefaultChain();
 }
 
 export function Header() {

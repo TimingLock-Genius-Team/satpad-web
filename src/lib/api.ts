@@ -7,7 +7,7 @@
 const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 const API_BASE_URL =
   rawBase === undefined || rawBase === "" ? "" : rawBase.replace(/\/$/, "");
-const DEFAULT_NETWORK = process.env.NEXT_PUBLIC_DEFAULT_NETWORK || "sepolia";
+const DEFAULT_NETWORK = process.env.NEXT_PUBLIC_DEFAULT_NETWORK || "xlayer";
 
 export function getApiBaseUrl() {
   return API_BASE_URL;
