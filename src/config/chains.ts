@@ -54,10 +54,15 @@ export const xLayer = defineChain({
   },
 });
 
+const NETWORK_CHAINS: Record<string, ReturnType<typeof defineChain>> = {
+  sepolia,
+  xlayer: xLayer,
+};
+
 export function getDefaultChain() {
-  return process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "sepolia" ? sepolia : xLayer;
+  return NETWORK_CHAINS[process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ""] ?? xLayer;
 }
 
-export function chainForSatpadNetwork(_network: string) {
-  return xLayer;
+export function chainForSatpadNetwork(network: string) {
+  return NETWORK_CHAINS[network] ?? xLayer;
 }
