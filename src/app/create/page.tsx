@@ -314,24 +314,39 @@ export default function CreatePage() {
   const isLoading = deployStatus === "uploading" || deployStatus === "building";
 
   return (
-    <div className="w-full min-h-screen bg-surface-base flex flex-col items-center pt-8 md:pt-12 px-4 pb-20">
-      <div className="max-w-[900px] w-full">
+    <div className="w-full min-h-screen relative flex flex-col items-center pt-8 md:pt-16 px-4 pb-20 overflow-hidden font-sans">
+      {/* Full Page Decorative Background Elements (Homepage Style) */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_60%,transparent_100%)]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-accent-primary/10 rounded-full blur-[120px] mix-blend-screen animate-blob" />
+        <div className="absolute top-[20%] right-[-5%] w-[40vw] h-[40vw] bg-accent-success/10 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] bg-accent-primary/5 rounded-full blur-[150px] mix-blend-screen animate-blob" style={{ animationDelay: '4s' }} />
+      </div>
+
+      <div className="max-w-[900px] w-full relative z-10">
         {/* Header */}
-        <div className="mb-10 text-left">
-          <h1 className="text-3xl md:text-[32px] font-bold tracking-tight mb-2 text-content-primary">
-            Launch a token
+        <div className="mb-10 text-left relative z-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[12px] bg-surface-highlight border border-border/50 text-[10px] font-mono font-bold tracking-widest text-content-secondary mb-6 opacity-0 animate-fade-in-up uppercase">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-primary"></span>
+            </span>
+            DEPLOYMENT_PROTOCOL // INIT
+          </div>
+          <h1 className="text-[3rem] md:text-[4.5rem] leading-[1.05] font-bold tracking-tighter mb-4 text-content-primary opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            Launch a <span className="text-accent-primary italic pr-2">token</span>
           </h1>
-          <p className="text-content-secondary text-sm md:text-base">
+          <p className="text-content-secondary text-lg md:text-xl font-mono tracking-tight opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             Permanent. Public. Powered by math.
           </p>
         </div>
 
         {/* Stepper */}
-        <div className="flex items-center justify-between mb-8 relative">
-          <div className="absolute left-0 top-4 w-full h-0.5 bg-border z-0" />
+        <div className="flex items-center justify-between mb-10 relative opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <div className="absolute left-0 top-6 w-full h-[1px] bg-border z-0" />
           <div
             className={cn(
-              "absolute left-0 top-4 h-0.5 bg-accent-primary z-0 transition-all duration-300",
+              "absolute left-0 top-6 h-[2px] bg-accent-primary z-0 transition-all duration-500 shadow-[0_0_10px_rgba(46,232,144,0.5)]",
               progressWidth,
             )}
           />
@@ -344,41 +359,44 @@ export default function CreatePage() {
               <div
                 key={step.id}
                 className={cn(
-                  "relative z-10 flex flex-col gap-2 bg-surface-base",
-                  i === 0 && "items-start pr-4",
-                  i === STEPS.length - 1 && "items-end pl-4",
-                  i !== 0 && i !== STEPS.length - 1 && "items-center px-2 md:px-4",
+                  "relative z-10 flex flex-col gap-3",
+                  i === 0 && "items-start",
+                  i === STEPS.length - 1 && "items-end",
+                  i !== 0 && i !== STEPS.length - 1 && "items-center",
                 )}
               >
                 <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center font-medium text-sm border transition-colors duration-300",
-                    isActive && "bg-accent-primary/20 border-accent-primary text-accent-primary",
-                    isCompleted && "bg-accent-primary border-accent-primary text-surface-base",
-                    !isActive && !isCompleted && "bg-surface border-border text-content-tertiary",
+                    "w-12 h-12 rounded-[10px] flex items-center justify-center font-mono font-bold text-[14px] border-2 transition-all duration-300 transform relative overflow-hidden",
+                    isActive && "bg-[#0A0A0A] border-accent-primary text-accent-primary shadow-[0_0_20px_rgba(46,232,144,0.4)] scale-110 rotate-3",
+                    isCompleted && "bg-accent-primary border-accent-primary text-surface-base shadow-[0_0_15px_rgba(46,232,144,0.3)]",
+                    !isActive && !isCompleted && "bg-[#0A0A0A] border-border text-content-tertiary",
                   )}
                 >
-                  {isCompleted ? (
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  ) : (
-                    step.id
-                  )}
+                  {isActive && <div className="absolute inset-0 bg-accent-primary/20" />}
+                  <span className="relative z-10">
+                    {isCompleted ? (
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      `0${step.id}`
+                    )}
+                  </span>
                 </div>
                 <span
                   className={cn(
-                    "text-sm transition-colors duration-300",
-                    isActive && "text-accent-primary font-medium",
+                    "text-[11px] font-mono tracking-widest uppercase transition-colors duration-300 bg-surface-base/80 px-1.5 py-0.5 rounded backdrop-blur-sm",
+                    isActive && "text-accent-primary font-bold shadow-[0_0_10px_rgba(46,232,144,0.2)]",
                     isCompleted && "text-accent-primary",
                     !isActive && !isCompleted && "text-content-tertiary",
                   )}
@@ -391,22 +409,24 @@ export default function CreatePage() {
         </div>
 
         {/* Form Container */}
-        <div className="bg-surface rounded-2xl border border-border p-6 md:p-8 space-y-6">
+        <div className="bg-surface/60 backdrop-blur-xl border border-border/50 rounded-[12px] p-6 md:p-8 space-y-6 shadow-2xl relative overflow-hidden group/form opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          {/* Ambient Glow */}
+          <div className="absolute -top-32 -right-32 w-64 h-64 bg-accent-primary/20 rounded-full blur-[100px] opacity-0 group-hover/form:opacity-100 transition-opacity duration-700 pointer-events-none" />
           {/* ============ Step 1: Basics ============ */}
           {currentStep === 1 && (
             <>
               {/* Image Upload */}
-              <div>
-                <label className="block text-[13px] font-medium text-content-secondary mb-3">
-                  Image (optional)
+              <div className="relative z-10">
+                <label className="block text-[10px] font-mono tracking-widest uppercase font-bold text-content-secondary mb-3">
+                  Image_Source <span className="text-content-tertiary font-normal lowercase">(optional)</span>
                 </label>
                 <div className="flex items-center gap-6">
                   <div
                     className={cn(
-                      "w-[90px] h-[90px] flex-shrink-0 rounded-2xl bg-surface-highlight border border-dashed flex items-center justify-center cursor-pointer transition-colors relative overflow-hidden",
+                      "w-[90px] h-[90px] flex-shrink-0 rounded-[12px] bg-[#0A0A0A] border border-dashed flex items-center justify-center cursor-pointer transition-all duration-300 relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] group/upload",
                       store.image
-                        ? "border-border"
-                        : "border-border hover:border-accent-primary/50",
+                        ? "border-border/50"
+                        : "border-border/50 hover:border-accent-primary hover:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                     )}
                     onClick={() => fileInputRef.current?.click()}
                     onDragOver={(e) => e.preventDefault()}
@@ -426,21 +446,21 @@ export default function CreatePage() {
                             e.stopPropagation();
                             clearImage();
                           }}
-                          className="absolute top-1.5 right-1.5 w-5 h-5 bg-surface/90 rounded-full flex items-center justify-center hover:bg-surface transition-colors"
+                          className="absolute top-1.5 right-1.5 w-5 h-5 bg-surface/90 backdrop-blur rounded-[6px] flex items-center justify-center hover:bg-accent-danger/20 hover:text-accent-danger transition-colors border border-border/50"
                         >
-                          <X className="w-3 h-3 text-content-primary" />
+                          <X className="w-3 h-3 text-content-primary transition-colors" />
                         </button>
                       </>
                     ) : (
-                      <Plus className="w-8 h-8 text-content-tertiary" />
+                      <Plus className="w-8 h-8 text-content-tertiary group-hover/upload:text-accent-primary transition-colors group-hover/upload:scale-110" />
                     )}
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="text-content-primary text-[13px] font-medium mb-1.5">
                       Drag and drop, or click to choose
                     </p>
-                    <p className="text-content-tertiary text-[11px]">
-                      PNG / JPG / WebP / GIF - 512x512 recommended - max 1MB
+                    <p className="text-content-tertiary text-[11px] font-mono">
+                      PNG / JPG / WebP / GIF - 512x512 max 1MB
                     </p>
                   </div>
                 </div>
@@ -452,22 +472,22 @@ export default function CreatePage() {
                   onChange={handleFileChange}
                 />
                 {errors.image && (
-                  <div className="mt-3 px-3 py-2.5 bg-accent-danger/10 border border-accent-danger/20 rounded-lg flex items-center gap-2.5 text-accent-danger transition-all duration-300">
+                  <div className="mt-3 px-3 py-2.5 bg-accent-danger/10 border border-accent-danger/30 rounded-[8px] flex items-center gap-2.5 text-accent-danger transition-all duration-300">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    <p className="text-[13px] font-medium">{errors.image}</p>
+                    <p className="text-[12px] font-mono">{errors.image}</p>
                   </div>
                 )}
               </div>
 
               {/* Token Name */}
-              <div>
+              <div className="relative z-10">
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-[13px] font-medium text-content-secondary">
-                    Token name <span className="text-accent-warning">*</span>
+                  <label className="block text-[10px] font-mono tracking-widest uppercase font-bold text-content-secondary">
+                    Token_Name <span className="text-accent-warning">*</span>
                   </label>
-                  <span className="text-[11px] text-content-tertiary">
+                  <span className="text-[10px] font-mono text-content-tertiary">
                     {store.name.length}/32
                   </span>
                 </div>
@@ -482,22 +502,22 @@ export default function CreatePage() {
                   }}
                   maxLength={32}
                   className={cn(
-                    "w-full bg-surface-highlight border rounded-lg px-4 py-2.5 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors",
-                    errors.name ? "border-accent-danger" : "border-border",
+                    "w-full bg-[#0A0A0A] border rounded-[12px] px-4 py-3 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none transition-all duration-300",
+                    errors.name ? "border-accent-danger/50 focus:border-accent-danger focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-border/50 focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                   )}
                 />
                 {errors.name && (
-                  <p className="text-accent-danger text-[11px] mt-1">{errors.name}</p>
+                  <p className="text-accent-danger text-[11px] font-mono mt-1.5">{errors.name}</p>
                 )}
               </div>
 
               {/* Symbol */}
-              <div>
+              <div className="relative z-10">
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-[13px] font-medium text-content-secondary">
-                    Symbol <span className="text-accent-warning">*</span>
+                  <label className="block text-[10px] font-mono tracking-widest uppercase font-bold text-content-secondary">
+                    Ticker_Symbol <span className="text-accent-warning">*</span>
                   </label>
-                  <span className="text-[11px] text-content-tertiary">
+                  <span className="text-[10px] font-mono text-content-tertiary">
                     {store.symbol.length}/8
                   </span>
                 </div>
@@ -515,22 +535,22 @@ export default function CreatePage() {
                   }}
                   maxLength={8}
                   className={cn(
-                    "w-full bg-surface-highlight border rounded-lg px-4 py-2.5 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors",
-                    errors.symbol ? "border-accent-danger" : "border-border",
+                    "w-full bg-[#0A0A0A] border rounded-[12px] px-4 py-3 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none transition-all duration-300 font-mono font-bold tracking-wider",
+                    errors.symbol ? "border-accent-danger/50 focus:border-accent-danger focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-border/50 focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                   )}
                 />
                 {errors.symbol && (
-                  <p className="text-accent-danger text-[11px] mt-1">{errors.symbol}</p>
+                  <p className="text-accent-danger text-[11px] font-mono mt-1.5">{errors.symbol}</p>
                 )}
-                <p className="text-[11px] text-content-tertiary mt-2">
+                <p className="text-[10px] font-mono text-content-tertiary mt-2">
                   Auto-uppercased. Letters and numbers only, max 8 characters.
                 </p>
               </div>
 
               {/* Description */}
-              <div>
-                <label className="block text-[13px] font-medium text-content-secondary mb-2">
-                  Description
+              <div className="relative z-10">
+                <label className="block text-[10px] font-mono tracking-widest uppercase font-bold text-content-secondary mb-2">
+                  Metadata_Desc
                 </label>
                 <div className="relative">
                   <textarea
@@ -541,13 +561,13 @@ export default function CreatePage() {
                       store.setField("description", e.target.value)
                     }
                     maxLength={280}
-                    className="w-full bg-surface-highlight border border-border rounded-lg px-4 py-2.5 pb-8 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors resize-none"
+                    className="w-full bg-[#0A0A0A] border border-border/50 rounded-[12px] px-4 py-3 pb-8 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)] transition-all duration-300 resize-none"
                   />
-                  <span className="absolute bottom-3 right-3 text-[11px] text-content-tertiary">
+                  <span className="absolute bottom-3 right-3 text-[10px] font-mono text-content-tertiary">
                     {store.description.length}/280
                   </span>
                 </div>
-                <p className="text-[11px] text-content-tertiary mt-2">
+                <p className="text-[10px] font-mono text-content-tertiary mt-2">
                   A short pitch (max 280 chars).
                 </p>
               </div>
@@ -556,20 +576,20 @@ export default function CreatePage() {
 
           {/* ============ Step 2: Socials ============ */}
           {currentStep === 2 && (
-            <>
+            <div className="relative z-10">
               <div>
-                <label className="block text-[13px] font-medium text-content-secondary mb-3">
-                  Social links (optional)
+                <label className="block text-[10px] font-mono tracking-widest uppercase font-bold text-content-secondary mb-3">
+                  Social_Links <span className="text-content-tertiary font-normal lowercase">(optional)</span>
                 </label>
-                <p className="text-[11px] text-content-tertiary -mt-2 mb-4">
+                <p className="text-[10px] font-mono text-content-tertiary -mt-2 mb-6">
                   Add links to your community channels. All fields are optional.
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {/* Twitter / X */}
-                  <div>
+                  <div className="group/input">
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <X className="w-4 h-4 text-content-tertiary" />
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <X className="w-4 h-4 text-content-tertiary group-focus-within/input:text-accent-primary transition-colors" />
                       </div>
                       <input
                         type="text"
@@ -581,21 +601,21 @@ export default function CreatePage() {
                             setErrors((prev) => ({ ...prev, twitter: undefined }));
                         }}
                         className={cn(
-                          "w-full bg-surface-highlight border rounded-lg pl-10 pr-4 py-2.5 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors",
-                          errors.twitter ? "border-accent-danger" : "border-border",
+                          "w-full bg-[#0A0A0A] border rounded-[12px] pl-11 pr-4 py-3 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none transition-all duration-300",
+                          errors.twitter ? "border-accent-danger/50 focus:border-accent-danger focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-border/50 focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                         )}
                       />
                     </div>
                     {errors.twitter && (
-                      <p className="text-accent-danger text-[11px] mt-1">{errors.twitter}</p>
+                      <p className="text-accent-danger text-[11px] font-mono mt-1.5">{errors.twitter}</p>
                     )}
                   </div>
 
                   {/* Telegram */}
-                  <div>
+                  <div className="group/input">
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <Send className="w-4 h-4 text-content-tertiary" />
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <Send className="w-4 h-4 text-content-tertiary group-focus-within/input:text-accent-primary transition-colors" />
                       </div>
                       <input
                         type="text"
@@ -607,21 +627,21 @@ export default function CreatePage() {
                             setErrors((prev) => ({ ...prev, telegram: undefined }));
                         }}
                         className={cn(
-                          "w-full bg-surface-highlight border rounded-lg pl-10 pr-4 py-2.5 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors",
-                          errors.telegram ? "border-accent-danger" : "border-border",
+                          "w-full bg-[#0A0A0A] border rounded-[12px] pl-11 pr-4 py-3 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none transition-all duration-300",
+                          errors.telegram ? "border-accent-danger/50 focus:border-accent-danger focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-border/50 focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                         )}
                       />
                     </div>
                     {errors.telegram && (
-                      <p className="text-accent-danger text-[11px] mt-1">{errors.telegram}</p>
+                      <p className="text-accent-danger text-[11px] font-mono mt-1.5">{errors.telegram}</p>
                     )}
                   </div>
 
                   {/* Website */}
-                  <div>
+                  <div className="group/input">
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <Globe className="w-4 h-4 text-content-tertiary" />
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <Globe className="w-4 h-4 text-content-tertiary group-focus-within/input:text-accent-primary transition-colors" />
                       </div>
                       <input
                         type="text"
@@ -633,31 +653,32 @@ export default function CreatePage() {
                             setErrors((prev) => ({ ...prev, website: undefined }));
                         }}
                         className={cn(
-                          "w-full bg-surface-highlight border rounded-lg pl-10 pr-4 py-2.5 text-content-primary placeholder:text-content-tertiary text-[13px] focus:outline-none focus:border-accent-primary/50 transition-colors",
-                          errors.website ? "border-accent-danger" : "border-border",
+                          "w-full bg-[#0A0A0A] border rounded-[12px] pl-11 pr-4 py-3 text-content-primary placeholder:text-content-tertiary text-[14px] shadow-[inset_0_0_15px_rgba(0,0,0,0.6)] focus:outline-none transition-all duration-300",
+                          errors.website ? "border-accent-danger/50 focus:border-accent-danger focus:shadow-[0_0_15px_rgba(239,68,68,0.2)]" : "border-border/50 focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)]",
                         )}
                       />
                     </div>
                     {errors.website && (
-                      <p className="text-accent-danger text-[11px] mt-1">{errors.website}</p>
+                      <p className="text-accent-danger text-[11px] font-mono mt-1.5">{errors.website}</p>
                     )}
                   </div>
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* ============ Step 3: Curve ============ */}
           {currentStep === 3 && (
-            <div className="space-y-5">
-              <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-4">
-                <h3 className="text-content-primary text-[14px] font-semibold mb-1">
-                  Bonding Curve Configuration
+            <div className="space-y-5 relative z-10">
+              <div className="bg-[#0A0A0A] rounded-[12px] border border-border/50 p-6 space-y-5 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]">
+                <h3 className="text-content-primary text-[10px] font-mono tracking-widest uppercase font-bold mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-accent-primary rounded-full shadow-[0_0_5px_rgba(46,232,144,0.8)] animate-pulse" />
+                  Bonding_Curve_Config
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <p className="text-[11px] text-content-tertiary mb-1">
-                      Curve S
+                    <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1.5">
+                      Curve S_Param
                     </p>
                     <input
                       ref={curveSInputRef}
@@ -681,65 +702,68 @@ export default function CreatePage() {
                         const finalVal = Math.max(1, Math.min(CREATE_FLOW_CURVE_S_MAX, store.curveS));
                         store.setField("curveS", finalVal);
                       }}
-                      className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
+                      className="w-full bg-[#111] border border-border/50 rounded-[8px] px-3 py-2 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 focus:shadow-[0_0_10px_rgba(46,232,144,0.15)] transition-all"
                     />
                   </div>
                   <div>
-                    <p className="text-[11px] text-content-tertiary mb-1">
+                    <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1.5">
                       Total Supply
                     </p>
-                    <p className="text-content-primary text-[14px] font-medium font-mono">
+                    <p className="text-content-primary text-[14px] font-medium font-mono bg-[#111] border border-border/20 rounded-[8px] px-3 py-2 opacity-80">
                       21,000,000 tokens
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] text-content-tertiary mb-1">
+                    <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1.5">
                       Curve Type
                     </p>
-                    <p className="text-content-primary text-[14px] font-medium">
-                      Exponential Bonding Curve
+                    <p className="text-content-primary text-[14px] font-medium font-mono bg-[#111] border border-border/20 rounded-[8px] px-3 py-2 opacity-80">
+                      Exponential
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] text-content-tertiary mb-1">
+                    <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1.5">
                       Graduation Threshold
                     </p>
-                    <p className="text-content-primary text-[14px] font-medium font-mono">
-                      100,000 OKB reserve
+                    <p className="text-content-primary text-[14px] font-medium font-mono bg-[#111] border border-border/20 rounded-[8px] px-3 py-2 opacity-80">
+                      100,000 OKB
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Curve Preview */}
-              <CurvePreview
-                curveS={curveSNormalized}
-                feeBps={feeBps}
-                launchBuyNative={store.initialBuyEth}
-                onLaunchBuyNativeChange={(v) => store.setField("initialBuyEth", v)}
-              />
+              <div className="rounded-[12px] overflow-hidden border border-border/50 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+                <CurvePreview
+                  curveS={curveSNormalized}
+                  feeBps={feeBps}
+                  launchBuyNative={store.initialBuyEth}
+                  onLaunchBuyNativeChange={(v) => store.setField("initialBuyEth", v)}
+                />
+              </div>
 
-              <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-3">
-                <h3 className="text-content-primary text-[14px] font-semibold">
-                  Initial purchase (optional)
+              <div className="bg-[#0A0A0A] rounded-[12px] border border-border/50 p-6 space-y-4 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-accent-primary/5 rounded-full blur-[50px] pointer-events-none" />
+                <h3 className="text-content-primary text-[10px] font-mono tracking-widest uppercase font-bold flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-accent-primary rounded-full shadow-[0_0_5px_rgba(46,232,144,0.8)]" />
+                  Initial_Purchase <span className="text-content-tertiary font-normal lowercase tracking-normal">(optional)</span>
                 </h3>
-                <p className="text-[11px] text-content-tertiary leading-relaxed">
-                  One atomic transaction: create the token and buy on the curve (Four.meme-style). Uses native gas
-                  token ( OKB on X Layer).
+                <p className="text-[11px] font-mono text-content-tertiary leading-relaxed">
+                  One atomic transaction: create token + buy on curve. Uses native gas token.
                 </p>
-                <p className="text-[11px] text-content-tertiary leading-relaxed">
-                  Launch buy can mint at most {LAUNCH_BUY_MAX_MINT_BPS / 100}% of supply. Current max is{" "}
-                  <span className="font-mono text-content-secondary">{launchBuyMaxNative} native</span> for this curve.
+                <p className="text-[11px] font-mono text-content-tertiary leading-relaxed">
+                  Launch buy can mint at most {LAUNCH_BUY_MAX_MINT_BPS / 100}% of supply. Max is{" "}
+                  <span className="font-bold text-accent-primary">{launchBuyMaxNative} native</span>.
                 </p>
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="text-[11px] text-content-tertiary">Amount (native)</p>
+                <div className="mt-2 relative z-10">
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Amount (Native)</p>
                     <button
                       type="button"
                       onClick={() => store.setField("initialBuyEth", formatEther(launchBuyMaxWei))}
-                      className="text-[11px] font-semibold text-accent-primary hover:text-accent-primary/85 transition-colors tabular-nums"
+                      className="text-[10px] font-mono font-bold text-accent-primary hover:text-accent-primary/80 transition-colors bg-accent-primary/10 px-2 py-0.5 rounded border border-accent-primary/30"
                     >
-                      Max
+                      MAX
                     </button>
                   </div>
                   <input
@@ -751,10 +775,10 @@ export default function CreatePage() {
                       const v = e.target.value.replace(/[^0-9.]/g, "");
                       store.setField("initialBuyEth", v);
                     }}
-                    className="w-full bg-surface border border-border rounded-lg px-3 py-1.5 text-content-primary font-mono text-sm focus:outline-none focus:border-accent-primary/50 transition-colors"
+                    className="w-full bg-[#111] border border-border/50 rounded-[8px] px-4 py-2.5 text-content-primary font-mono text-[14px] focus:outline-none focus:border-accent-primary/50 focus:shadow-[0_0_15px_rgba(46,232,144,0.15)] transition-all"
                   />
                   {initialBuyValidationError && (
-                    <p className="mt-2 text-[11px] text-accent-danger">
+                    <p className="mt-2 text-[11px] font-mono text-accent-danger">
                       {initialBuyValidationError}
                     </p>
                   )}
@@ -765,44 +789,50 @@ export default function CreatePage() {
 
           {/* ============ Step 4: Deploy ============ */}
           {currentStep === 4 && (
-            <>
+            <div className="relative z-10">
               {!isConnected && (
                 <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <p className="text-content-tertiary text-[14px]">
-                    Please connect your wallet to deploy
+                  <div className="w-12 h-12 rounded-full border border-accent-warning/30 bg-accent-warning/10 flex items-center justify-center">
+                    <span className="w-2 h-2 rounded-full bg-accent-warning animate-pulse" />
+                  </div>
+                  <p className="text-content-tertiary text-[12px] font-mono uppercase tracking-widest">
+                    Wallet connection required
                   </p>
                 </div>
               )}
 
               {isConnected && deployStatus === "idle" && (
                 <div className="space-y-4">
-                  <h3 className="text-content-primary text-[14px] font-semibold">
-                    Review your token
+                  <h3 className="text-content-primary text-[10px] font-mono tracking-widest uppercase font-bold flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-accent-primary rounded-full shadow-[0_0_5px_rgba(46,232,144,0.8)] animate-pulse" />
+                    Review_Payload
                   </h3>
 
                   {/* Summary Card */}
-                  <div className="bg-surface-highlight rounded-xl border border-border p-5 space-y-4">
+                  <div className="bg-[#0A0A0A] rounded-[12px] border border-border/50 p-6 space-y-5 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] relative overflow-hidden">
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent-primary/5 rounded-full blur-[40px] pointer-events-none" />
+                    
                     {/* Image + Name/Symbol */}
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 relative z-10 border-b border-border/30 pb-5">
                       {store.image ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={store.image}
                           alt="Token"
-                          className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
+                          className="w-16 h-16 rounded-[10px] object-cover flex-shrink-0 border border-border/50 shadow-lg"
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-xl bg-surface border border-border flex items-center justify-center flex-shrink-0">
-                          <span className="text-content-tertiary text-xl font-bold">
+                        <div className="w-16 h-16 rounded-[10px] bg-[#111] border border-border/50 flex items-center justify-center flex-shrink-0 shadow-inner">
+                          <span className="text-content-tertiary text-xl font-bold font-mono">
                             {store.symbol.slice(0, 2) || "?"}
                           </span>
                         </div>
                       )}
                       <div>
-                        <p className="text-content-primary text-[15px] font-semibold">
+                        <p className="text-content-primary text-[16px] font-bold tracking-tight">
                           {store.name || "Unnamed Token"}
                         </p>
-                        <p className="text-content-tertiary text-[13px] font-mono">
+                        <p className="text-accent-primary text-[12px] font-mono font-bold mt-1 tracking-wider bg-accent-primary/10 px-2 py-0.5 rounded w-fit border border-accent-primary/20">
                           ${store.symbol || "N/A"}
                         </p>
                       </div>
@@ -810,11 +840,11 @@ export default function CreatePage() {
 
                     {/* Description */}
                     {store.description && (
-                      <div>
-                        <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-1">
+                      <div className="relative z-10">
+                        <p className="text-[10px] text-content-tertiary font-mono uppercase tracking-widest mb-1.5">
                           Description
                         </p>
-                        <p className="text-content-secondary text-[13px]">
+                        <p className="text-content-secondary text-[13px] leading-relaxed">
                           {store.description}
                         </p>
                       </div>
@@ -822,8 +852,8 @@ export default function CreatePage() {
 
                     {/* Socials */}
                     {(store.twitter || store.telegram || store.website) && (
-                      <div>
-                        <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-2">
+                      <div className="relative z-10">
+                        <p className="text-[10px] text-content-tertiary font-mono uppercase tracking-widest mb-2">
                           Socials
                         </p>
                         <div className="flex flex-wrap gap-3">
@@ -832,10 +862,10 @@ export default function CreatePage() {
                               href={store.twitter}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-[13px] text-accent-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-[12px] text-accent-primary hover:text-accent-primary/80 transition-colors font-mono"
                             >
-                              <X className="w-3.5 h-3.5" />
-                              X / Twitter
+                              <X className="w-3 h-3" />
+                              [X]
                             </a>
                           )}
                           {store.telegram && (
@@ -843,10 +873,10 @@ export default function CreatePage() {
                               href={store.telegram}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-[13px] text-accent-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-[12px] text-accent-primary hover:text-accent-primary/80 transition-colors font-mono"
                             >
-                              <Send className="w-3.5 h-3.5" />
-                              Telegram
+                              <Send className="w-3 h-3" />
+                              [TG]
                             </a>
                           )}
                           {store.website && (
@@ -854,10 +884,10 @@ export default function CreatePage() {
                               href={store.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-[13px] text-accent-primary hover:underline"
+                              className="inline-flex items-center gap-1.5 text-[12px] text-accent-primary hover:text-accent-primary/80 transition-colors font-mono"
                             >
-                              <Globe className="w-3.5 h-3.5" />
-                              Website
+                              <Globe className="w-3 h-3" />
+                              [WEB]
                             </a>
                           )}
                         </div>
@@ -865,31 +895,31 @@ export default function CreatePage() {
                     )}
 
                     {/* Curve Summary */}
-                    <div>
-                      <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-2">
+                    <div className="relative z-10 bg-[#111] p-4 rounded-[8px] border border-border/30">
+                      <p className="text-[10px] text-content-tertiary font-mono uppercase tracking-widest mb-3">
                         Curve Parameters
                       </p>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-                        <span className="text-content-tertiary text-[12px]">Total Supply</span>
-                        <span className="text-content-secondary text-[12px] font-mono">21,000,000</span>
-                        <span className="text-content-tertiary text-[12px]">Curve Type</span>
-                        <span className="text-content-secondary text-[12px]">Exponential</span>
-                        <span className="text-content-tertiary text-[12px]">Curve S</span>
-                        <span className="text-content-secondary text-[12px] font-mono">{store.curveS}</span>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                        <span className="text-content-tertiary text-[11px] font-mono">Total Supply</span>
+                        <span className="text-content-primary text-[11px] font-mono text-right">21,000,000</span>
+                        <span className="text-content-tertiary text-[11px] font-mono">Curve Type</span>
+                        <span className="text-content-primary text-[11px] font-mono text-right">Exponential</span>
+                        <span className="text-content-tertiary text-[11px] font-mono">Curve S</span>
+                        <span className="text-accent-primary text-[11px] font-mono font-bold text-right">{store.curveS}</span>
                       </div>
                     </div>
 
                     {store.initialBuyEth.trim().length > 0 && (
-                      <div>
-                        <p className="text-[11px] text-content-tertiary uppercase tracking-wider mb-2">
-                          Initial purchase
+                      <div className="relative z-10 bg-accent-primary/5 p-4 rounded-[8px] border border-accent-primary/20">
+                        <p className="text-[10px] text-accent-primary font-mono uppercase tracking-widest mb-2">
+                          Initial_Purchase
                         </p>
-                        <p className="text-content-secondary text-[13px] font-mono">
+                        <p className="text-content-primary text-[13px] font-mono font-bold">
                           {store.initialBuyEth.trim()} native{" "}
-                          <span className="text-content-tertiary">(single tx via factory)</span>
+                          <span className="text-content-tertiary font-normal text-[11px]">(atomic tx)</span>
                         </p>
                         {initialBuyValidationError && (
-                          <p className="mt-2 text-[11px] text-accent-danger">
+                          <p className="mt-2 text-[11px] font-mono text-accent-danger">
                             {initialBuyValidationError}
                           </p>
                         )}
@@ -901,47 +931,56 @@ export default function CreatePage() {
 
               {/* Loading State */}
               {isLoading && (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-10 h-10 border-2 border-accent-primary/30 border-t-accent-primary rounded-full animate-spin" />
-                  <p className="text-content-secondary text-[14px] font-medium">
-                    {deployStatus === "uploading" ? "Uploading to IPFS & signing metadata..." : "Building transaction..."}
-                  </p>
-                  <p className="text-content-tertiary text-[12px]">
-                    Please do not close this page.
-                  </p>
+                <div className="flex flex-col items-center justify-center py-16 gap-6">
+                  <div className="relative flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full border border-accent-primary/30 animate-[spin_3s_linear_infinite]" />
+                    <div className="w-12 h-12 rounded-full border border-accent-primary/50 border-t-transparent animate-[spin_2s_linear_infinite_reverse] absolute" />
+                    <div className="w-2 h-2 bg-accent-primary shadow-[0_0_10px_rgba(46,232,144,0.8)] absolute animate-pulse" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-accent-primary text-[13px] font-mono font-bold tracking-widest uppercase">
+                      {deployStatus === "uploading" ? "Uploading_Metadata..." : "Building_Tx..."}
+                    </p>
+                    <p className="text-content-tertiary text-[11px] font-mono">
+                      DO NOT CLOSE THIS PAGE
+                    </p>
+                  </div>
                 </div>
               )}
 
               {/* Success State */}
               {deployStatus === "success" && (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="w-12 h-12 rounded-full bg-accent-success/20 border border-accent-success flex items-center justify-center">
+                <div className="flex flex-col items-center justify-center py-16 gap-6">
+                  <div className="w-16 h-16 rounded-full bg-accent-success/10 border border-accent-success/30 flex items-center justify-center relative shadow-[0_0_30px_rgba(var(--accent-success-rgb),0.2)]">
+                    <div className="absolute inset-0 rounded-full border border-accent-success animate-ping opacity-20 [animation-duration:2s]" />
                     <svg
-                      width="22"
-                      height="22"
+                      width="28"
+                      height="28"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-accent-success"
+                      className="text-accent-success drop-shadow-[0_0_8px_rgba(var(--accent-success-rgb),0.8)]"
                     >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <p className="text-accent-success text-[16px] font-semibold">
-                    Token created successfully!
-                  </p>
-                  <p className="text-content-tertiary text-[13px] text-center max-w-sm">
-                    {store.initialBuyEth.trim()
-                      ? "Launch and purchase are complete in one transaction. The token may take a moment to appear on Explore."
-                      : "Your transaction has been submitted. The token will appear on the explore page shortly."}
-                  </p>
+                  <div className="text-center space-y-2">
+                    <p className="text-accent-success text-[16px] font-mono font-bold tracking-widest uppercase">
+                      DEPLOYMENT_SUCCESS
+                    </p>
+                    <p className="text-content-tertiary text-[12px] font-mono max-w-sm leading-relaxed">
+                      {store.initialBuyEth.trim()
+                        ? "Token created and initial buy complete. Propagating to explore..."
+                        : "Token created successfully. Propagating to explore..."}
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => router.push("/")}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
+                    className="mt-4 inline-flex items-center gap-2 px-8 py-3 bg-accent-primary text-surface-base font-bold rounded-[8px] hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[12px] uppercase tracking-wider font-mono shadow-[0_0_20px_rgba(46,232,144,0.3)] hover:shadow-[0_0_30px_rgba(46,232,144,0.5)]"
                   >
                     View Explore
                     <ChevronRight className="w-4 h-4" />
@@ -951,28 +990,28 @@ export default function CreatePage() {
 
               {/* Error State */}
               {deployStatus === "error" && (
-                <div className="flex flex-col items-center py-8 w-full animate-in fade-in zoom-in-95 duration-400">
-                  <div className="w-14 h-14 rounded-full bg-accent-danger/10 border border-accent-danger/20 flex items-center justify-center mb-5 shadow-[0_0_30px_rgba(239,68,68,0.15)] relative">
-                    <div className="absolute inset-0 rounded-full border border-accent-danger/40 animate-ping opacity-20 [animation-duration:2s]" />
-                    <X className="w-6 h-6 text-accent-danger relative z-10" />
+                <div className="flex flex-col items-center py-12 w-full animate-in fade-in zoom-in-95 duration-400">
+                  <div className="w-16 h-16 rounded-full bg-accent-danger/10 border border-accent-danger/30 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(239,68,68,0.2)] relative">
+                    <div className="absolute inset-0 rounded-full border border-accent-danger animate-ping opacity-20 [animation-duration:2s]" />
+                    <X className="w-8 h-8 text-accent-danger relative z-10 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
                   </div>
                   
-                  <h3 className="text-content-primary text-xl font-bold mb-2">
-                    Deployment failed
+                  <h3 className="text-accent-danger text-[16px] font-mono font-bold tracking-widest uppercase mb-2">
+                    DEPLOYMENT_FAILED
                   </h3>
                   
-                  <p className="text-content-tertiary text-[13px] mb-6 text-center max-w-md">
-                    We encountered an error while trying to deploy your token. See the details below.
+                  <p className="text-content-tertiary text-[12px] font-mono mb-8 text-center max-w-md">
+                    Process terminated unexpectedly. See diagnostic log.
                   </p>
 
-                  <div className="w-full bg-[#1A1112] border border-accent-danger/20 rounded-xl overflow-hidden mb-8 relative shadow-inner">
-                    <div className="bg-accent-danger/10 px-4 py-2 border-b border-accent-danger/20 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent-danger shadow-[0_0_5px_rgba(239,68,68,0.8)]" />
-                      <span className="text-[10px] font-mono text-accent-danger/90 font-semibold uppercase tracking-widest">Error Log</span>
+                  <div className="w-full bg-[#0A0A0A] border border-accent-danger/30 rounded-[12px] overflow-hidden mb-8 relative shadow-[inset_0_0_20px_rgba(239,68,68,0.05)]">
+                    <div className="bg-accent-danger/10 px-4 py-2.5 border-b border-accent-danger/20 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-accent-danger shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse" />
+                      <span className="text-[10px] font-mono text-accent-danger/90 font-bold uppercase tracking-widest">Diagnostic_Log</span>
                     </div>
-                    <div className="p-4 max-h-[180px] overflow-y-auto overflow-x-hidden custom-scrollbar">
-                      <p className="text-accent-danger/80 text-[12px] font-mono leading-relaxed break-words whitespace-pre-wrap select-text">
-                        {deployError || "Something went wrong. Please try again."}
+                    <div className="p-5 max-h-[200px] overflow-y-auto custom-scrollbar">
+                      <p className="text-accent-danger text-[12px] font-mono leading-relaxed break-words whitespace-pre-wrap select-text opacity-90">
+                        {deployError || "ERR_UNKNOWN_EXCEPTION"}
                       </p>
                     </div>
                   </div>
@@ -980,21 +1019,21 @@ export default function CreatePage() {
                   <button
                     type="button"
                     onClick={handleRetry}
-                    className="inline-flex items-center gap-2 px-8 py-2.5 bg-surface border border-border text-content-primary font-semibold rounded-lg hover:bg-surface-highlight hover:border-content-tertiary transition-all text-[13px]"
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-[#111] border border-border/50 text-content-primary font-bold font-mono text-[12px] tracking-widest uppercase rounded-[8px] hover:bg-surface-highlight hover:border-content-tertiary transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.05)]"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                    Try Again
+                    Retry_Process
                   </button>
                 </div>
               )}
-            </>
+            </div>
           )}
 
           {/* ============ Navigation ============ */}
           {!isLoading && deployStatus !== "success" && (
             <div
               className={cn(
-                "pt-4 flex",
+                "pt-6 flex relative z-10 border-t border-border/30 mt-4",
                 currentStep > 1 ? "justify-between" : "justify-end",
               )}
             >
@@ -1002,9 +1041,9 @@ export default function CreatePage() {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent border border-border text-content-primary font-semibold rounded-lg hover:bg-surface-highlight transition-all text-[13px]"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-transparent border border-border/50 text-content-primary font-mono font-bold text-[11px] uppercase tracking-widest rounded-[8px] hover:bg-surface-highlight transition-all"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-3.5 h-3.5" />
                   Back
                 </button>
               )}
@@ -1012,7 +1051,7 @@ export default function CreatePage() {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 text-[13px]"
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-accent-primary text-surface-base font-mono font-bold text-[12px] uppercase tracking-widest rounded-[8px] hover:bg-accent-primary/90 transition-all hover:-translate-y-0.5 shadow-[0_0_15px_rgba(46,232,144,0.3)] hover:shadow-[0_0_25px_rgba(46,232,144,0.5)]"
                 >
                   Continue
                   <ChevronRight className="w-4 h-4" />
@@ -1024,13 +1063,13 @@ export default function CreatePage() {
                   onClick={handleDeploy}
                   disabled={isLoading || Boolean(initialBuyValidationError)}
                   className={cn(
-                    "inline-flex items-center gap-2 px-6 py-2.5 bg-accent-primary text-surface-base font-semibold rounded-lg transition-all text-[13px]",
+                    "inline-flex items-center gap-2 px-8 py-3 bg-accent-primary text-surface-base font-mono font-bold text-[12px] uppercase tracking-widest rounded-[8px] transition-all",
                     isLoading || initialBuyValidationError
                       ? "opacity-50 cursor-not-allowed"
-                      : "hover:bg-accent-primary/90 hover:-translate-y-0.5"
+                      : "hover:bg-accent-primary/90 hover:-translate-y-0.5 shadow-[0_0_20px_rgba(46,232,144,0.4)] hover:shadow-[0_0_30px_rgba(46,232,144,0.6)]"
                   )}
                 >
-                  Deploy
+                  Execute_Deploy
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}
