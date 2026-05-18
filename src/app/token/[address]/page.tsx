@@ -398,11 +398,46 @@ export default function TokenDetailPage() {
 
         {/* Sato Data */}
         <div className="pt-2 relative z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-3.5 bg-[rgb(var(--token-rgb))] rounded-sm" />
-            <h2 className="text-content-primary font-bold text-xs uppercase tracking-widest">sato data</h2>
+          {/* Tech-styled Header */}
+          <div className="flex items-center gap-4 mb-6 relative cursor-pointer">
+            {/* Tech Icon/Node */}
+            <div className="relative flex items-center justify-center">
+              <div 
+                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.3)] flex items-center justify-center"
+                style={{ animation: 'spin 6s linear infinite' }}
+              >
+                <div 
+                  className="w-2 h-2 bg-[rgb(var(--token-rgb))] shadow-[0_0_8px_rgb(var(--token-rgb))]"
+                  style={{ animation: 'spin 3s linear infinite reverse' }}
+                />
+              </div>
+            </div>
+            
+            {/* Text Content */}
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
+                  Data_Node
+                </span>
+                <span className="text-content-tertiary font-mono text-[9px]">// 0x01</span>
+              </div>
+              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
+                sato data
+                <span className="inline-block w-1.5 h-4 bg-[rgb(var(--token-rgb))] opacity-80 animate-pulse ml-1" />
+              </h2>
+            </div>
+            
+            {/* Connecting Line & Circuit pattern */}
+            <div className="flex-1 flex items-center ml-2 opacity-60 hidden sm:flex translate-y-1.5">
+              <div className="h-px flex-1 bg-gradient-to-r from-[rgb(var(--token-rgb))] to-transparent" />
+              <div className="flex gap-1.5 mr-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_8px_rgb(var(--token-rgb))]" />
+                <div className="w-1.5 h-1.5 rounded-full border border-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_4px_rgba(var(--token-rgb),0.5)]" style={{ animationDelay: '0.2s' }} />
+                <div className="w-1.5 h-1.5 rounded-full border border-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_4px_rgba(var(--token-rgb),0.5)]" style={{ animationDelay: '0.4s' }} />
+              </div>
+            </div>
           </div>
-          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden group/card">
+          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px] relative z-10">
               {/* SUPPLY */}
@@ -479,12 +514,43 @@ export default function TokenDetailPage() {
 
         {/* Price and Issuance */}
         <div className="pt-2 relative z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-3.5 bg-[rgb(var(--token-rgb))] rounded-sm" />
-            <h2 className="text-content-primary font-bold text-xs uppercase tracking-widest">price and issuance</h2>
+          <div className="flex items-center gap-4 mb-6 relative cursor-pointer">
+            <div className="relative flex items-center justify-center">
+              <div 
+                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.3)] flex items-center justify-center"
+                style={{ animation: 'spin 6s linear infinite' }}
+              >
+                <div 
+                  className="w-2 h-2 bg-[rgb(var(--token-rgb))] shadow-[0_0_8px_rgb(var(--token-rgb))]"
+                  style={{ animation: 'spin 3s linear infinite reverse' }}
+                />
+              </div>
+            </div>
+            
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
+                  Market_Node
+                </span>
+                <span className="text-content-tertiary font-mono text-[9px]">// 0x02</span>
+              </div>
+              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
+                price & issuance
+                <span className="inline-block w-1.5 h-4 bg-[rgb(var(--token-rgb))] opacity-80 animate-pulse ml-1" />
+              </h2>
+            </div>
+            
+            <div className="flex-1 flex items-center ml-2 opacity-60 hidden sm:flex translate-y-1.5">
+              <div className="h-px flex-1 bg-gradient-to-r from-[rgb(var(--token-rgb))] to-transparent" />
+              <div className="flex gap-1.5 mr-4">
+                <div className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_8px_rgb(var(--token-rgb))]" />
+                <div className="w-1.5 h-1.5 rounded-full border border-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_4px_rgba(var(--token-rgb),0.5)]" style={{ animationDelay: '0.2s' }} />
+                <div className="w-1.5 h-1.5 rounded-full border border-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_4px_rgba(var(--token-rgb),0.5)]" style={{ animationDelay: '0.4s' }} />
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
@@ -498,7 +564,7 @@ export default function TokenDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>
