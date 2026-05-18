@@ -437,7 +437,7 @@ export default function TokenDetailPage() {
               </div>
             </div>
           </div>
-          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card">
+          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
             <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px] relative z-10">
               {/* SUPPLY */}
@@ -550,8 +550,8 @@ export default function TokenDetailPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
                 <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span></span>
@@ -564,8 +564,8 @@ export default function TokenDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
+              <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>
                 <span className="text-content-tertiary text-[10px]">unit: <span className="text-content-primary font-mono font-medium">tokens/OKB</span></span>
