@@ -11,7 +11,7 @@ interface TokenCardProps {
   token: Token;
 }
 
-const getBgColor = (symbol: string) => {
+const getTokenColorRGB = (symbol: string) => {
   let hash = 0;
   for (let i = 0; i < symbol.length; i++) {
     hash = symbol.charCodeAt(i) + ((hash << 5) - hash);
@@ -19,14 +19,23 @@ const getBgColor = (symbol: string) => {
   const r = (hash & 0xFF0000) >> 16;
   const g = (hash & 0x00FF00) >> 8;
   const b = hash & 0x0000FF;
-  return `rgb(${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40})`;
+  return `${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40}`;
 };
 
 const formatPrice = (price: number) => {
-  if (price < 0.001) {
+  if (price === 0) return "0";
+  if (price < 0.0001) {
     return price.toExponential(2);
   }
-  return price.toString();
+  if (price >= 1000) {
+    return new Intl.NumberFormat('en-US', {
+      notation: 'compact',
+      maximumFractionDigits: 2,
+    }).format(price);
+  }
+  return new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 5,
+  }).format(price);
 };
 
 const parsePriceOkb = (priceOkb: string): number => {
@@ -38,9 +47,53 @@ const parsePriceOkb = (priceOkb: string): number => {
 function fmtOkb(weiString: string): string {
   const n = Number(weiString) / 1e18;
   if (isNaN(n)) return "0";
-  if (n < 0.001) return n.toExponential(3);
-  return n.toFixed(6);
+  if (n === 0) return "0";
+  if (n < 0.0001) return n.toExponential(2);
+  if (n >= 1000) {
+    return new Intl.NumberFormat('en-US', {
+      notation: 'compact',
+      maximumFractionDigits: 2,
+    }).format(n);
+  }
+  return new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 5,
+  }).format(n);
 }
+
+const formatCompactValue = (str: string | undefined | null) => {
+  if (!str || str === "--") return { value: "--", unit: null };
+  
+  let rawValue = str;
+  let unit: string | null = null;
+  
+  const match = str.match(/^(.+?)\s+([A-Za-z]+)$/);
+  if (match) {
+    rawValue = match[1];
+    unit = match[2];
+  }
+  
+  const prefixMatch = rawValue.match(/^([^0-9\.\-]*)/);
+  const prefix = prefixMatch ? prefixMatch[1] : "";
+  const numericPart = rawValue.slice(prefix.length);
+  
+  const num = Number(numericPart.replace(/,/g, ''));
+  if (!isNaN(num) && numericPart.trim() !== "") {
+    if (num >= 1000) {
+      rawValue = prefix + new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 2,
+      }).format(num);
+    } else if (num < 0.001 && num > 0) {
+      rawValue = prefix + num.toExponential(2);
+    } else {
+      rawValue = prefix + new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: 4,
+      }).format(num);
+    }
+  }
+  
+  return { value: rawValue, unit };
+};
 
 function MiniChartPath({ token }: { token: Token }) {
   const priceHistory = token.priceHistory;
@@ -90,20 +143,55 @@ export function TokenCard({ token }: TokenCardProps) {
   const priceChange = token.priceChange24h ?? 0;
   const volumeDisplay = token.volume24h ?? (token.volume24hOkb ? fmtOkb(token.volume24hOkb) + " OKB" : "--");
   const avatarSrc = resolveIpfsUrl(token.avatarUrl);
+  const tokenRGB = getTokenColorRGB(token.symbol);
+
+  const mcapData = formatCompactValue(token.mcap);
+  const volData = formatCompactValue(volumeDisplay);
 
   return (
     <Link
       href={`/token/${token.address}`}
-      className="group bg-surface/60 backdrop-blur-md border border-border/60 rounded-[20px] p-5 h-[240px] flex flex-col gap-4 cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:border-accent-primary/50 hover:shadow-[0_8px_30px_-12px] hover:shadow-accent-primary/30 relative overflow-hidden"
+      className="group bg-gradient-to-b from-surface/80 to-surface/40 backdrop-blur-xl border border-white/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_4px_20px_-8px_rgba(0,0,0,0.5)] rounded-[20px] p-5 h-[240px] flex flex-col gap-4 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:border-[rgba(var(--token-rgb),0.4)] hover:shadow-[0_8px_30px_-12px_rgba(var(--token-rgb),0.35)] relative overflow-hidden"
+      style={{ '--token-rgb': tokenRGB } as React.CSSProperties}
     >
+      {/* Ambient Glow */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[80px] opacity-10 pointer-events-none group-hover:opacity-25 transition-opacity duration-500" />
+      
       {/* Hover Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/0 via-transparent to-accent-primary/0 group-hover:from-accent-primary/5 group-hover:to-accent-primary/10 transition-colors duration-500 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[rgba(var(--token-rgb),0)] via-transparent to-[rgba(var(--token-rgb),0)] group-hover:from-[rgba(var(--token-rgb),0.06)] group-hover:to-[rgba(var(--token-rgb),0.12)] transition-colors duration-500 pointer-events-none" />
+      
+      {/* Animated Streaming Border */}
+      <div 
+        className="absolute inset-0 rounded-[20px] pointer-events-none overflow-hidden z-20"
+        style={{
+          padding: '2px',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+        }}
+      >
+        <div 
+          className="absolute inset-[-100%] opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ 
+            animation: 'spin 4s linear infinite',
+            background: 'conic-gradient(from 0deg, transparent 0%, transparent 20%, rgb(var(--token-rgb)) 45%, #ffffff 50%, transparent 50%, transparent 100%)' 
+          }} 
+        />
+        {/* Opposite side beam for balance (optional, remove if you only want one beam) */}
+        <div 
+          className="absolute inset-[-100%] opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+          style={{ 
+            animation: 'spin 4s linear infinite',
+            background: 'conic-gradient(from 180deg, transparent 0%, transparent 20%, rgb(var(--token-rgb)) 45%, #ffffff 50%, transparent 50%, transparent 100%)' 
+          }} 
+        />
+      </div>
       
       {/* Card Header */}
       <div className="flex items-start gap-3 relative z-10">
         <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm text-white border border-border shrink-0 overflow-hidden shadow-inner"
-          style={avatarSrc ? undefined : { background: getBgColor(token.symbol) }}
+          className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-sm text-white border border-white/5 shrink-0 overflow-hidden group-hover:border-[rgba(var(--token-rgb),0.3)] transition-colors duration-300 relative"
+          style={avatarSrc ? undefined : { background: `linear-gradient(135deg, rgba(${tokenRGB}, 0.8), rgba(${tokenRGB}, 0.4))` }}
         >
           {avatarSrc ? (
             /* eslint-disable-next-line @next/next/no-img-element */
@@ -115,10 +203,10 @@ export function TokenCard({ token }: TokenCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-[17px] font-bold text-content-primary truncate group-hover:text-accent-primary transition-colors">
+            <span className="text-[17px] font-bold text-content-primary truncate transition-colors duration-300 group-hover:text-[rgb(var(--token-rgb))] drop-shadow-sm">
               {token.name}
             </span>
-            <span className="font-mono text-xs font-medium text-content-tertiary px-1.5 py-0.5 rounded bg-surface-highlight">
+            <span className="font-mono text-xs font-bold px-1.5 py-0.5 rounded transition-colors duration-300 bg-black/20 border border-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)] text-content-secondary group-hover:bg-[rgba(var(--token-rgb),0.15)] group-hover:text-[rgb(var(--token-rgb))] group-hover:border-[rgba(var(--token-rgb),0.3)]">
               {token.symbol}
             </span>
           </div>
@@ -168,20 +256,26 @@ export function TokenCard({ token }: TokenCardProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mt-auto relative z-10">
-        <div className="bg-surface-base/50 rounded-lg p-2 border border-border/40">
-          <div className="text-[10px] text-content-tertiary mb-0.5 uppercase tracking-wider">Price</div>
-          <div className="flex items-baseline gap-1">
-            <span className="font-mono text-[13px] font-bold text-content-primary">{formatPrice(priceNum)}</span>
+      <div className="grid grid-cols-3 gap-1.5 mt-auto relative z-10">
+        <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
+          <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">Price</div>
+          <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={formatPrice(priceNum)}>
+            <span className="truncate">{formatPrice(priceNum)}</span>
           </div>
         </div>
-        <div className="bg-surface-base/50 rounded-lg p-2 border border-border/40">
-          <div className="text-[10px] text-content-tertiary mb-0.5 uppercase tracking-wider">MCap</div>
-          <span className="font-mono text-[13px] font-bold text-content-primary">{token.mcap ?? "--"}</span>
+        <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
+          <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">MCap</div>
+          <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={token.mcap ?? undefined}>
+            <span className="truncate">{mcapData.value}</span>
+            {mcapData.unit && <span className="text-[8px] sm:text-[9px] text-content-secondary shrink-0">{mcapData.unit}</span>}
+          </div>
         </div>
-        <div className="bg-surface-base/50 rounded-lg p-2 border border-border/40">
-          <div className="text-[10px] text-content-tertiary mb-0.5 uppercase tracking-wider">24h Vol</div>
-          <span className="font-mono text-[13px] font-bold text-content-primary">{volumeDisplay}</span>
+        <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
+          <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">24h Vol</div>
+          <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={volumeDisplay}>
+            <span className="truncate">{volData.value}</span>
+            {volData.unit && <span className="text-[8px] sm:text-[9px] text-content-secondary shrink-0">{volData.unit}</span>}
+          </div>
         </div>
       </div>
 

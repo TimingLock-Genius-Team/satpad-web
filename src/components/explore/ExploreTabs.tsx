@@ -1,6 +1,5 @@
 "use client";
 
-import { Flame, Sparkles, GraduationCap } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 interface ExploreTabsProps {
@@ -10,11 +9,11 @@ interface ExploreTabsProps {
 }
 
 const TABS = [
-  { id: "trending", label: "Trending", Icon: Flame, colorClass: "text-[#ff5c00]", bgClass: "bg-[#ff5c00]/10" },
-  { id: "new", label: "New", Icon: Sparkles, colorClass: "text-[#00e5ff]", bgClass: "bg-[#00e5ff]/10" },
-  { id: "graduating", label: "Graduating soon", Icon: GraduationCap, colorClass: "text-[#b026ff]", bgClass: "bg-[#b026ff]/10" },
-  { id: "graduated", label: "Graduated", Icon: GraduationCap, colorClass: "text-[#2ee890]", bgClass: "bg-[#2ee890]/10" },
-  { id: "all", label: "All", Icon: null, colorClass: "text-content-primary", bgClass: "bg-surface-highlight" },
+  { id: "trending", label: "Trending", emoji: "🔥", activeBg: "bg-accent-primary", activeColor: "text-surface-base" },
+  { id: "new", label: "New", emoji: "⚡", activeBg: "bg-accent-primary", activeColor: "text-surface-base" },
+  { id: "graduating", label: "Graduating soon", emoji: "⏳", activeBg: "bg-accent-primary", activeColor: "text-surface-base" },
+  { id: "graduated", label: "Graduated", emoji: "🎓", activeBg: "bg-accent-primary", activeColor: "text-surface-base" },
+  { id: "all", label: "All", emoji: "🪐", activeBg: "bg-accent-primary", activeColor: "text-surface-base" },
 ];
 
 export function ExploreTabs({ activeTab, onTabChange, isScrolled = false }: ExploreTabsProps) {
@@ -22,36 +21,31 @@ export function ExploreTabs({ activeTab, onTabChange, isScrolled = false }: Expl
     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide w-full max-w-full pb-2">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
-        const IconComponent = tab.Icon;
 
         return (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] font-bold transition-all duration-300 whitespace-nowrap shrink-0 overflow-hidden",
+              "group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] font-bold transition-all duration-300 whitespace-nowrap shrink-0 overflow-hidden outline-none ring-0",
               isActive
-                ? `shadow-sm ${tab.bgClass} ${tab.colorClass}`
+                ? `shadow-sm ${tab.activeBg} ${tab.activeColor}`
                 : isScrolled
-                  ? "bg-surface border border-border/50 text-content-tertiary hover:text-content-primary hover:border-border-hover"
-                  : "bg-transparent border border-transparent text-content-tertiary hover:text-content-primary hover:bg-surface-highlight/30"
+                  ? "bg-surface text-content-tertiary hover:text-content-primary hover:bg-surface-highlight"
+                  : "bg-transparent text-content-tertiary hover:text-content-primary hover:bg-surface-highlight/30"
             )}
           >
             {/* Active background glow */}
             {isActive && (
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
             )}
             
-            {IconComponent && (
-              <IconComponent 
-                className={cn(
-                  "w-4 h-4 transition-transform duration-300", 
-                  isActive ? "scale-110" : "group-hover:scale-110 opacity-70 group-hover:opacity-100",
-                  isActive ? "" : tab.colorClass // Use the tab's specific color even when inactive (but slightly dimmed)
-                )} 
-                strokeWidth={isActive ? 2.5 : 2}
-              />
-            )}
+            <span className={cn(
+              "text-base transition-transform duration-300",
+              isActive ? "scale-110" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
+            )}>
+              {tab.emoji}
+            </span>
             <span className="relative z-10">{tab.label}</span>
           </button>
         );

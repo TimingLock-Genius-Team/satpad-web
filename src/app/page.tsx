@@ -43,18 +43,18 @@ function SkeletonCard() {
           <div className="h-3 w-20 bg-surface-highlight rounded" />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-3 mt-auto">
+      <div className="grid grid-cols-3 gap-2 mt-auto">
         <div className="space-y-1.5">
-          <div className="h-2.5 w-8 bg-surface-highlight rounded" />
-          <div className="h-4 w-14 bg-surface-highlight rounded" />
+          <div className="h-2 w-8 bg-surface-highlight rounded" />
+          <div className="h-3.5 w-14 bg-surface-highlight rounded" />
         </div>
         <div className="space-y-1.5">
-          <div className="h-2.5 w-8 bg-surface-highlight rounded" />
-          <div className="h-4 w-14 bg-surface-highlight rounded" />
+          <div className="h-2 w-8 bg-surface-highlight rounded" />
+          <div className="h-3.5 w-14 bg-surface-highlight rounded" />
         </div>
         <div className="space-y-1.5">
-          <div className="h-2.5 w-10 bg-surface-highlight rounded" />
-          <div className="h-4 w-14 bg-surface-highlight rounded" />
+          <div className="h-2 w-10 bg-surface-highlight rounded" />
+          <div className="h-3.5 w-14 bg-surface-highlight rounded" />
         </div>
       </div>
       <div className="h-5 w-full bg-surface-highlight rounded" />
@@ -285,20 +285,26 @@ export default function Home() {
               <button
                 onClick={() => setViewMode("comfy")}
                 className={cn(
-                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg",
-                  viewMode === "comfy" ? "bg-surface-highlight text-content-primary shadow-sm ring-1 ring-border/50" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
+                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  viewMode === "comfy" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
                 )}
               >
-                Comfy
+                {viewMode === "comfy" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                )}
+                <span className="relative z-10">Comfy</span>
               </button>
               <button
                 onClick={() => setViewMode("compact")}
                 className={cn(
-                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg",
-                  viewMode === "compact" ? "bg-surface-highlight text-content-primary shadow-sm ring-1 ring-border/50" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
+                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  viewMode === "compact" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
                 )}
               >
-                Compact
+                {viewMode === "compact" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                )}
+                <span className="relative z-10">Compact</span>
               </button>
             </div>
 
