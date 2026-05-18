@@ -157,8 +157,8 @@ export default function CreatePage() {
   };
 
   const handleImageFile = (file: File) => {
-    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      setErrors((prev) => ({ ...prev, image: "Please upload a PNG, JPG, or WebP image." }));
+    if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) {
+      setErrors((prev) => ({ ...prev, image: "Please upload a PNG, JPG, WebP, or GIF image." }));
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -440,14 +440,14 @@ export default function CreatePage() {
                       Drag and drop, or click to choose
                     </p>
                     <p className="text-content-tertiary text-[11px]">
-                      PNG / JPG / WebP - 512x512 recommended - max 1MB
+                      PNG / JPG / WebP / GIF - 512x512 recommended - max 1MB
                     </p>
                   </div>
                 </div>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/png,image/jpeg,image/webp"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
                   className="hidden"
                   onChange={handleFileChange}
                 />
