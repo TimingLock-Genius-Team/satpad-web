@@ -402,73 +402,73 @@ export default function TokenDetailPage() {
             <div className="w-1.5 h-3.5 bg-[rgb(var(--token-rgb))] rounded-sm" />
             <h2 className="text-content-primary font-bold text-xs uppercase tracking-widest">sato data</h2>
           </div>
-          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.05] pointer-events-none" />
+          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden group/card">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px] relative z-10">
               {/* SUPPLY */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up">
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">SUPPLY</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">max</span>
-                  <span className="text-content-primary font-mono font-medium">{maxSupply}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">max</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{maxSupply}</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">circulating</span>
-                  <span className="text-content-primary font-mono font-medium">{circulatingSupply}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">circulating</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{circulatingSupply}</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">holders</span>
-                  <span className="text-content-primary font-mono font-medium">{satoData.holders}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">holders</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{satoData.holders}</span>
                 </div>
               </div>
 
               {/* PRICE */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">PRICE</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">market</span>
-                  <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">market</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">reserve</span>
-                  <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">reserve</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
                 </div>
               </div>
 
               {/* VALUATION */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">VALUATION</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">mcap (fd)</span>
-                  <span className="text-content-primary font-mono font-medium">{fdMarketCapOkb}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">mcap (fd)</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fdMarketCapOkb}</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">mcap (circ)</span>
-                  <span className="text-content-primary font-mono font-medium">{circulatingMarketCapOkb}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">mcap (circ)</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{circulatingMarketCapOkb}</span>
                 </div>
               </div>
 
               {/* RESERVE */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">RESERVE</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">liquidity</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">liquidity</span>
                   <div className="text-right">
-                    <div className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.reserveOkb)} OKB</div>
+                    <div className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</div>
                   </div>
                 </div>
               </div>
 
               {/* ACTIVITY */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">ACTIVITY</div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">vol 24h</span>
-                  <span className="text-content-primary font-mono font-medium">{volumeOkb} OKB</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">vol 24h</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{volumeOkb} OKB</span>
                 </div>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-content-secondary">txns 24h</span>
-                  <span className="text-content-primary font-mono font-medium">{satoData.txns24h}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">txns 24h</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{satoData.txns24h}</span>
                 </div>
               </div>
             </div>
