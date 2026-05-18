@@ -38,10 +38,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors",
+          "flex items-center justify-center w-9 h-9 rounded-[8px] transition-all duration-300",
           currentPage === 1
             ? "text-content-tertiary/30 cursor-not-allowed"
-            : "text-content-secondary hover:bg-surface-highlight hover:text-content-primary"
+            : "text-content-secondary hover:bg-[#0A0A0A] border border-transparent hover:border-border/50 hover:text-content-primary hover:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
         )}
       >
         <ChevronLeft className="w-4 h-4" />
@@ -65,10 +65,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
             key={page}
             onClick={() => onPageChange(page)}
             className={cn(
-              "w-9 h-9 rounded-lg text-[13px] font-medium transition-colors",
+              "w-9 h-9 rounded-[8px] text-[13px] font-mono font-bold transition-all duration-300",
               isActive
-                ? "bg-accent-primary text-surface-base"
-                : "text-content-secondary hover:bg-surface-highlight hover:text-content-primary"
+                ? "bg-accent-primary text-surface-base shadow-[0_0_15px_rgba(46,232,144,0.4)] scale-110"
+                : "text-content-secondary hover:bg-[#0A0A0A] border border-transparent hover:border-border/50 hover:text-content-primary hover:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
             )}
           >
             {page}
@@ -80,10 +80,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className={cn(
-          "flex items-center justify-center w-9 h-9 rounded-lg transition-colors",
+          "flex items-center justify-center w-9 h-9 rounded-[8px] transition-all duration-300",
           currentPage === totalPages
             ? "text-content-tertiary/30 cursor-not-allowed"
-            : "text-content-secondary hover:bg-surface-highlight hover:text-content-primary"
+            : "text-content-secondary hover:bg-[#0A0A0A] border border-transparent hover:border-border/50 hover:text-content-primary hover:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"
         )}
       >
         <ChevronRight className="w-4 h-4" />
