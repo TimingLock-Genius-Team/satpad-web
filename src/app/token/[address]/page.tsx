@@ -419,7 +419,7 @@ export default function TokenDetailPage() {
                 <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
                   Data_Node
                 </span>
-                <span className="text-content-tertiary font-mono text-[9px]">// 0x01</span>
+                <span className="text-content-tertiary font-mono text-[9px]">{"// 0x01"}</span>
               </div>
               <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
                 sato data
@@ -532,7 +532,7 @@ export default function TokenDetailPage() {
                 <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
                   Market_Node
                 </span>
-                <span className="text-content-tertiary font-mono text-[9px]">// 0x02</span>
+                <span className="text-content-tertiary font-mono text-[9px]">{"// 0x02"}</span>
               </div>
               <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
                 price & issuance
