@@ -210,7 +210,8 @@ export default function TokenDetailPage() {
           {/* Left Column */}
           <div className="flex flex-col gap-8 min-w-0">
             {/* Token Header */}
-            <div className="bg-surface/60 backdrop-blur-xl p-3.5 sm:p-4 rounded-[24px] flex flex-col sm:flex-row gap-4 sm:gap-5 border border-border/50 shadow-2xl relative overflow-hidden group">
+            <div className="animated-border-wrapper shadow-2xl" style={{ '--token-rgb': tokenRGB } as React.CSSProperties}>
+            <div className="bg-surface/60 backdrop-blur-xl p-3.5 sm:p-4 rounded-[22px] flex flex-col sm:flex-row gap-4 sm:gap-5 relative overflow-hidden group">
               {/* Ambient Glow in Card */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.15] pointer-events-none" />
               
@@ -365,6 +366,7 @@ export default function TokenDetailPage() {
                   </div>
                 </div>
               </div>
+            </div>
             </div>
 
             {/* Chart */}
