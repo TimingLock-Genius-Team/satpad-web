@@ -192,7 +192,9 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
   const buttonState = getButtonState({ isConnected, amount, quoteLoading, quoteError, txStage, txError, quote, actionLabel });
 
   return (
-    <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
+    <div className="flex flex-col w-full bg-surface/60 backdrop-blur-xl border border-border/50 p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+      <div className="absolute top-[-20%] left-[-20%] w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.1] pointer-events-none" />
+      <div className="relative z-10">
       {isMigrated || quoteMovedToUniswap ? (
         <div className="flex flex-col gap-4">
           <div className="rounded-input border border-accent-primary/30 bg-accent-primary/10 p-4">
@@ -389,6 +391,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
       </div>
       </>
       )}
+      </div>
     </div>
   );
 }

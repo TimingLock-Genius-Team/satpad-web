@@ -93,13 +93,16 @@ function PanelShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm min-w-0">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl min-w-0 relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[rgb(var(--token-rgb))] rounded-full blur-[80px] opacity-[0.05] pointer-events-none group-hover:opacity-[0.1] transition-opacity duration-500" />
+      <div className="flex items-center justify-between relative z-10">
         <h3 className="text-content-primary font-bold tracking-widest uppercase text-xs">
           {title}
         </h3>
       </div>
-      {children}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
   );
 }

@@ -58,6 +58,17 @@ function parseTokenAmount(amount: string): number | null {
   return value * multiplier;
 }
 
+const getTokenColorRGB = (symbol: string) => {
+  let hash = 0;
+  for (let i = 0; i < symbol.length; i++) {
+    hash = symbol.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const r = (hash & 0xFF0000) >> 16;
+  const g = (hash & 0x00FF00) >> 8;
+  const b = hash & 0x0000FF;
+  return `${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40}`;
+};
+
 function TokenDetailSkeleton() {
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -179,29 +190,47 @@ export default function TokenDetailPage() {
   const isGraduated = Boolean(token.isGraduated);
   const isMigrated = Boolean(token.isMigrated || detail?.migration?.isMigrated);
   const uniswapLinks = buildUniswapLinks(address);
+  const tokenRGB = getTokenColorRGB(token.symbol);
 
   return (
-    <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
-      <div className="max-w-[1200px] mx-auto space-y-8">
+    <div 
+      className="w-full relative min-h-screen text-content-primary p-4 md:p-8 font-sans"
+      style={{ '--token-rgb': tokenRGB } as React.CSSProperties}
+    >
+      {/* Full Page Decorative Background Elements */}
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_60%,transparent_100%)]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] mix-blend-screen animate-blob opacity-20" style={{ backgroundColor: `rgb(var(--token-rgb))` }} />
+        <div className="absolute top-[20%] right-[-5%] w-[40vw] h-[40vw] bg-accent-primary/10 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] rounded-full blur-[150px] mix-blend-screen animate-blob opacity-10" style={{ backgroundColor: `rgb(var(--token-rgb))`, animationDelay: '4s' }} />
+      </div>
+
+      <div className="max-w-[1200px] mx-auto space-y-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(280px,360px)] gap-8 items-start relative">
           {/* Left Column */}
           <div className="flex flex-col gap-8 min-w-0">
             {/* Token Header */}
-            <div className="bg-surface p-3.5 sm:p-4 rounded-xl flex flex-col sm:flex-row gap-4 sm:gap-5 border border-border shadow-sm">
+            <div className="bg-surface/60 backdrop-blur-xl p-3.5 sm:p-4 rounded-[24px] flex flex-col sm:flex-row gap-4 sm:gap-5 border border-border/50 shadow-2xl relative overflow-hidden group">
+              {/* Ambient Glow in Card */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.15] pointer-events-none" />
+              
               {/* Left: Avatar */}
-              <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0">
+              <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0 z-10">
                 {avatarSrc ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover rounded-xl" />
+                  <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover rounded-[16px] shadow-lg border border-white/5" />
                 ) : (
-                  <div className="w-full h-full bg-surface-highlight rounded-xl flex items-center justify-center text-4xl font-bold text-content-primary">
+                  <div 
+                    className="w-full h-full rounded-[16px] flex items-center justify-center text-4xl font-bold text-white shadow-lg border border-white/5"
+                    style={{ background: `linear-gradient(135deg, rgba(var(--token-rgb), 0.8), rgba(var(--token-rgb), 0.4))` }}
+                  >
                     {token.symbol.substring(0, 2)}
                   </div>
                 )}
               </div>
 
               {/* Right: Info */}
-              <div className="flex flex-col flex-1 justify-between min-w-0 py-0.5">
+              <div className="flex flex-col flex-1 justify-between min-w-0 py-0.5 z-10">
                 {/* Top Section */}
                 <div>
                   <div className="flex justify-between items-start gap-2">
@@ -366,13 +395,14 @@ export default function TokenDetailPage() {
         </div>
 
         {/* Sato Data */}
-        <div className="pt-2">
+        <div className="pt-2 relative z-10">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-3.5 bg-accent-primary rounded-sm" />
-            <h2 className="text-content-primary font-semibold text-xs">sato data</h2>
+            <div className="w-1.5 h-3.5 bg-[rgb(var(--token-rgb))] rounded-sm" />
+            <h2 className="text-content-primary font-bold text-xs uppercase tracking-widest">sato data</h2>
           </div>
-          <div className="border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px]">
+          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.05] pointer-events-none" />
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px] relative z-10">
               {/* SUPPLY */}
               <div className="flex flex-col gap-2">
                 <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">SUPPLY</div>
@@ -446,18 +476,19 @@ export default function TokenDetailPage() {
         <TokenActivityPanels address={address} />
 
         {/* Price and Issuance */}
-        <div className="pt-2">
+        <div className="pt-2 relative z-10">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-1.5 h-3.5 bg-accent-primary rounded-sm" />
-            <h2 className="text-content-primary font-semibold text-xs">price and issuance</h2>
+            <div className="w-1.5 h-3.5 bg-[rgb(var(--token-rgb))] rounded-sm" />
+            <h2 className="text-content-primary font-bold text-xs uppercase tracking-widest">price and issuance</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-3 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
-              <div className="flex justify-between items-center text-xs">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
+              <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
                 <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span></span>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 relative z-10">
                 <TokenPriceTimeChart
                   points={chart?.points}
                   currentPriceOkbWei={satoData.marketPriceOkb}
@@ -465,12 +496,13 @@ export default function TokenDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm">
-              <div className="flex justify-between items-center text-xs">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[24px] shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.05] pointer-events-none" />
+              <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>
                 <span className="text-content-tertiary text-[10px]">unit: <span className="text-content-primary font-mono font-medium">tokens/OKB</span></span>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 relative z-10">
                 <SatoIssuanceChart
                   curve={token.curve}
                   reserveOkbWei={satoData.reserveOkb}
