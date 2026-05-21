@@ -97,6 +97,17 @@ const getTokenColorRGB = (symbol: string) => {
   return `${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40}`;
 };
 
+const getTokenTextColorRGB = (symbol: string) => {
+  let hash = 0;
+  for (let i = 0; i < symbol.length; i++) {
+    hash = symbol.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const r = (hash & 0xFF0000) >> 16;
+  const g = (hash & 0x00FF00) >> 8;
+  const b = hash & 0x0000FF;
+  return `${(r % 125) + 130}, ${(g % 125) + 130}, ${(b % 125) + 130}`;
+};
+
 function TokenDetailSkeleton() {
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -219,18 +230,19 @@ export default function TokenDetailPage() {
   const isMigrated = Boolean(token.isMigrated || detail?.migration?.isMigrated);
   const uniswapLinks = buildUniswapLinks(address);
   const tokenRGB = getTokenColorRGB(token.symbol);
+  const tokenTextRGB = getTokenTextColorRGB(token.symbol);
 
   return (
     <div 
       className="w-full relative min-h-screen text-content-primary p-4 md:p-8 font-sans"
-      style={{ '--token-rgb': tokenRGB } as React.CSSProperties}
+      style={{ '--token-rgb': tokenRGB, '--token-text-rgb': tokenTextRGB } as React.CSSProperties}
     >
       {/* Full Page Decorative Background Elements */}
       <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_60%,transparent_100%)]"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] mix-blend-screen animate-blob opacity-20" style={{ backgroundColor: `rgb(var(--token-rgb))` }} />
-        <div className="absolute top-[20%] right-[-5%] w-[40vw] h-[40vw] bg-accent-primary/10 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] rounded-full blur-[150px] mix-blend-screen animate-blob opacity-10" style={{ backgroundColor: `rgb(var(--token-rgb))`, animationDelay: '4s' }} />
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] mix-blend-screen animate-blob opacity-30" style={{ backgroundColor: `rgb(var(--token-rgb))` }} />
+        <div className="absolute top-[20%] right-[-5%] w-[40vw] h-[40vw] bg-accent-primary/5 rounded-full blur-[120px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] rounded-full blur-[150px] mix-blend-screen animate-blob opacity-20" style={{ backgroundColor: `rgb(var(--token-rgb))`, animationDelay: '4s' }} />
       </div>
 
       <div className="max-w-[1200px] mx-auto space-y-8 relative z-10">
@@ -241,7 +253,7 @@ export default function TokenDetailPage() {
             <div className="animated-border-wrapper shadow-2xl" style={{ '--token-rgb': tokenRGB } as React.CSSProperties}>
             <div className="bg-surface/60 backdrop-blur-xl p-3.5 sm:p-4 rounded-[22px] flex flex-col sm:flex-row gap-4 sm:gap-5 relative overflow-hidden group">
               {/* Ambient Glow in Card */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.15] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.25] pointer-events-none" />
               
               {/* Left: Avatar */}
               <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0 z-10">
@@ -430,7 +442,7 @@ export default function TokenDetailPage() {
             {/* Tech Icon/Node */}
             <div className="relative flex items-center justify-center">
               <div 
-                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.3)] flex items-center justify-center"
+                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.5)] flex items-center justify-center shadow-[0_0_12px_rgba(var(--token-rgb),0.3)]"
                 style={{ animation: 'spin 6s linear infinite' }}
               >
                 <div 
@@ -443,19 +455,19 @@ export default function TokenDetailPage() {
             {/* Text Content */}
             <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
+                <span className="text-[rgb(var(--token-text-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase drop-shadow-[0_0_6px_rgba(var(--token-rgb),0.5)]">
                   Data_Node
                 </span>
                 <span className="text-content-tertiary font-mono text-[9px]">{"// 0x01"}</span>
               </div>
-              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
+              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_18px_rgba(var(--token-rgb),0.6)]">
                 sato data
                 <span className="inline-block w-1.5 h-4 bg-[rgb(var(--token-rgb))] opacity-80 animate-pulse ml-1" />
               </h2>
             </div>
             
             {/* Connecting Line & Circuit pattern */}
-            <div className="flex-1 flex items-center ml-2 opacity-60 hidden sm:flex translate-y-1.5">
+            <div className="flex-1 flex items-center ml-2 opacity-75 hidden sm:flex translate-y-1.5">
               <div className="h-px flex-1 bg-gradient-to-r from-[rgb(var(--token-rgb))] to-transparent" />
               <div className="flex gap-1.5 mr-4">
                 <div className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_8px_rgb(var(--token-rgb))]" />
@@ -464,73 +476,73 @@ export default function TokenDetailPage() {
               </div>
             </div>
           </div>
-          <div className="bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
+          <div className="bg-surface/60 backdrop-blur-xl border border-[rgba(var(--token-rgb),0.15)] p-4 md:p-6 rounded-[12px] shadow-2xl shadow-[0_0_30px_rgba(var(--token-rgb),0.08)] relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.4)]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[120px] opacity-[0.06] pointer-events-none group-hover/card:opacity-[0.12] transition-opacity duration-500" />
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6 text-[11px] relative z-10">
               {/* SUPPLY */}
               <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up">
-                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">SUPPLY</div>
+                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-[rgba(var(--token-rgb),0.2)] pb-1">SUPPLY</div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">max</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{maxSupply}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{maxSupply}</span>
                 </div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">circulating</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{circulatingSupply}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{circulatingSupply}</span>
                 </div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">holders</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{satoData.holders}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{satoData.holders}</span>
                 </div>
               </div>
 
               {/* PRICE */}
               <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.05s' }}>
-                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">PRICE</div>
+                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-[rgba(var(--token-rgb),0.2)] pb-1">PRICE</div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">market</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span>
                 </div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">reserve</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
                 </div>
               </div>
 
               {/* VALUATION */}
               <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">VALUATION</div>
+                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-[rgba(var(--token-rgb),0.2)] pb-1">VALUATION</div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">mcap (fd)</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fdMarketCapOkb}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{fdMarketCapOkb}</span>
                 </div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">mcap (circ)</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{circulatingMarketCapOkb}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{circulatingMarketCapOkb}</span>
                 </div>
               </div>
 
               {/* RESERVE */}
               <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
-                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">RESERVE</div>
+                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-[rgba(var(--token-rgb),0.2)] pb-1">RESERVE</div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">liquidity</span>
                   <div className="text-right">
-                    <div className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</div>
+                    <div className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</div>
                   </div>
                 </div>
               </div>
 
               {/* ACTIVITY */}
               <div className="flex flex-col gap-2 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-border/50 pb-1">ACTIVITY</div>
+                <div className="text-content-tertiary text-[9px] tracking-widest uppercase font-bold mb-1 border-b border-[rgba(var(--token-rgb),0.2)] pb-1">ACTIVITY</div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">vol 24h</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{volumeOkb} OKB</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{volumeOkb} OKB</span>
                 </div>
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">txns 24h</span>
-                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{satoData.txns24h}</span>
+                  <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{satoData.txns24h}</span>
                 </div>
               </div>
             </div>
@@ -544,7 +556,7 @@ export default function TokenDetailPage() {
           <div className="flex items-center gap-4 mb-6 relative cursor-pointer">
             <div className="relative flex items-center justify-center">
               <div 
-                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.3)] flex items-center justify-center"
+                className="w-8 h-8 rounded border border-[rgba(var(--token-rgb),0.5)] flex items-center justify-center shadow-[0_0_12px_rgba(var(--token-rgb),0.3)]"
                 style={{ animation: 'spin 6s linear infinite' }}
               >
                 <div 
@@ -556,18 +568,18 @@ export default function TokenDetailPage() {
             
             <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[rgb(var(--token-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase opacity-70">
+                <span className="text-[rgb(var(--token-text-rgb))] font-mono text-[9px] font-bold tracking-[0.3em] uppercase drop-shadow-[0_0_6px_rgba(var(--token-rgb),0.5)]">
                   Market_Node
                 </span>
                 <span className="text-content-tertiary font-mono text-[9px]">{"// 0x02"}</span>
               </div>
-              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_12px_rgba(var(--token-rgb),0.4)]">
+              <h2 className="text-content-primary font-bold text-sm uppercase tracking-[0.25em] flex items-center gap-2 drop-shadow-[0_0_18px_rgba(var(--token-rgb),0.6)]">
                 price & issuance
                 <span className="inline-block w-1.5 h-4 bg-[rgb(var(--token-rgb))] opacity-80 animate-pulse ml-1" />
               </h2>
             </div>
             
-            <div className="flex-1 flex items-center ml-2 opacity-60 hidden sm:flex translate-y-1.5">
+            <div className="flex-1 flex items-center ml-2 opacity-75 hidden sm:flex translate-y-1.5">
               <div className="h-px flex-1 bg-gradient-to-r from-[rgb(var(--token-rgb))] to-transparent" />
               <div className="flex gap-1.5 mr-4">
                 <div className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--token-rgb))] animate-pulse shadow-[0_0_8px_rgb(var(--token-rgb))]" />
@@ -577,8 +589,8 @@ export default function TokenDetailPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)] content-visibility-auto">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-[rgba(var(--token-rgb),0.15)] p-4 md:p-6 rounded-[12px] shadow-2xl shadow-[0_0_30px_rgba(var(--token-rgb),0.08)] relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.4)] content-visibility-auto">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.06] pointer-events-none group-hover/card:opacity-[0.12] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
                 <span className="text-content-tertiary text-[10px]">now: <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.marketPriceOkb)} OKB</span></span>
@@ -591,8 +603,8 @@ export default function TokenDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)] content-visibility-auto">
-              <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-[rgba(var(--token-rgb),0.15)] p-4 md:p-6 rounded-[12px] shadow-2xl shadow-[0_0_30px_rgba(var(--token-rgb),0.08)] relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.4)] content-visibility-auto">
+              <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.06] pointer-events-none group-hover/card:opacity-[0.12] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>
                 <span className="text-content-tertiary text-[10px]">unit: <span className="text-content-primary font-mono font-medium">tokens/OKB</span></span>

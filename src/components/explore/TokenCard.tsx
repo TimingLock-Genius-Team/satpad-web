@@ -23,6 +23,17 @@ const getTokenColorRGB = (symbol: string) => {
   return `${(r % 150) + 40}, ${(g % 150) + 40}, ${(b % 150) + 40}`;
 };
 
+const getTokenTextColorRGB = (symbol: string) => {
+  let hash = 0;
+  for (let i = 0; i < symbol.length; i++) {
+    hash = symbol.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const r = (hash & 0xFF0000) >> 16;
+  const g = (hash & 0x00FF00) >> 8;
+  const b = hash & 0x0000FF;
+  return `${(r % 125) + 130}, ${(g % 125) + 130}, ${(b % 125) + 130}`;
+};
+
 const formatPrice = (price: number) => {
   if (price === 0) return "0";
   if (price < 0.0001) {
@@ -145,6 +156,7 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
   const volumeDisplay = token.volume24h ?? (token.volume24hOkb ? fmtOkb(token.volume24hOkb) + " OKB" : "--");
   const avatarSrc = resolveIpfsUrl(token.avatarUrl);
   const tokenRGB = getTokenColorRGB(token.symbol);
+  const tokenTextRGB = getTokenTextColorRGB(token.symbol);
 
   const mcapData = formatCompactValue(token.mcap);
   const volData = formatCompactValue(volumeDisplay);
@@ -153,7 +165,7 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
     <Link
       href={`/token/${token.address}`}
       className="group bg-gradient-to-b from-surface/80 to-surface/40 backdrop-blur-xl border border-white/5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_4px_20px_-8px_rgba(0,0,0,0.5)] rounded-[20px] p-5 h-[240px] flex flex-col gap-4 cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:border-[rgba(var(--token-rgb),0.4)] hover:shadow-[0_8px_30px_-12px_rgba(var(--token-rgb),0.35)] relative overflow-hidden"
-      style={{ '--token-rgb': tokenRGB } as React.CSSProperties}
+      style={{ '--token-rgb': tokenRGB, '--token-text-rgb': tokenTextRGB } as React.CSSProperties}
     >
       {/* Ambient Glow */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[80px] opacity-10 pointer-events-none group-hover:opacity-25 transition-opacity duration-500" />
@@ -203,10 +215,10 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-[17px] font-bold text-content-primary truncate transition-colors duration-300 group-hover:text-[rgb(var(--token-rgb))] drop-shadow-sm">
+            <span className="text-[17px] font-bold text-content-primary truncate transition-colors duration-300 group-hover:text-[rgb(var(--token-text-rgb))] drop-shadow-sm">
               {token.name}
             </span>
-            <span className="font-mono text-xs font-bold px-1.5 py-0.5 rounded transition-colors duration-300 bg-black/20 border border-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)] text-content-secondary group-hover:bg-[rgba(var(--token-rgb),0.15)] group-hover:text-[rgb(var(--token-rgb))] group-hover:border-[rgba(var(--token-rgb),0.3)]">
+            <span className="font-mono text-xs font-bold px-1.5 py-0.5 rounded transition-colors duration-300 bg-black/20 border border-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.3)] text-content-secondary group-hover:bg-[rgba(var(--token-rgb),0.15)] group-hover:text-[rgb(var(--token-text-rgb))] group-hover:border-[rgba(var(--token-rgb),0.3)]">
               {token.symbol}
             </span>
           </div>
