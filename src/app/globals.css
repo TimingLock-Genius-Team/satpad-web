@@ -10,6 +10,10 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 500px;
+  }
 }
 
 :root {
@@ -92,6 +96,38 @@ textarea:focus,
 input:focus-visible,
 textarea:focus-visible {
   outline: none !important;
+}
+
+/* ================================================
+ * Animated rotating border (token detail card)
+ * ================================================ */
+@property --card-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-border {
+  to {
+    --card-angle: 360deg;
+  }
+}
+
+.animated-border-wrapper {
+  position: relative;
+  border-radius: 26px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--card-angle),
+    rgb(var(--token-rgb, 46 232 144)),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.18),
+    rgb(var(--accent-primary, 46 232 144)),
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.04),
+    rgb(var(--token-rgb, 46 232 144))
+  );
+  animation: rotate-border 3s linear infinite;
 }
 
 /* RainbowKit connect modal — force black text for readability */

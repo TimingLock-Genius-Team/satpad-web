@@ -3,8 +3,33 @@ import test from "node:test";
 
 import { buildUniswapLinks } from "./uniswap-links";
 
-test("buildUniswapLinks keeps pool, buy, and sell links with pool as default", () => {
+test("buildUniswapLinks returns xlayer links by default", () => {
+  delete process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
+  delete process.env.NEXT_PUBLIC_UNISWAP_SEPOLIA_POOL_ID;
+  delete process.env.NEXT_PUBLIC_UNISWAP_XLAYER_POOL_ID;
   const links = buildUniswapLinks("0x7926876d0D28aC4d49F8c1129BEd261Fa3b4830C");
+
+  assert.equal(
+    links.defaultUrl,
+    "https://app.uniswap.org/explore/pools/xlayer/0x0000000000000000000000000000000000000000000000000000000000000000",
+  );
+  assert.equal(links.defaultUrl, links.poolUrl);
+  assert.equal(
+    links.buyUrl,
+    "https://app.uniswap.org/swap?chain=xlayer&inputCurrency=OKB&outputCurrency=0x7926876d0D28aC4d49F8c1129BEd261Fa3b4830C",
+  );
+  assert.equal(
+    links.sellUrl,
+    "https://app.uniswap.org/swap?chain=xlayer&inputCurrency=0x7926876d0D28aC4d49F8c1129BEd261Fa3b4830C&outputCurrency=OKB",
+  );
+});
+
+test("buildUniswapLinks returns sepolia links when NEXT_PUBLIC_DEFAULT_NETWORK=sepolia", () => {
+  process.env.NEXT_PUBLIC_DEFAULT_NETWORK = "sepolia";
+  delete process.env.NEXT_PUBLIC_UNISWAP_SEPOLIA_POOL_ID;
+  delete process.env.NEXT_PUBLIC_UNISWAP_XLAYER_POOL_ID;
+  const links = buildUniswapLinks("0x7926876d0D28aC4d49F8c1129BEd261Fa3b4830C");
+  delete process.env.NEXT_PUBLIC_DEFAULT_NETWORK;
 
   assert.equal(
     links.defaultUrl,

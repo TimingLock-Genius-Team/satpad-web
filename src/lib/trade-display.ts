@@ -58,7 +58,7 @@ export function formatBalanceDisplay(value: bigint | undefined, decimals: number
   return `${n.toFixed(4)} ${symbol}`;
 }
 
-export default {
+const tradeDisplay = {
   fmtOkb,
   fmtOkbDisplay,
   fmtTokenDisplay,
@@ -67,3 +67,5 @@ export default {
   formatWeiForInput,
   tradeInputAssetSymbol,
 };
+
+export default tradeDisplay;

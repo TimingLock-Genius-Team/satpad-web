@@ -1,12 +1,13 @@
 import { http } from "wagmi";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
-import { sepolia, xLayer, hashKeyTestnet } from "./chains";
+import { sepolia, xLayer } from "./chains";
+
 
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 export const wagmiConfig = getDefaultConfig({
-  appName: "Satpad",
+  appName: "Eulr",
   projectId: walletConnectProjectId ?? "local-only",
   ...(walletConnectProjectId
     ? {}
@@ -18,11 +19,10 @@ export const wagmiConfig = getDefaultConfig({
           },
         ],
       }),
-  chains: [sepolia, xLayer, hashKeyTestnet],
+  chains: [xLayer, sepolia],
   ssr: true,
   transports: {
-    [sepolia.id]: http(),
     [xLayer.id]: http(),
-    [hashKeyTestnet.id]: http(),
+    [sepolia.id]: http(),
   },
 });

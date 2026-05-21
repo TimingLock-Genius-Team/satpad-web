@@ -94,13 +94,16 @@ function PanelShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4 border border-border p-4 md:p-5 rounded-card bg-surface shadow-sm min-w-0">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl min-w-0 relative overflow-hidden group/panel transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[rgb(var(--token-rgb))] rounded-full blur-[80px] opacity-[0.03] pointer-events-none group-hover/panel:opacity-[0.1] transition-opacity duration-500" />
+      <div className="flex items-center justify-between relative z-10">
         <h3 className="text-content-primary font-bold tracking-widest uppercase text-xs">
           {title}
         </h3>
       </div>
-      {children}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
   );
 }
@@ -126,8 +129,8 @@ function TradesPanel({
         <div className="text-sm text-content-tertiary">No indexed trades yet</div>
       ) : (
         <div className="max-h-[210px] overflow-y-auto -mr-3 pr-3">
-          <div className="divide-y divide-border/50">
-            {trades.map((trade) => {
+          <div>
+            {trades.map((trade, index) => {
               const side = toTradeSide(trade.side);
               const sideClass =
                 side === "mint" ? "text-accent-success" : "text-accent-danger";
@@ -135,7 +138,8 @@ function TradesPanel({
               return (
                 <div
                   key={`${trade.txHash}-${trade.logIndex}`}
-                  className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
+                  className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0 border-b border-border/50 last:border-b-0 hover:bg-surface-highlight/20 rounded-lg px-2 -mx-2 transition-colors opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.03}s` }}
                 >
                   <div className={`font-bold uppercase tracking-widest ${sideClass}`}>
                     {side}
@@ -195,11 +199,12 @@ function HoldersPanel({
         <div className="text-sm text-content-tertiary">No indexed holders yet</div>
       ) : (
         <div className="max-h-[210px] overflow-y-auto -mr-3 pr-3">
-          <div className="divide-y divide-border/50">
-            {holders.map((holder) => (
+          <div>
+            {holders.map((holder, index) => (
               <div
                 key={`${holder.holder}-${holder.lastBlock}`}
-                className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0"
+                className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 py-3 text-xs first:pt-0 last:pb-0 border-b border-border/50 last:border-b-0 hover:bg-surface-highlight/20 rounded-lg px-2 -mx-2 transition-colors opacity-0 animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.03}s` }}
               >
                 <div
                   className="font-mono text-content-secondary truncate"

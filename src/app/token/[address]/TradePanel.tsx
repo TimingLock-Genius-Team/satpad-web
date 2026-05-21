@@ -200,7 +200,39 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
   const buttonState = getButtonState({ isConnected, amount, quoteLoading, quoteError, txStage, txError, quote, actionLabel });
 
   return (
-    <div className="flex flex-col w-full border border-border p-6 rounded-card bg-surface shadow-sm">
+    <div className={`flex flex-col w-full bg-[#050505]/90 backdrop-blur-2xl border ${txBusy ? "border-[rgba(var(--token-rgb),0.8)]" : "border-[rgba(var(--token-rgb),0.4)]"} p-6 md:p-8 rounded-[12px] shadow-[0_0_40px_rgba(var(--token-rgb),0.15)] relative overflow-hidden group/tradepanel transition-all duration-700 hover:shadow-[0_0_60px_rgba(var(--token-rgb),0.25)] hover:border-[rgba(var(--token-rgb),0.6)]`}>
+      {/* Flowing Light Border Effect during Transaction */}
+      <div 
+        className={`absolute inset-0 z-50 pointer-events-none rounded-[12px] transition-opacity duration-500 ${txBusy ? "opacity-100" : "opacity-0"}`}
+        style={{
+          padding: '2px',
+          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+          WebkitMaskComposite: 'xor',
+          maskComposite: 'exclude',
+          filter: isMint ? 'drop-shadow(0 0 10px rgba(var(--token-rgb), 0.8))' : 'drop-shadow(0 0 10px rgba(239, 68, 68, 0.8))',
+        }}
+      >
+        <div 
+          className="absolute inset-[-100%] animate-[spin_2s_linear_infinite]" 
+          style={{ 
+            backgroundImage: isMint 
+              ? 'conic-gradient(from 0deg, transparent 0 280deg, rgba(var(--token-rgb), 1) 340deg, rgba(255,255,255,1) 360deg)' 
+              : 'conic-gradient(from 0deg, transparent 0 280deg, rgba(239, 68, 68, 1) 340deg, rgba(255,255,255,1) 360deg)'
+          }}
+        />
+      </div>
+
+      {/* Tech Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(var(--token-rgb),0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(var(--token-rgb),0.05)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_100%_100%_at_50%_0%,#000_80%,transparent_100%)] pointer-events-none" />
+      
+      {/* Ambient Glowing Orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-72 h-72 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.15] pointer-events-none group-hover/tradepanel:opacity-[0.25] transition-opacity duration-700" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-64 h-64 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.1] pointer-events-none group-hover/tradepanel:opacity-[0.2] transition-opacity duration-700" />
+
+      {/* Top Edge Highlight */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[rgba(var(--token-rgb),0.8)] to-transparent opacity-60" />
+
+      <div className="relative z-10">
       {isMigrated || quoteMovedToUniswap ? (
         <div className="flex flex-col gap-4">
           <div className="rounded-input border border-accent-primary/30 bg-accent-primary/10 p-4">
@@ -247,26 +279,38 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
       ) : (
       <>
       {/* Tabs */}
-      <div className="flex w-full mb-6 border border-border rounded-input overflow-hidden text-sm font-semibold tracking-wide">
+      <div className="flex w-full mb-8 border border-[rgba(var(--token-rgb),0.4)] bg-[#0A0A0A] rounded-[8px] overflow-hidden text-sm font-semibold tracking-[0.2em] relative shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]">
+        {/* Animated glowing border for active tab */}
+        <div 
+          className={`absolute bottom-0 h-1 transition-all duration-500 ${isMint ? "bg-[rgb(var(--token-rgb))] shadow-[0_0_12px_rgb(var(--token-rgb))]" : "bg-accent-danger shadow-[0_0_12px_rgba(239,68,68,0.8)]"}`} 
+          style={{ 
+            width: mintClosed ? '100%' : '50%', 
+            left: !isMint && !mintClosed ? '50%' : '0%' 
+          }} 
+        />
         {!mintClosed && (
           <button
             onClick={() => { if (!txBusy) { setTradeType("mint"); setAmount(""); setTxError(null); } }}
             disabled={txBusy}
-            className={`flex-1 py-3 transition-colors uppercase text-xs disabled:opacity-50 ${
-              isMint ? "bg-surface-highlight text-accent-primary" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
+            className={`flex-1 py-4 transition-all uppercase text-[13px] disabled:opacity-50 relative ${
+              isMint 
+                ? "bg-[rgba(var(--token-rgb),0.15)] text-[rgb(var(--token-rgb))] font-bold shadow-[inset_0_0_15px_rgba(var(--token-rgb),0.2)]" 
+                : "text-content-tertiary hover:text-content-secondary hover:bg-[rgba(var(--token-rgb),0.05)]"
             }`}
           >
-            mint
+            MINT_MODE
           </button>
         )}
         <button
           onClick={() => { if (!txBusy) { setTradeType("burn"); setAmount(""); setTxError(null); } }}
           disabled={txBusy}
-          className={`flex-1 py-3 ${mintClosed ? "" : "border-l border-border"} transition-colors uppercase text-xs disabled:opacity-50 ${
-            !isMint ? "bg-surface-highlight text-accent-danger" : "text-content-tertiary hover:text-content-secondary hover:bg-surface-base"
+          className={`flex-1 py-4 ${mintClosed ? "" : "border-l border-[rgba(var(--token-rgb),0.2)]"} transition-all uppercase text-[13px] disabled:opacity-50 relative ${
+            !isMint 
+              ? "bg-accent-danger/15 text-accent-danger font-bold shadow-[inset_0_0_15px_rgba(239,68,68,0.2)]" 
+              : "text-content-tertiary hover:text-content-secondary hover:bg-accent-danger/5"
           }`}
         >
-          burn
+          BURN_MODE
         </button>
       </div>
       {mintClosed && (
@@ -281,26 +325,34 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
       <div className="flex flex-col gap-3">
         {/* Input Area */}
         <div className={txBusy ? "opacity-50 pointer-events-none" : ""}>
-          <div className="bg-surface-base border border-border/50 p-4 rounded-input transition-colors focus-within:border-border">
-            <div className="flex justify-between text-xs text-content-tertiary font-medium mb-3">
-              <span>Pay</span>
-              <span>Bal: {balanceLabel}</span>
+          <div className="bg-[#0A0A0A] border border-[rgba(var(--token-rgb),0.3)] p-6 md:p-8 rounded-[12px] transition-all duration-300 focus-within:border-[rgb(var(--token-rgb))] focus-within:shadow-[0_0_25px_rgba(var(--token-rgb),0.15)] shadow-[inset_0_0_20px_rgba(0,0,0,0.6)] relative overflow-hidden group/input">
+            
+            <div className="flex justify-between text-[11px] text-content-tertiary font-mono mb-6 tracking-widest uppercase">
+              <span className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-[rgb(var(--token-rgb))] rounded-sm opacity-80" />
+                PAY_AMOUNT
+              </span>
+              <span className="text-[rgb(var(--token-rgb))] opacity-80 pb-0.5">BAL: {balanceLabel}</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 relative z-10">
               <input
                 type="text"
                 placeholder="0.0"
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
-                className="bg-transparent outline-none text-2xl text-content-primary flex-1 min-w-0 placeholder:text-content-tertiary font-mono"
+                className="bg-transparent outline-none text-2xl md:text-3xl text-content-primary flex-1 min-w-0 placeholder:text-content-tertiary/20 font-mono tracking-wide drop-shadow-[0_0_12px_rgba(255,255,255,0.1)] leading-none"
               />
               <button
                 onClick={handleSetMax}
                 disabled={!activeBalance?.value || txBusy}
-                className={`text-xs font-mono flex items-baseline justify-center gap-1 hover:opacity-80 transition-opacity px-2 py-1 rounded bg-surface-highlight disabled:opacity-50 ${isMint ? "text-accent-primary" : "text-accent-danger"}`}
+                className={`text-[11px] font-mono font-bold tracking-[0.2em] flex items-baseline justify-center gap-2 hover:opacity-100 opacity-80 transition-all px-4 py-2.5 rounded-[4px] border ${
+                  isMint 
+                    ? "border-[rgba(var(--token-rgb),0.5)] bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-rgb))] hover:bg-[rgba(var(--token-rgb),0.2)] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.4)]" 
+                    : "border-accent-danger/50 bg-accent-danger/10 text-accent-danger hover:bg-accent-danger/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                } disabled:opacity-30 disabled:hover:shadow-none`}
               >
-                <span>max</span>
-                <span className="text-content-secondary uppercase">{inputAssetSymbol}</span>
+                <span>MAX</span>
+                <span className="opacity-60">{inputAssetSymbol}</span>
               </button>
             </div>
           </div>
@@ -308,53 +360,56 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
 
         {/* Quote Info Box */}
         {quoteLoading && amount && amount !== "0" && (
-          <div className="flex items-center justify-center gap-2 text-xs text-content-tertiary py-2">
+          <div className="flex items-center justify-center gap-2 text-xs text-[rgb(var(--token-rgb))] py-2 font-mono opacity-80 animate-pulse">
             <Loader2 className="w-3 h-3 animate-spin" />
-            Fetching quote...
+            COMPUTING_QUOTE...
           </div>
         )}
         {quoteError && amount && amount !== "0" && (
-          <div className="text-xs text-accent-danger text-center py-2">
-            {quoteErrorMessage ?? "Failed to get quote"}
+          <div className="text-xs text-accent-danger text-center py-2 font-mono bg-accent-danger/10 border border-accent-danger/30 rounded">
+            [ERR] {quoteErrorMessage ?? "FAILED_TO_GET_QUOTE"}
           </div>
         )}
         {quote && amount && amount !== "0" && (
           <div className={txBusy ? "opacity-50" : ""}>
-            <div className="text-xs font-mono text-content-secondary space-y-2 mt-2 bg-surface-highlight/30 p-3 rounded-input">
+            <div className="text-[11px] font-mono text-content-secondary space-y-2 mt-2 bg-[#050505] border border-[rgba(var(--token-rgb),0.15)] p-3.5 rounded-input relative overflow-hidden">
+              {/* Decorative scanline in quote box */}
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-[rgb(var(--token-rgb))] opacity-20" />
+
               {isMint && (
-                <div className="flex justify-between">
-                  <span>pay</span>
-                  <span className="text-content-primary">
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-tertiary">PAY</span>
+                  <span className="text-content-primary font-bold group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
                     {fmtOkbDisplay(quote.amountIn)} <span className="text-content-secondary text-[10px]">OKB</span>
                   </span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <span>platform fee</span>
-                <span className="text-content-primary">{fmtOkbDisplay(quote.fee)} OKB</span>
+              <div className="flex justify-between items-baseline group/row">
+                <span className="text-content-tertiary">PLATFORM_FEE</span>
+                <span className="text-content-primary group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbDisplay(quote.fee)} OKB</span>
               </div>
               {quoteRows.map((row) => (
-                <div key={`${row.label}-${row.symbol}`} className="flex justify-between gap-4">
-                  <span>
-                    {row.label}
+                <div key={`${row.label}-${row.symbol}`} className="flex justify-between items-baseline gap-4 group/row">
+                  <span className="text-content-tertiary">
+                    {row.label.toUpperCase().replace(/\s+/g, "_")}
                     {row.detail ? <span className="text-content-tertiary"> ({row.detail})</span> : null}
                   </span>
-                  <span className="text-content-primary text-right">
+                  <span className="text-content-primary text-right font-bold group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
                     {formatQuoteRowAmount(row)} <span className="text-content-secondary text-[10px]">{row.symbol}</span>
                   </span>
                 </div>
               ))}
-              <div className="flex justify-between pt-2 border-t border-border/30">
-                <span>price impact</span>
-                <span className={priceImpact > 5 ? "text-accent-danger" : "text-content-primary"}>
+              <div className="flex justify-between items-baseline pt-2 border-t border-[rgba(var(--token-rgb),0.1)] group/row">
+                <span className="text-content-tertiary">PRICE_IMPACT</span>
+                <span className={`${priceImpact > 5 ? "text-accent-danger" : "text-[rgb(var(--token-rgb))]"} font-bold`}>
                   {(priceImpact / 100).toFixed(2)}%
                 </span>
               </div>
               {minReceived && (
-                <div className="flex justify-between">
-                  <span>min received</span>
-                  <span className="text-content-primary">
-                    {minReceived.amount} <span className="text-content-secondary text-[10px]">{minReceived.symbol}</span>
+                <div className="flex justify-between items-baseline group/row">
+                  <span className="text-content-tertiary">MIN_RECEIVED</span>
+                  <span className="text-content-primary group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
+                    {minReceived.amount} <span className="text-content-tertiary text-[9px]">{minReceived.symbol}</span>
                   </span>
                 </div>
               )}
@@ -385,25 +440,31 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
         <button
           onClick={handleTrade}
           disabled={buttonState.disabled}
-          className={`w-full py-3.5 font-semibold uppercase tracking-widest text-xs rounded-input transition-all flex items-center justify-center gap-2 ${
+          className={`w-full py-4 font-mono font-bold uppercase tracking-[0.2em] text-xs rounded-input transition-all flex items-center justify-center gap-2 relative overflow-hidden group/btn border ${
             txStage === "success"
-              ? "bg-accent-success text-white"
+              ? "bg-accent-success text-white border-accent-success"
               : isMint
-                ? "bg-accent-primary text-surface-base hover:bg-accent-primary/90"
-                : "bg-accent-danger text-white hover:bg-accent-danger/90"
-          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                ? "bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-rgb))] border-[rgba(var(--token-rgb),0.4)] hover:bg-[rgba(var(--token-rgb),0.2)] hover:border-[rgb(var(--token-rgb))] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.3)]"
+                : "bg-accent-danger/10 text-accent-danger border-accent-danger/40 hover:bg-accent-danger/20 hover:border-accent-danger hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+          } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:bg-transparent`}
         >
+          {/* Scanning light effect for button */}
+          {!buttonState.disabled && (
+            <div className="absolute inset-0 -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-[rgba(var(--token-rgb),0.2)] to-transparent skew-x-12" />
+          )}
           {txStage === "confirming" && <Loader2 className="w-4 h-4 animate-spin" />}
-          {buttonState.label}
+          <span className="relative z-10">{buttonState.label}</span>
         </button>
 
         {/* Footer Text */}
-        <div className="text-[10px] text-content-tertiary/70 font-mono mt-4 text-center leading-relaxed max-w-[200px] mx-auto">
-          via Eulr Backend API · {targetChain.name}
+        <div className="text-[9px] text-content-tertiary/60 font-mono mt-4 text-center tracking-[0.2em] uppercase flex items-center justify-center gap-2">
+          <div className="w-1 h-1 bg-accent-primary rounded-full animate-pulse" />
+          <span>ROUTED_VIA_EULR_API // {targetChain.name}</span>
         </div>
       </div>
       </>
       )}
+      </div>
     </div>
   );
 }

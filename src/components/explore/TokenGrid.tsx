@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { TokenCard } from "./TokenCard";
 import { Token } from "@/types/token";
 import { cn } from "@/utils/cn";
@@ -9,7 +10,7 @@ interface TokenGridProps {
   emptyMessage?: string;
 }
 
-export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage }: TokenGridProps) {
+export const TokenGrid = memo(function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage }: TokenGridProps) {
   if (tokens.length === 0) {
     return (
       <div className="py-20 text-center">
@@ -23,13 +24,18 @@ export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <div aria-live="polite" className="text-[13px] text-content-tertiary">
-          <span className="font-mono text-content-secondary">{totalCount ?? tokens.length}</span> tokens
-        </div>
-        <div className="flex items-center gap-[6px] text-[11px] text-content-tertiary">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-brand-pulse"></span>
-          <span className="uppercase tracking-[0.06em] font-medium">Live</span>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-content-primary mb-2 flex items-center gap-3">
+            Active Markets
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-success/10 text-accent-success text-xs font-bold uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-brand-pulse"></span>
+              Live
+            </span>
+          </h2>
+          <p className="text-content-secondary text-sm">
+            Discover and trade the latest tokens. Showing <span className="font-mono text-content-primary">{totalCount ?? tokens.length}</span> results.
+          </p>
         </div>
       </div>
       
@@ -42,10 +48,16 @@ export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage
         )}
         style={viewMode === "comfy" ? { gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' } : {}}
       >
-        {tokens.map((token) => (
-          <TokenCard key={token.address} token={token} />
+        {tokens.map((token, index) => (
+          <div
+            key={token.address}
+            className="opacity-0 animate-fade-in-up content-visibility-auto"
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
+            <TokenCard token={token} />
+          </div>
         ))}
       </div>
     </div>
   );
-}
+});

@@ -3,12 +3,11 @@
  * - Leave empty (default): browser calls same origin (e.g. :5000) and Next.js rewrites proxy to the backend → no CORS in dev.
  * - Set to full URL when the API is on another host (e.g. production).
  *
- * Local Sepolia integration may proxy to backend port 3340; match `BACKEND_PROXY_TARGET` in next.config.mjs.
  */
 const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 const API_BASE_URL =
   rawBase === undefined || rawBase === "" ? "" : rawBase.replace(/\/$/, "");
-const DEFAULT_NETWORK = process.env.NEXT_PUBLIC_DEFAULT_NETWORK || "sepolia";
+const DEFAULT_NETWORK = process.env.NEXT_PUBLIC_DEFAULT_NETWORK || "xlayer";
 
 export function getApiBaseUrl() {
   return API_BASE_URL;

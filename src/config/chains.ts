@@ -2,8 +2,6 @@ import { defineChain } from "viem";
 
 const sepoliaDefaultRpc =
   process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com";
-const hashkeyTestnetDefaultRpc =
-  process.env.NEXT_PUBLIC_HASHKEYTEST_RPC_URL || "https://hashkeychain-testnet.alt.technology";
 const xLayerDefaultRpc = process.env.NEXT_PUBLIC_XLAYER_RPC_URL || "https://rpc.xlayer.tech";
 
 export const sepolia = defineChain({
@@ -56,39 +54,15 @@ export const xLayer = defineChain({
   },
 });
 
-export const hashKeyTestnet = defineChain({
-  id: 133,
-  name: "HashKey Testnet",
-  nativeCurrency: {
-    decimals: 18,
-    name: "HSK",
-    symbol: "HSK",
-  },
-  rpcUrls: {
-    default: { http: [hashkeyTestnetDefaultRpc] },
-  },
-  blockExplorers: {
-    default: {
-      name: "HashKey Explorer",
-      url: "https://hashkey-testnet-explorer.alt.technology",
-    },
-  },
-  contracts: {
-    multicall3: {
-      address: "0xcA11bde05977b3631167028862bE2a173976CA11",
-      blockCreated: 1,
-    },
-  },
-});
+const NETWORK_CHAINS: Record<string, ReturnType<typeof defineChain>> = {
+  sepolia,
+  xlayer: xLayer,
+};
+
+export function getDefaultChain() {
+  return NETWORK_CHAINS[process.env.NEXT_PUBLIC_DEFAULT_NETWORK || ""] ?? xLayer;
+}
 
 export function chainForSatpadNetwork(network: string) {
-  switch (network) {
-    case "sepolia":
-      return sepolia;
-    case "xlayer":
-      return xLayer;
-    case "hashkeytest":
-    default:
-      return hashKeyTestnet;
-  }
+  return NETWORK_CHAINS[network] ?? xLayer;
 }
