@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import { Check, Copy, ExternalLink, Wallet } from "lucide-react";
 import { Pagination } from "@/components/explore/Pagination";
 import { useAccount } from "wagmi";
@@ -358,11 +359,13 @@ export default function PortfolioPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {hAvatarSrc ? (
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img
+                              <Image
                                 src={hAvatarSrc}
                                 alt={h.symbol}
-                                className="w-8 h-8 rounded object-cover"
+                                width={32}
+                                height={32}
+                                className="rounded object-cover"
+                                unoptimized
                               />
                             ) : (
                               <div
@@ -465,11 +468,13 @@ export default function PortfolioPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             {histAvatarSrc ? (
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img
+                              <Image
                                 src={histAvatarSrc}
                                 alt={item.token.symbol}
-                                className="w-6 h-6 rounded object-cover"
+                                width={24}
+                                height={24}
+                                className="rounded object-cover"
+                                unoptimized
                               />
                             ) : (
                               <div

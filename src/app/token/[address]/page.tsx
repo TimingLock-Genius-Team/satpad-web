@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
-import { TradePanel } from "./TradePanel";
 import { TokenChart } from "@/components/token/TokenChart";
 import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
-import { TokenPriceTimeChart } from "@/components/token/TokenPriceTimeChart";
-import { SatoIssuanceChart } from "@/components/token/SatoIssuanceChart";
 import { Copy, ExternalLink, Send, Globe, Check, RefreshCw } from "lucide-react";
 import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,6 +14,35 @@ import { cn } from "@/utils/cn";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 import { getDefaultChain } from "@/config/chains";
 import { buildUniswapLinks } from "@/lib/uniswap-links";
+
+const TradePanel = dynamic(
+  () => import("./TradePanel").then((m) => ({ default: m.TradePanel })),
+  {
+    loading: () => <div className="h-[400px] rounded-card bg-surface animate-pulse" />,
+  }
+);
+
+const TokenPriceTimeChart = dynamic(
+  () =>
+    import("@/components/token/TokenPriceTimeChart").then((m) => ({
+      default: m.TokenPriceTimeChart,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[300px] rounded-card bg-surface animate-pulse" />,
+  }
+);
+
+const SatoIssuanceChart = dynamic(
+  () =>
+    import("@/components/token/SatoIssuanceChart").then((m) => ({
+      default: m.SatoIssuanceChart,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[300px] rounded-card bg-surface animate-pulse" />,
+  }
+);
 
 function chainForId() {
   return getDefaultChain();
@@ -218,8 +246,7 @@ export default function TokenDetailPage() {
               {/* Left: Avatar */}
               <div className="relative w-full sm:w-[136px] sm:h-[136px] aspect-square sm:aspect-auto flex-shrink-0 z-10">
                 {avatarSrc ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover rounded-[16px] shadow-lg border border-white/5" />
+                  <Image src={avatarSrc} alt={token.symbol} fill className="object-cover rounded-[16px] shadow-lg border border-white/5" unoptimized />
                 ) : (
                   <div 
                     className="w-full h-full rounded-[16px] flex items-center justify-center text-4xl font-bold text-white shadow-lg border border-white/5"
@@ -550,7 +577,7 @@ export default function TokenDetailPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)] content-visibility-auto">
               <div className="absolute top-0 right-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">price over time</span>
@@ -564,7 +591,7 @@ export default function TokenDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)]">
+            <div className="flex flex-col gap-3 bg-surface/60 backdrop-blur-xl border border-border/50 p-4 md:p-6 rounded-[12px] shadow-2xl relative overflow-hidden group/card transition-colors duration-500 hover:border-[rgba(var(--token-rgb),0.25)] content-visibility-auto">
               <div className="absolute top-0 left-0 w-48 h-48 bg-[rgb(var(--token-rgb))] rounded-full blur-[100px] opacity-[0.03] pointer-events-none group-hover/card:opacity-[0.08] transition-opacity duration-500" />
               <div className="flex justify-between items-center text-xs relative z-10">
                 <span className="text-content-secondary font-bold tracking-wide uppercase text-[11px]">sato issuance</span>

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { TokenCard } from "./TokenCard";
 import { Token } from "@/types/token";
 import { cn } from "@/utils/cn";
@@ -9,7 +10,7 @@ interface TokenGridProps {
   emptyMessage?: string;
 }
 
-export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage }: TokenGridProps) {
+export const TokenGrid = memo(function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage }: TokenGridProps) {
   if (tokens.length === 0) {
     return (
       <div className="py-20 text-center">
@@ -48,9 +49,9 @@ export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage
         style={viewMode === "comfy" ? { gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' } : {}}
       >
         {tokens.map((token, index) => (
-          <div 
-            key={token.address} 
-            className="opacity-0 animate-fade-in-up" 
+          <div
+            key={token.address}
+            className="opacity-0 animate-fade-in-up content-visibility-auto"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             <TokenCard token={token} />
@@ -59,4 +60,4 @@ export function TokenGrid({ tokens, viewMode = "comfy", totalCount, emptyMessage
       </div>
     </div>
   );
-}
+});

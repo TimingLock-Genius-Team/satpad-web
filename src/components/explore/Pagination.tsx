@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -27,7 +28,7 @@ function getPageNumbers(currentPage: number, totalPages: number): (number | "...
   return pages;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export const Pagination = memo(function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const pages = getPageNumbers(currentPage, totalPages);
@@ -90,4 +91,4 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       </button>
     </div>
   );
-}
+});

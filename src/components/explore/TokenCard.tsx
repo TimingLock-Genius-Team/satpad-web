@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { memo, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/utils/cn";
 import { Token } from "@/types/token";
 import { timeAgo, timestampMs } from "@/lib/time-display";
@@ -130,7 +131,7 @@ function MiniChartPath({ token }: { token: Token }) {
   );
 }
 
-export function TokenCard({ token }: TokenCardProps) {
+export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
   const [now, setNow] = useState<number | null>(null);
   const priceNum = token.price ?? parsePriceOkb(token.priceOkb);
 
@@ -194,8 +195,7 @@ export function TokenCard({ token }: TokenCardProps) {
           style={avatarSrc ? undefined : { background: `linear-gradient(135deg, rgba(${tokenRGB}, 0.8), rgba(${tokenRGB}, 0.4))` }}
         >
           {avatarSrc ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={avatarSrc} alt={token.symbol} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <Image src={avatarSrc} alt={token.symbol} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
           ) : (
             token.symbol.slice(0, 2).toUpperCase()
           )}
@@ -285,4 +285,4 @@ export function TokenCard({ token }: TokenCardProps) {
       </div>
     </Link>
   );
-}
+});

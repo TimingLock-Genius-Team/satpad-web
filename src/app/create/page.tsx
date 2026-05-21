@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, type DragEvent, type ChangeEvent } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAccount, useWalletClient, usePublicClient, useSwitchChain, useChainId } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,8 +24,14 @@ import {
   maxLaunchBuyGrossWei,
   validateOptionalInitialBuyNativeInput,
 } from "@/lib/launch-buy-limits";
-import { CurvePreview } from "@/components/create/CurvePreview";
 import type { ApiCreateBuildRequest } from "@/lib/api-types";
+
+const CurvePreview = dynamic(
+  () => import("@/components/create/CurvePreview").then((m) => ({ default: m.CurvePreview })),
+  {
+    loading: () => <div className="h-[400px] rounded-card bg-surface animate-pulse" />,
+  }
+);
 
 const STEPS = [
   { id: 1, label: "Basics" },
@@ -434,11 +442,12 @@ export default function CreatePage() {
                   >
                     {store.image ? (
                       <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                           src={store.image}
                           alt="Token preview"
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          unoptimized
                         />
                         <button
                           type="button"
@@ -815,11 +824,13 @@ export default function CreatePage() {
                     {/* Image + Name/Symbol */}
                     <div className="flex items-center gap-4 relative z-10 border-b border-border/30 pb-5">
                       {store.image ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
+                        <Image
                           src={store.image}
                           alt="Token"
-                          className="w-16 h-16 rounded-[10px] object-cover flex-shrink-0 border border-border/50 shadow-lg"
+                          width={64}
+                          height={64}
+                          className="rounded-[10px] object-cover flex-shrink-0 border border-border/50 shadow-lg"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-[10px] bg-[#111] border border-border/50 flex items-center justify-center flex-shrink-0 shadow-inner">
