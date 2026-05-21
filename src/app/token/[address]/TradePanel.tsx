@@ -18,6 +18,7 @@ import {
   formatWeiForInput,
   tradeInputAssetSymbol,
 } from "@/lib/trade-display";
+import { buildQuoteBreakdownRows, type QuoteBreakdownRow } from "@/lib/quote-breakdown";
 
 interface TradePanelProps {
   tokenAddress: string;
@@ -52,6 +53,10 @@ function apiErrorMessage(error: unknown): string | null {
 
 function isMovedToUniswapError(error: unknown): boolean {
   return apiErrorMessage(error)?.toLowerCase().includes("moved to uniswap") ?? false;
+}
+
+function formatQuoteRowAmount(row: QuoteBreakdownRow): string {
+  return row.symbol === "OKB" ? fmtOkbDisplay(row.valueWei) : fmtTokenDisplay(row.valueWei);
 }
 
 export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isMigrated = false, uniswapLinks }: TradePanelProps) {
@@ -183,6 +188,9 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
   const minReceived = quote?.minOut
     ? formatQuoteMinReceived(tradeType, quote.minOut, tokenSymbol)
     : null;
+  const quoteRows = quote
+    ? buildQuoteBreakdownRows({ side: tradeType, tokenSymbol, quote })
+    : [];
   const quoteMovedToUniswap = isMovedToUniswapError(quoteError);
   const quoteErrorMessage = apiErrorMessage(quoteError);
 
@@ -313,22 +321,29 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
         {quote && amount && amount !== "0" && (
           <div className={txBusy ? "opacity-50" : ""}>
             <div className="text-xs font-mono text-content-secondary space-y-2 mt-2 bg-surface-highlight/30 p-3 rounded-input">
+              {isMint && (
+                <div className="flex justify-between">
+                  <span>pay</span>
+                  <span className="text-content-primary">
+                    {fmtOkbDisplay(quote.amountIn)} <span className="text-content-secondary text-[10px]">OKB</span>
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span>{isMint ? "minting" : "burning"}</span>
-                <span className="text-content-primary">
-                  {fmtTokenDisplay(isMint ? quote.amountOut : quote.amountIn)} <span className="text-content-secondary text-[10px]">{tokenSymbol}</span>
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>for</span>
-                <span className="text-content-primary">
-                  {fmtOkbDisplay(isMint ? quote.amountIn : quote.amountOut)} <span className="text-content-secondary text-[10px]">OKB</span>
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>fee</span>
+                <span>platform fee</span>
                 <span className="text-content-primary">{fmtOkbDisplay(quote.fee)} OKB</span>
               </div>
+              {quoteRows.map((row) => (
+                <div key={`${row.label}-${row.symbol}`} className="flex justify-between gap-4">
+                  <span>
+                    {row.label}
+                    {row.detail ? <span className="text-content-tertiary"> ({row.detail})</span> : null}
+                  </span>
+                  <span className="text-content-primary text-right">
+                    {formatQuoteRowAmount(row)} <span className="text-content-secondary text-[10px]">{row.symbol}</span>
+                  </span>
+                </div>
+              ))}
               <div className="flex justify-between pt-2 border-t border-border/30">
                 <span>price impact</span>
                 <span className={priceImpact > 5 ? "text-accent-danger" : "text-content-primary"}>

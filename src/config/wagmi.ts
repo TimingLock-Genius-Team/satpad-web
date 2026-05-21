@@ -1,10 +1,23 @@
 import { http } from "wagmi";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import { sepolia, xLayer, hashKeyTestnet } from "./chains";
+
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 
 export const wagmiConfig = getDefaultConfig({
   appName: "Satpad",
-  projectId: "4b4f535d8832a8ba77a8df254ba2ba61", // public project ID
+  projectId: walletConnectProjectId ?? "local-only",
+  ...(walletConnectProjectId
+    ? {}
+    : {
+        wallets: [
+          {
+            groupName: "Available",
+            wallets: [injectedWallet],
+          },
+        ],
+      }),
   chains: [sepolia, xLayer, hashKeyTestnet],
   ssr: true,
   transports: {

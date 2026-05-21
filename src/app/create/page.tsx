@@ -69,6 +69,8 @@ export default function CreatePage() {
   const createBuild = useCreateBuild();
   const config = useConfig(network);
   const feeBps = config.data?.deployment.curve.feeBps ?? 30;
+  const burnTaxMinBps = config.data?.deployment.curve.burnTaxMinBps ?? 100;
+  const burnTaxMaxBps = config.data?.deployment.curve.burnTaxMaxBps ?? 1000;
   const curveSNormalized = clampCurveSForCreateFlow(store.curveS);
   const launchBuyMaxWei = maxLaunchBuyGrossWei(curveSNormalized, feeBps);
   const launchBuyMaxNative = Number(formatEther(launchBuyMaxWei)).toLocaleString(undefined, {
@@ -695,7 +697,18 @@ export default function CreatePage() {
                       100,000 OKB reserve
                     </p>
                   </div>
+                  <div>
+                    <p className="text-[11px] text-content-tertiary mb-1">
+                      Burn Tax
+                    </p>
+                    <p className="text-content-primary text-[14px] font-medium font-mono">
+                      {(burnTaxMaxBps / 100).toFixed(2)}% → {(burnTaxMinBps / 100).toFixed(2)}%
+                    </p>
+                  </div>
                 </div>
+                <p className="text-[11px] text-content-tertiary leading-relaxed">
+                  Dynamic burn tax starts high near the low end of the curve and falls as price rises. Collected tokens are burned directly.
+                </p>
               </div>
 
               {/* Curve Preview */}
@@ -862,6 +875,10 @@ export default function CreatePage() {
                         <span className="text-content-secondary text-[12px]">Exponential</span>
                         <span className="text-content-tertiary text-[12px]">Curve S</span>
                         <span className="text-content-secondary text-[12px] font-mono">{store.curveS}</span>
+                        <span className="text-content-tertiary text-[12px]">Burn Tax</span>
+                        <span className="text-content-secondary text-[12px] font-mono">
+                          {(burnTaxMaxBps / 100).toFixed(2)}% → {(burnTaxMinBps / 100).toFixed(2)}%
+                        </span>
                       </div>
                     </div>
 

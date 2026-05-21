@@ -18,9 +18,15 @@ export interface Token {
   description?: string;
   avatarUrl?: string;
   createdAt?: number;
+  taxBurnedTokens?: string;
   curve?: {
+    k?: string;
+    s?: string;
     curveS: number;
     feeBps: number;
+    burnTaxMinBps?: number;
+    burnTaxMaxBps?: number;
+    selfDeprecationBps?: number;
     maxBuyOkb: string;
   };
 }

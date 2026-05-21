@@ -22,6 +22,7 @@ export function mapApiTokenToToken(item: ApiTokenListItem): Token {
     description: item.description,
     avatarUrl: item.avatarUrl ?? undefined,
     createdAt: item.createdAt,
+    taxBurnedTokens: item.taxBurnedTokens,
     curve: item.curve,
   };
 }

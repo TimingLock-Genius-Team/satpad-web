@@ -16,6 +16,8 @@ import { resolveIpfsUrl } from "@/lib/ipfs";
 import { useAccount } from "wagmi";
 import { hashKeyTestnet, sepolia, xLayer } from "@/config/chains";
 import { buildUniswapLinks } from "@/lib/uniswap-links";
+import { formatBpsPercent } from "@/lib/quote-breakdown";
+import { fmtTokenDisplay } from "@/lib/trade-display";
 
 function chainForId(chainId?: number) {
   switch (chainId) {
@@ -189,6 +191,9 @@ export default function TokenDetailPage() {
   const isGraduated = Boolean(token.isGraduated);
   const isMigrated = Boolean(token.isMigrated || detail?.migration?.isMigrated);
   const uniswapLinks = buildUniswapLinks(address);
+  const taxBurnedTokens = satoData.taxBurnedTokens ?? token.taxBurnedTokens;
+  const burnTaxMinBps = token.curve?.burnTaxMinBps;
+  const burnTaxMaxBps = token.curve?.burnTaxMaxBps;
 
   return (
     <div className="w-full bg-surface-base min-h-screen text-content-primary p-4 md:p-8 font-sans">
@@ -355,6 +360,12 @@ export default function TokenDetailPage() {
                   <span className="text-content-secondary">holders</span>
                   <span className="text-content-primary font-mono font-medium">{satoData.holders}</span>
                 </div>
+                {taxBurnedTokens && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-content-secondary">burned</span>
+                    <span className="text-content-primary font-mono font-medium">{fmtTokenDisplay(taxBurnedTokens)}</span>
+                  </div>
+                )}
               </div>
 
               {/* PRICE */}
@@ -368,6 +379,14 @@ export default function TokenDetailPage() {
                   <span className="text-content-secondary">reserve</span>
                   <span className="text-content-primary font-mono font-medium">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
                 </div>
+                {burnTaxMinBps !== undefined && burnTaxMaxBps !== undefined && (
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-content-secondary">burn tax</span>
+                    <span className="text-content-primary font-mono font-medium">
+                      {formatBpsPercent(burnTaxMaxBps)} → {formatBpsPercent(burnTaxMinBps)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* VALUATION */}

@@ -5,6 +5,7 @@ import { formatUnits } from "viem";
 import { useTokenHolders, useTokenTrades } from "@/lib/api-hooks";
 import type { ApiHolder, ApiTrade } from "@/lib/api-types";
 import { toTradeSide } from "@/lib/trade-display";
+import { formatBpsPercent } from "@/lib/quote-breakdown";
 
 interface TokenActivityPanelsProps {
   address: string;
@@ -146,6 +147,12 @@ function TradesPanel({
                     <div className="mt-1 text-content-tertiary">
                       {fmtEth(trade.netOkb)} OKB net / {fmtEth(trade.grossOkb)} gross
                     </div>
+                    {trade.burnTaxTokens && BigInt(trade.burnTaxTokens) > BigInt(0) && (
+                      <div className="mt-1 text-content-tertiary">
+                        burn tax {fmtEth(trade.burnTaxTokens)} tokens
+                        {trade.burnTaxBps !== undefined ? ` (${formatBpsPercent(trade.burnTaxBps)})` : ""}
+                      </div>
+                    )}
                   </div>
                   <div
                     className="font-mono text-content-secondary"

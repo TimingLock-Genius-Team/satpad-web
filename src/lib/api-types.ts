@@ -30,6 +30,8 @@ export interface ApiConfig {
       k: string;
       s: string;
       feeBps: number;
+      burnTaxMinBps?: number;
+      burnTaxMaxBps?: number;
       selfDeprecationBps: number;
       maxBuyOkb: string;
     };
@@ -78,9 +80,12 @@ export interface ApiTokenListItem {
     s?: string;
     curveS: number;
     feeBps: number;
+    burnTaxMinBps?: number;
+    burnTaxMaxBps?: number;
     selfDeprecationBps?: number;
     maxBuyOkb: string;
   };
+  taxBurnedTokens?: string;
 }
 
 export interface ApiTokenDetail {
@@ -118,6 +123,7 @@ export interface ApiTokenDetail {
     mintPriceOkb?: string | null;
     marketCapOkb?: string | null;
     reserveOkb: string;
+    taxBurnedTokens?: string;
     volume24hOkb: string;
     txns24h: number;
   };
@@ -158,6 +164,10 @@ export interface ApiTrade {
   netOkb: string;
   feeOkb: string;
   tokens: string;
+  burnTaxBps?: number;
+  burnTaxTokens?: string;
+  grossTokens?: string;
+  effectiveTokens?: string;
   newOkbCum: string;
   blockNumber: string;
   ts: number;
@@ -184,6 +194,12 @@ export interface ApiQuoteResponse {
   amountIn: string;
   amountOut: string;
   fee: string;
+  burnTaxSupported?: boolean;
+  burnTaxBps?: number;
+  burnTaxTokens?: string;
+  grossTokenAmount?: string;
+  effectiveTokensIn?: string | null;
+  taxBurnedTokens?: string;
   minOut: string;
   priceImpactBps: number;
   maxBuyOkb?: string;
@@ -290,6 +306,9 @@ export interface ApiCreateValidateRequest {
   metadataURI: string;
   socialURI: string;
   curveS: number;
+  feeBps?: number | null;
+  burnTaxMinBps?: number | null;
+  burnTaxMaxBps?: number | null;
 }
 
 export interface ApiCreateValidateResponse {
@@ -313,6 +332,9 @@ export interface ApiCreateBuildRequest {
   metadataURI: string;
   socialURI: string;
   curveS: number;
+  feeBps?: number | null;
+  burnTaxMinBps?: number | null;
+  burnTaxMaxBps?: number | null;
   /** Wei string; when set with recipient, backend builds atomic createTokenAndBuy */
   initialBuyWei?: string;
   recipient?: string;
