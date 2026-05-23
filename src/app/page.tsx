@@ -274,15 +274,14 @@ export default function Home() {
           <div className="hidden md:block flex-1"></div>
 
           <div className="flex items-center justify-between gap-3 w-full md:w-auto pb-2 md:pb-0">
-            <div className={cn(
-              "flex gap-0 rounded-[10px] overflow-hidden shrink-0 p-0.5 transition-colors duration-300",
-              isSticky ? "border border-border/50 bg-surface" : "bg-transparent"
-            )}>
+            <div className="flex gap-1.5 shrink-0 transition-colors duration-300 bg-surface-highlight/20 p-1 rounded-xl border border-border/30">
               <button
                 onClick={() => setViewMode("comfy")}
                 className={cn(
-                  "px-[10px] py-[6px] text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
-                  viewMode === "comfy" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
+                  "px-3 py-1.5 text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  viewMode === "comfy" 
+                    ? "bg-accent-primary text-surface-base shadow-[0_0_10px_-2px] shadow-accent-primary/40" 
+                    : "bg-transparent text-content-tertiary hover:text-content-primary"
                 )}
               >
                 {viewMode === "comfy" && (
@@ -293,8 +292,10 @@ export default function Home() {
               <button
                 onClick={() => setViewMode("compact")}
                 className={cn(
-                  "px-[10px] py-[6px] text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
-                  viewMode === "compact" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
+                  "px-3 py-1.5 text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  viewMode === "compact" 
+                    ? "bg-accent-primary text-surface-base shadow-[0_0_10px_-2px] shadow-accent-primary/40" 
+                    : "bg-transparent text-content-tertiary hover:text-content-primary"
                 )}
               >
                 {viewMode === "compact" && (
