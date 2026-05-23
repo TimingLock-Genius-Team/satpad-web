@@ -16,7 +16,7 @@ const TABS = [
   { id: "all", label: "All", emoji: "🪐" },
 ];
 
-export function ExploreTabs({ activeTab, onTabChange, isScrolled = false }: ExploreTabsProps) {
+export function ExploreTabs({ activeTab, onTabChange }: ExploreTabsProps) {
   return (
     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide w-full max-w-full pb-2">
       {TABS.map((tab) => {

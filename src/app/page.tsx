@@ -143,8 +143,8 @@ export default function Home() {
       </div>
 
       {/* Dynamic Hero Section */}
-      <section className="relative w-full pb-4 pt-8 md:pt-10 px-4">
-        <div className="max-w-[1260px] mx-auto flex flex-col items-start text-left relative z-10">
+      <section className="relative w-full pb-4 pt-8 md:pt-10">
+        <div className="max-w-[1260px] mx-auto px-4 flex flex-col items-start text-left relative z-10">
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-highlight border border-border/50 text-[10px] font-medium text-content-secondary mb-3 opacity-0 animate-fade-in-up">
             <span className="relative flex h-1 w-1">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-success opacity-75"></span>
