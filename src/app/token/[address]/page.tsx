@@ -7,7 +7,8 @@ import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import { TokenChart } from "@/components/token/TokenChart";
 import { TokenActivityPanels } from "@/components/token/TokenActivityPanels";
-import { Copy, ExternalLink, Send, Globe, Check, RefreshCw } from "lucide-react";
+import { Copy, ExternalLink, Send, Globe, Check, RefreshCw, FileCode2 } from "lucide-react";
+import Link from "next/link";
 import { useTokenChart, useTokenDetail, useTokenSummary } from "@/lib/api-hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/utils/cn";
@@ -294,6 +295,15 @@ export default function TokenDetailPage() {
                         Meme
                       </span>
                     )}
+                    <Link 
+                      href="/docs/specs/v4-sell-tax" 
+                      className="px-2 py-0.5 border border-[rgb(var(--token-rgb),0.4)] bg-[rgb(var(--token-rgb),0.1)] text-[rgb(var(--token-rgb))] hover:bg-[rgb(var(--token-rgb),0.2)] transition-all duration-300 text-[10px] font-mono uppercase tracking-widest rounded flex items-center gap-1.5 group/spec cursor-pointer relative overflow-hidden shadow-[0_0_8px_rgba(var(--token-rgb),0.1)] hover:shadow-[0_0_12px_rgba(var(--token-rgb),0.3)]"
+                    >
+                      <span className="absolute inset-0 bg-[rgb(var(--token-rgb),0.2)] translate-y-[100%] group-hover/spec:translate-y-0 transition-transform duration-300"></span>
+                      <span className="w-1 h-1 rounded-full bg-[rgb(var(--token-rgb))] shadow-[0_0_5px_rgb(var(--token-rgb))] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]"></span>
+                      <span className="relative z-10 drop-shadow-[0_0_8px_rgba(var(--token-rgb),0.5)] font-bold">V4_TAX_SPEC</span>
+                      <FileCode2 className="w-3 h-3 relative z-10 group-hover/spec:scale-110 transition-transform" />
+                    </Link>
                     {(socials?.twitter || socials?.telegram || socials?.website) && (
                       <div className="flex items-center gap-2 text-content-tertiary ml-1">
                         {socials?.twitter && <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><XIcon className="w-3 h-3" /></a>}
@@ -507,11 +517,17 @@ export default function TokenDetailPage() {
                   <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbCompact(satoData.reserveOkb)} OKB</span>
                 </div>
                 {burnTaxMinBps !== undefined && burnTaxMaxBps !== undefined && (
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-content-secondary">burn tax</span>
-                    <span className="text-content-primary font-mono font-medium">
-                      {formatBpsPercent(burnTaxMaxBps)} → {formatBpsPercent(burnTaxMinBps)}
-                    </span>
+                  <div className="flex flex-col gap-1.5 pt-1 mt-1 border-t border-border/30">
+                    <div className="flex justify-between items-baseline group/row">
+                      <span className="text-content-secondary group-hover/row:text-content-primary transition-colors">burn tax</span>
+                      <span className="text-content-primary font-mono font-medium group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
+                        {formatBpsPercent(burnTaxMaxBps)} → {formatBpsPercent(burnTaxMinBps)}
+                      </span>
+                    </div>
+                    <Link href="/docs/specs/v4-sell-tax" className="flex items-center justify-end gap-1 text-[9px] font-mono tracking-widest uppercase text-[rgb(var(--token-rgb),0.7)] hover:text-[rgb(var(--token-rgb))] transition-colors group/link">
+                      <span>View_Spec</span>
+                      <ExternalLink className="w-2 h-2 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+                    </Link>
                   </div>
                 )}
               </div>
