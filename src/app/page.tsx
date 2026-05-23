@@ -143,118 +143,114 @@ export default function Home() {
       </div>
 
       {/* Dynamic Hero Section */}
-      <section className="relative w-full pb-20 pt-24 md:pt-32 px-4">
-        <div className="max-w-[1260px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
-          {/* Text Content */}
-          <div className="flex flex-col items-start text-left relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-highlight border border-border/50 text-xs font-medium text-content-secondary mb-8 opacity-0 animate-fade-in-up">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-success"></span>
+      <section className="relative w-full pb-4 pt-8 md:pt-10 px-4">
+        <div className="max-w-[1260px] mx-auto flex flex-col items-start text-left relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-highlight border border-border/50 text-[10px] font-medium text-content-secondary mb-3 opacity-0 animate-fade-in-up">
+            <span className="relative flex h-1 w-1">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-success opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1 w-1 bg-accent-success"></span>
+            </span>
+            Live on XLayer
+          </div>
+          
+          <h1 className="text-[2rem] md:text-[2.5rem] lg:text-[3rem] leading-[1.05] font-bold tracking-tighter mb-2 text-content-primary opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            The <span className="text-accent-primary italic pr-2">exponential</span>launchpad
+          </h1>
+          
+          <p className="text-content-secondary text-[13px] md:text-sm mb-5 leading-relaxed max-w-[500px] opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            Permissionless token issuance powered by <span className="text-content-primary font-medium">sat1 bonding curves</span>. Create, trade, and graduate with deep liquidity.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <button
+              onClick={() => router.push("/create")}
+              className="group relative px-4 py-2 bg-accent-primary text-surface-base font-bold rounded-full overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-[0_8px_30px_-10px] hover:shadow-accent-primary/50"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+              <span className="relative flex items-center gap-1.5 text-[12px]">
+                Launch a token
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
               </span>
-              Live on XLayer
-            </div>
+            </button>
             
-            <h1 className="text-[3.5rem] md:text-[5rem] lg:text-[5.5rem] leading-[1.05] font-bold tracking-tighter mb-6 text-content-primary opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              The <span className="text-accent-primary italic pr-2">exponential</span><br/>launchpad
-            </h1>
-            
-            <p className="text-content-secondary text-lg md:text-xl mb-10 leading-relaxed max-w-[540px] opacity-0 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              Permissionless token issuance powered by <span className="text-content-primary font-medium">sat1 bonding curves</span>. Create, trade, and graduate with deep liquidity.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4 opacity-0 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <button
-                onClick={() => router.push("/create")}
-                className="group relative px-8 py-4 bg-accent-primary text-surface-base font-bold rounded-full overflow-hidden transition-all hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px] hover:shadow-accent-primary/50"
-              >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-                <span className="relative flex items-center gap-2">
-                  Launch a token
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-1">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </span>
-              </button>
-              
-              <a href="/docs" className="px-8 py-4 rounded-full border border-border/80 text-content-secondary font-medium hover:bg-surface-highlight hover:text-content-primary transition-all hover:-translate-y-1">
-                Read the docs
-              </a>
-            </div>
-
-            {/* Mobile Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 mt-12 w-full lg:hidden opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <div className="bg-surface/60 backdrop-blur-md border border-border/60 rounded-2xl p-4">
-                <div className="text-content-tertiary text-[11px] font-medium mb-1">24H Volume</div>
-                <div className="text-xl font-bold text-content-primary flex items-baseline gap-1">
-                  {statsData ? fmtOkb(statsData.volume24hOkb) : statsError ? "--" : "--"} <span className="text-xs font-medium text-content-tertiary">OKB</span>
-                </div>
-              </div>
-              <div className="bg-surface/60 backdrop-blur-md border border-border/60 rounded-2xl p-4">
-                <div className="text-content-tertiary text-[11px] font-medium mb-1">Tokens Live</div>
-                <div className="text-xl font-bold text-content-primary">
-                  {statsData ? statsData.tokensLive : statsError ? "--" : "--"}
-                </div>
-              </div>
-              <div className="bg-surface/60 backdrop-blur-md border border-border/60 rounded-2xl p-4">
-                <div className="text-content-tertiary text-[11px] font-medium mb-1">Graduated</div>
-                <div className="text-xl font-bold text-content-primary">
-                  {statsData ? statsData.graduated : statsError ? "--" : "--"}
-                </div>
-              </div>
-              <div className="bg-surface/60 backdrop-blur-md border border-border/60 rounded-2xl p-4">
-                <div className="text-content-tertiary text-[11px] font-medium mb-1">Total Trades</div>
-                <div className="text-xl font-bold text-content-primary">
-                  {statsData ? statsData.totalTrades.toLocaleString() : statsError ? "--" : "--"}
-                </div>
-              </div>
-            </div>
+            <a href="/docs" className="px-4 py-2 rounded-full text-content-secondary text-[12px] font-medium hover:text-content-primary transition-colors">
+              Read the docs
+            </a>
           </div>
 
-          {/* Desktop Asymmetric Stats Layout */}
-          <div className="relative h-[480px] w-full hidden lg:block opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-[800px] opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             {/* Card 1: 24H Volume */}
-            <div className="absolute top-[8%] right-[5%] w-[280px] bg-surface/60 backdrop-blur-xl border border-border/50 rounded-[24px] p-6 shadow-2xl animate-float">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent-primary/10 flex items-center justify-center text-accent-primary">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '0s' }}></div>
+              <div className="relative z-10">
+                <div className="text-content-tertiary text-[10px] font-medium mb-0.5 flex items-center gap-1.5">
+                  <div className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-60"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-primary/80"></span>
+                  </div>
+                  24H Volume
                 </div>
-                <div className="text-content-secondary text-sm font-medium">24H Volume</div>
-              </div>
-              <div className="text-[2.5rem] font-black text-content-primary tracking-tight flex items-baseline gap-2">
-                {statsData ? fmtOkb(statsData.volume24hOkb) : statsError ? "--" : "--"}
-                <span className="text-lg text-content-tertiary font-medium">OKB</span>
+                <div className="text-sm md:text-base font-bold text-content-primary flex items-baseline gap-1">
+                  {statsData ? fmtOkb(statsData.volume24hOkb) : statsError ? "--" : "--"} <span className="text-[10px] font-medium text-content-tertiary">OKB</span>
+                </div>
               </div>
             </div>
 
             {/* Card 2: Tokens Live */}
-            <div className="absolute top-[42%] left-[0%] w-[240px] bg-surface/60 backdrop-blur-xl border border-border/50 rounded-[24px] p-6 shadow-2xl animate-float-delayed">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent-success/10 flex items-center justify-center text-accent-success">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '0.75s' }}></div>
+              <div className="relative z-10">
+                <div className="text-content-tertiary text-[10px] font-medium mb-0.5 flex items-center gap-1.5">
+                  <div className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-60"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-primary/80"></span>
+                  </div>
+                  Tokens Live
                 </div>
-                <div className="text-content-secondary text-sm font-medium">Tokens Live</div>
-              </div>
-              <div className="text-[2.5rem] font-black text-content-primary tracking-tight">
-                {statsData ? statsData.tokensLive : statsError ? "--" : "--"}
+                <div className="text-sm md:text-base font-bold text-content-primary">
+                  {statsData ? statsData.tokensLive : statsError ? "--" : "--"}
+                </div>
               </div>
             </div>
 
-            {/* Card 3: Total Trades / Graduated */}
-            <div className="absolute bottom-[5%] right-[10%] w-[280px] bg-surface/60 backdrop-blur-xl border border-border/50 rounded-[24px] p-6 shadow-2xl animate-float" style={{ animationDuration: '7s' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent-warning/10 flex items-center justify-center text-accent-warning">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11v1a10 10 0 1 1-9-10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            {/* Card 3: Graduated */}
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '1.5s' }}></div>
+              <div className="relative z-10">
+                <div className="text-content-tertiary text-[10px] font-medium mb-0.5 flex items-center gap-1.5">
+                  <div className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-60"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-primary/80"></span>
+                  </div>
+                  Graduated
                 </div>
-                <div className="text-content-secondary text-sm font-medium">Graduated</div>
-              </div>
-              <div className="flex items-end justify-between">
-                <div className="text-[2.5rem] font-black text-content-primary tracking-tight">
+                <div className="text-sm md:text-base font-bold text-content-primary">
                   {statsData ? statsData.graduated : statsError ? "--" : "--"}
                 </div>
-                <div className="text-sm font-medium text-content-tertiary mb-2">
-                  {statsData ? statsData.totalTrades.toLocaleString() : "--"} trades
+              </div>
+            </div>
+
+            {/* Card 4: Total Trades */}
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '2.25s' }}></div>
+              <div className="relative z-10">
+                <div className="text-content-tertiary text-[10px] font-medium mb-0.5 flex items-center gap-1.5">
+                  <div className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-primary opacity-60"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-primary/80"></span>
+                  </div>
+                  Total Trades
+                </div>
+                <div className="text-sm md:text-base font-bold text-content-primary">
+                  {statsData ? statsData.totalTrades.toLocaleString() : statsError ? "--" : "--"}
                 </div>
               </div>
             </div>
@@ -263,7 +259,7 @@ export default function Home() {
       </section>
 
       {/* Tabs and Search Section */}
-      <div ref={stickyRef} className="sticky top-[64px] z-20 py-3 md:h-20 md:py-0 mb-8 transition-all">
+      <div ref={stickyRef} className="sticky top-[64px] z-20 py-2 md:h-14 md:py-0 mb-4 transition-all">
         {/* Dynamic Blur Background that only appears when sticky */}
         <div className={cn(
           "absolute inset-0 bg-surface-base/80 backdrop-blur-xl border-y border-border/50 transition-opacity duration-300 -z-10 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.5)]",
@@ -279,13 +275,13 @@ export default function Home() {
 
           <div className="flex items-center justify-between gap-3 w-full md:w-auto pb-2 md:pb-0">
             <div className={cn(
-              "flex gap-0 rounded-xl overflow-hidden shrink-0 p-1 transition-colors duration-300",
+              "flex gap-0 rounded-[10px] overflow-hidden shrink-0 p-0.5 transition-colors duration-300",
               isSticky ? "border border-border/50 bg-surface" : "bg-transparent"
             )}>
               <button
                 onClick={() => setViewMode("comfy")}
                 className={cn(
-                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  "px-[10px] py-[6px] text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
                   viewMode === "comfy" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
                 )}
               >
@@ -297,7 +293,7 @@ export default function Home() {
               <button
                 onClick={() => setViewMode("compact")}
                 className={cn(
-                  "px-[12px] py-[8px] text-[13px] font-bold transition-all rounded-lg relative overflow-hidden",
+                  "px-[10px] py-[6px] text-[12px] font-bold transition-all rounded-lg relative overflow-hidden",
                   viewMode === "compact" ? "bg-accent-primary text-surface-base shadow-sm" : "bg-transparent text-content-tertiary hover:text-content-secondary hover:bg-surface-highlight/50"
                 )}
               >
@@ -310,16 +306,16 @@ export default function Home() {
 
             {/* Search */}
             <div className={cn(
-              "flex items-center gap-2 focus-within:border-accent-primary/50 focus-within:ring-1 focus-within:ring-accent-primary/20 transition-all rounded-xl px-4 h-11 w-full md:max-w-[320px]",
+              "flex items-center gap-2 focus-within:border-accent-primary/50 focus-within:ring-1 focus-within:ring-accent-primary/20 transition-all rounded-[10px] px-3 h-9 w-full md:max-w-[280px]",
               isSticky ? "bg-surface border border-border/50" : "bg-surface-highlight/30 border border-transparent hover:bg-surface-highlight/50"
             )}>
-              <Search className="w-4 h-4 text-content-tertiary flex-shrink-0" />
+              <Search className="w-3.5 h-3.5 text-content-tertiary flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Search name, symbol, or 0x address"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="flex-1 bg-transparent border-none focus:outline-none text-[13px] text-content-primary placeholder:text-content-tertiary min-w-0"
+                className="flex-1 bg-transparent border-none focus:outline-none text-[12px] text-content-primary placeholder:text-content-tertiary min-w-0"
               />
             </div>
           </div>

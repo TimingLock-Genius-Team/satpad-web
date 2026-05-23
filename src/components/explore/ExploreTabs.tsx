@@ -27,7 +27,7 @@ export function ExploreTabs({ activeTab, onTabChange, isScrolled = false }: Expl
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={cn(
-              "group relative inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[14px] font-bold transition-all duration-300 whitespace-nowrap shrink-0 overflow-hidden outline-none ring-0",
+              "group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-[12px] font-bold transition-all duration-300 whitespace-nowrap shrink-0 overflow-hidden outline-none ring-0",
               isActive
                 ? `shadow-sm ${tab.activeBg} ${tab.activeColor}`
                 : isScrolled
@@ -41,7 +41,7 @@ export function ExploreTabs({ activeTab, onTabChange, isScrolled = false }: Expl
             )}
             
             <span className={cn(
-              "text-base transition-transform duration-300",
+              "text-[14px] transition-transform duration-300",
               isActive ? "scale-110" : "group-hover:scale-110 opacity-70 group-hover:opacity-100"
             )}>
               {tab.emoji}
