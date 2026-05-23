@@ -294,7 +294,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
             disabled={txBusy}
             className={`flex-1 py-4 transition-all uppercase text-[13px] disabled:opacity-50 relative ${
               isMint 
-                ? "bg-[rgba(var(--token-rgb),0.15)] text-[rgb(var(--token-text-rgb))] font-bold shadow-[inset_0_0_15px_rgba(var(--token-rgb),0.2)]" 
+                ? "bg-[rgba(var(--token-rgb),0.15)] text-[rgb(var(--token-rgb))] font-bold shadow-[inset_0_0_15px_rgba(var(--token-rgb),0.2)]" 
                 : "text-content-tertiary hover:text-content-secondary hover:bg-[rgba(var(--token-rgb),0.05)]"
             }`}
           >
@@ -332,7 +332,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
                 <div className="w-1.5 h-1.5 bg-[rgb(var(--token-rgb))] rounded-sm opacity-80" />
                 PAY_AMOUNT
               </span>
-              <span className="text-[rgb(var(--token-text-rgb))] opacity-80 pb-0.5">BAL: {balanceLabel}</span>
+              <span className="text-[rgb(var(--token-rgb))] opacity-80 pb-0.5">BAL: {balanceLabel}</span>
             </div>
             <div className="flex items-center justify-between gap-4 relative z-10">
               <input
@@ -347,7 +347,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
                 disabled={!activeBalance?.value || txBusy}
                 className={`text-[11px] font-mono font-bold tracking-[0.2em] flex items-baseline justify-center gap-2 hover:opacity-100 opacity-80 transition-all px-4 py-2.5 rounded-[4px] border ${
                   isMint 
-                    ? "border-[rgba(var(--token-rgb),0.5)] bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-text-rgb))] hover:bg-[rgba(var(--token-rgb),0.2)] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.4)]" 
+                    ? "border-[rgba(var(--token-rgb),0.5)] bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-rgb))] hover:bg-[rgba(var(--token-rgb),0.2)] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.4)]" 
                     : "border-accent-danger/50 bg-accent-danger/10 text-accent-danger hover:bg-accent-danger/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
                 } disabled:opacity-30 disabled:hover:shadow-none`}
               >
@@ -360,7 +360,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
 
         {/* Quote Info Box */}
         {quoteLoading && amount && amount !== "0" && (
-          <div className="flex items-center justify-center gap-2 text-xs text-[rgb(var(--token-text-rgb))] py-2 font-mono opacity-80 animate-pulse">
+          <div className="flex items-center justify-center gap-2 text-xs text-[rgb(var(--token-rgb))] py-2 font-mono opacity-80 animate-pulse">
             <Loader2 className="w-3 h-3 animate-spin" />
             COMPUTING_QUOTE...
           </div>
@@ -386,7 +386,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
               )}
               <div className="flex justify-between items-baseline group/row">
                 <span className="text-content-tertiary">PLATFORM_FEE</span>
-                <span className="text-content-primary group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">{fmtOkbDisplay(quote.fee)} OKB</span>
+                <span className="text-content-primary group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">{fmtOkbDisplay(quote.fee)} OKB</span>
               </div>
               {quoteRows.map((row) => (
                 <div key={`${row.label}-${row.symbol}`} className="flex justify-between items-baseline gap-4 group/row">
@@ -394,21 +394,21 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
                     {row.label.toUpperCase().replace(/\s+/g, "_")}
                     {row.detail ? <span className="text-content-tertiary"> ({row.detail})</span> : null}
                   </span>
-                  <span className="text-content-primary text-right font-bold group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">
+                  <span className="text-content-primary text-right font-bold group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
                     {formatQuoteRowAmount(row)} <span className="text-content-secondary text-[10px]">{row.symbol}</span>
                   </span>
                 </div>
               ))}
               <div className="flex justify-between items-baseline pt-2 border-t border-[rgba(var(--token-rgb),0.1)] group/row">
                 <span className="text-content-tertiary">PRICE_IMPACT</span>
-                <span className={`${priceImpact > 5 ? "text-accent-danger" : "text-[rgb(var(--token-text-rgb))]"} font-bold`}>
+                <span className={`${priceImpact > 5 ? "text-accent-danger" : "text-[rgb(var(--token-rgb))]"} font-bold`}>
                   {(priceImpact / 100).toFixed(2)}%
                 </span>
               </div>
               {minReceived && (
                 <div className="flex justify-between items-baseline group/row">
                   <span className="text-content-tertiary">MIN_RECEIVED</span>
-                  <span className="text-content-primary group-hover/row:text-[rgb(var(--token-text-rgb))] transition-colors">
+                  <span className="text-content-primary group-hover/row:text-[rgb(var(--token-rgb))] transition-colors">
                     {minReceived.amount} <span className="text-content-tertiary text-[9px]">{minReceived.symbol}</span>
                   </span>
                 </div>
@@ -444,7 +444,7 @@ export function TradePanel({ tokenAddress, tokenSymbol, isGraduated = false, isM
             txStage === "success"
               ? "bg-accent-success text-white border-accent-success"
               : isMint
-                ? "bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-text-rgb))] border-[rgba(var(--token-rgb),0.4)] hover:bg-[rgba(var(--token-rgb),0.2)] hover:border-[rgb(var(--token-rgb))] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.3)]"
+                ? "bg-[rgba(var(--token-rgb),0.1)] text-[rgb(var(--token-rgb))] border-[rgba(var(--token-rgb),0.4)] hover:bg-[rgba(var(--token-rgb),0.2)] hover:border-[rgb(var(--token-rgb))] hover:shadow-[0_0_15px_rgba(var(--token-rgb),0.3)]"
                 : "bg-accent-danger/10 text-accent-danger border-accent-danger/40 hover:bg-accent-danger/20 hover:border-accent-danger hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]"
           } disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:bg-transparent`}
         >

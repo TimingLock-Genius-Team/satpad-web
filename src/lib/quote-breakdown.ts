@@ -10,7 +10,7 @@ export interface QuoteBreakdownRow {
 }
 
 function hasBurnTax(quote: ApiQuoteResponse): boolean {
-  return Boolean(quote.burnTaxSupported) || BigInt(quote.burnTaxTokens ?? "0") > BigInt(0);
+  return BigInt(quote.burnTaxTokens ?? "0") > BigInt(0);
 }
 
 export function formatBpsPercent(bps: number): string {
