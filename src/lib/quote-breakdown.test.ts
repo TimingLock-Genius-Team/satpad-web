@@ -52,6 +52,23 @@ test("buildQuoteBreakdownRows exposes mint gross, burn tax, and net token output
   assert.equal(rows[2].symbol, "DUAL");
 });
 
+test("buildQuoteBreakdownRows hides mint burn-tax rows when tax amount is zero", () => {
+  const rows = buildQuoteBreakdownRows({
+    side: "mint",
+    tokenSymbol: "DUAL",
+    quote: quote({
+      side: "mint",
+      grossTokenAmount: "2000000000000000000",
+      amountOut: "2000000000000000000",
+      burnTaxSupported: true,
+      burnTaxBps: 0,
+      burnTaxTokens: "0",
+    }),
+  });
+
+  assert.deepEqual(rows.map((row) => row.label), ["you receive"]);
+});
+
 test("buildQuoteBreakdownRows exposes burn gross input, tax, effective sold, and net OKB", () => {
   const rows = buildQuoteBreakdownRows({
     side: "burn",
@@ -74,4 +91,22 @@ test("buildQuoteBreakdownRows exposes burn gross input, tax, effective sold, and
     "you receive",
   ]);
   assert.equal(rows[3].symbol, "OKB");
+});
+
+test("buildQuoteBreakdownRows hides burn burn-tax rows when tax amount is zero", () => {
+  const rows = buildQuoteBreakdownRows({
+    side: "burn",
+    tokenSymbol: "DUAL",
+    quote: quote({
+      side: "burn",
+      amountIn: "2000000000000000000",
+      effectiveTokensIn: "2000000000000000000",
+      amountOut: "900000000000000000",
+      burnTaxSupported: true,
+      burnTaxBps: 0,
+      burnTaxTokens: "0",
+    }),
+  });
+
+  assert.deepEqual(rows.map((row) => row.label), ["tokens in", "you receive"]);
 });

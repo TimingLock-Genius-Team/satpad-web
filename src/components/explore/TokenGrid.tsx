@@ -51,7 +51,7 @@ export const TokenGrid = memo(function TokenGrid({ tokens, viewMode = "comfy", t
         {tokens.map((token, index) => (
           <div
             key={token.address}
-            className="opacity-0 animate-fade-in-up"
+            className="opacity-0 animate-fade-in-up content-visibility-auto"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             <TokenCard token={token} />
