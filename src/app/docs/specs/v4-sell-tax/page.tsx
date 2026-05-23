@@ -376,15 +376,15 @@ export default function V4SellTaxSpecPage() {
           <article className="font-mono text-sm leading-relaxed text-content-secondary space-y-6">
             <ReactMarkdown
               components={{
-                h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-content-primary mt-12 mb-6 border-l-4 border-accent-primary pl-4 uppercase tracking-tight" {...props} />,
-                h2: ({node, ...props}) => <h2 className="text-xl font-bold text-content-primary mt-10 mb-4 flex items-center gap-2" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-lg font-bold text-content-primary mt-8 mb-3" {...props} />,
-                p: ({node, ...props}) => <p className="mb-4 text-[14px]" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-none space-y-2 mb-6 pl-2" {...props} />,
-                li: ({node, ...props}) => (
+                h1: ({node: _node, ...props}) => <h1 className="text-2xl font-bold text-content-primary mt-12 mb-6 border-l-4 border-accent-primary pl-4 uppercase tracking-tight" {...props} />,
+                h2: ({node: _node, ...props}) => <h2 className="text-xl font-bold text-content-primary mt-10 mb-4 flex items-center gap-2" {...props} />,
+                h3: ({node: _node, ...props}) => <h3 className="text-lg font-bold text-content-primary mt-8 mb-3" {...props} />,
+                p: ({node: _node, ...props}) => <p className="mb-4 text-[14px]" {...props} />,
+                ul: ({node: _node, ...props}) => <ul className="list-none space-y-2 mb-6 pl-2" {...props} />,
+                li: ({node: _node, ...props}) => (
                   <li className="relative pl-5 before:content-[''] before:absolute before:left-0 before:top-[0.6em] before:w-1.5 before:h-1.5 before:bg-accent-primary/50 before:rounded-sm" {...props} />
                 ),
-                code: ({node, inline, className, children, ...props}: any) => {
+                code: ({node: _node, inline, className, children, ...props}: React.HTMLAttributes<HTMLElement> & { inline?: boolean; node?: unknown }) => {
                   const match = /language-(\w+)/.exec(className || '');
                   return !inline && match ? (
                     <div className="my-6 relative group">
