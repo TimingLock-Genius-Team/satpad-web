@@ -88,10 +88,19 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-surface-base/80 backdrop-blur-md">
       <div className="w-full max-w-[1260px] mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-4 md:gap-8">
-          <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-            <span className="text-accent-primary italic">e</span>
-            <span className="text-content-primary">ulr</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+              <span className="text-accent-primary italic">e</span>
+              <span className="text-content-primary">ulr</span>
+            </Link>
+            {process.env.NEXT_PUBLIC_NETWORK_NAME && (
+              <span className="px-2 py-0.5 rounded-full border border-accent-primary/30 bg-accent-primary/10 text-accent-primary text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-[0_0_10px_rgba(46,232,144,0.1)] relative overflow-hidden group cursor-default">
+                <span className="absolute inset-0 bg-accent-primary/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-primary shadow-[0_0_5px_rgba(46,232,144,0.8)] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]"></span>
+                <span className="relative z-10 drop-shadow-[0_0_8px_rgba(46,232,144,0.5)]">{process.env.NEXT_PUBLIC_NETWORK_NAME}</span>
+              </span>
+            )}
+          </div>
           <nav className="hidden md:flex items-center gap-6">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
