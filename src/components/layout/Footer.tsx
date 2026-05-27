@@ -78,7 +78,7 @@ export function Footer() {
             Social
           </div>
           <div className="flex flex-col gap-2">
-            <ComingSoon>Twitter</ComingSoon>
+            <FooterLink href="https://x.com/Eulr_Official">Twitter</FooterLink>
             <ComingSoon>Telegram</ComingSoon>
             <ComingSoon>Discord</ComingSoon>
           </div>
