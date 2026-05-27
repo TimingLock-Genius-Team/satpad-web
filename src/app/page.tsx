@@ -184,7 +184,7 @@ export default function Home() {
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full max-w-[800px] opacity-0 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             {/* Card 1: 24H Volume */}
-            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10 border border-white/10 hover:border-white/20 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '0s' }}></div>
               <div className="relative z-10">
@@ -202,7 +202,7 @@ export default function Home() {
             </div>
 
             {/* Card 2: Tokens Live */}
-            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10 border border-white/10 hover:border-white/20 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '0.75s' }}></div>
               <div className="relative z-10">
@@ -220,7 +220,7 @@ export default function Home() {
             </div>
 
             {/* Card 3: Graduated */}
-            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10 border border-white/10 hover:border-white/20 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '1.5s' }}></div>
               <div className="relative z-10">
@@ -238,7 +238,7 @@ export default function Home() {
             </div>
 
             {/* Card 4: Total Trades */}
-            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10">
+            <div className="relative overflow-hidden bg-surface-highlight/20 backdrop-blur-md rounded-xl p-2.5 md:p-3 shadow-[0_4px_20px_-4px] shadow-accent-primary/10 border border-white/10 hover:border-white/20 transition-colors">
               <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent"></div>
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent-primary/10 to-transparent animate-[shimmer_3s_infinite]" style={{ animationDelay: '2.25s' }}></div>
               <div className="relative z-10">
@@ -274,7 +274,7 @@ export default function Home() {
           <div className="hidden md:block flex-1"></div>
 
           <div className="flex items-center justify-between gap-3 w-full md:w-auto pb-2 md:pb-0">
-            <div className="flex gap-1.5 shrink-0 transition-colors duration-300 bg-surface-highlight/20 p-1 rounded-xl border border-border/30">
+            <div className="flex gap-1.5 shrink-0 transition-colors duration-300 bg-surface-highlight/20 p-1 rounded-xl border border-white/10 hover:border-white/20">
               <button
                 onClick={() => setViewMode("comfy")}
                 className={cn(
@@ -308,7 +308,7 @@ export default function Home() {
             {/* Search */}
             <div className={cn(
               "flex items-center gap-2 focus-within:border-accent-primary/50 focus-within:ring-1 focus-within:ring-accent-primary/20 transition-all rounded-[10px] px-3 h-9 w-full md:max-w-[280px]",
-              isSticky ? "bg-surface border border-border/50" : "bg-surface-highlight/30 border border-transparent hover:bg-surface-highlight/50"
+              isSticky ? "bg-surface border border-white/10 hover:border-white/20" : "bg-surface-highlight/30 border border-white/10 hover:border-white/20"
             )}>
               <Search className="w-3.5 h-3.5 text-content-tertiary flex-shrink-0" />
               <input
