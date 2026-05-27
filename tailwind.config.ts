@@ -45,15 +45,21 @@ const config: Config = {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
+        "toast-float": {
+          "0%": { opacity: "0", transform: "translateY(10px) scale(0.8)" },
+          "20%": { opacity: "1", transform: "translateY(-5px) scale(1.1)" },
+          "100%": { opacity: "0", transform: "translateY(-25px) scale(1)" },
+        },
       },
       animation: {
         "brand-pulse": "brand-pulse 2s ease-in-out infinite",
         "glow-pulse": "glow-pulse 2.4s ease-in-out infinite",
-        "fade-in-up": "fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "fade-in-up": "fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards", 
         "float": "float 6s ease-in-out infinite",
         "float-delayed": "float 6s ease-in-out 3s infinite",
         "blob": "blob 10s infinite",
         "shimmer": "shimmer 2s linear infinite",
+        "toast-float": "toast-float 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
       colors: {
         surface: {

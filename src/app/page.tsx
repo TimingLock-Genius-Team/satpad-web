@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { ExploreTabs } from "@/components/explore/ExploreTabs";
 import { TokenGrid } from "@/components/explore/TokenGrid";
 import { Pagination } from "@/components/explore/Pagination";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { cn } from "@/utils/cn";
 import { useTokens, useStats } from "@/lib/api-hooks";
 import { mapApiTokenToToken } from "@/lib/token-display";
@@ -196,7 +197,7 @@ export default function Home() {
                   24H Volume
                 </div>
                 <div className="text-sm md:text-base font-bold text-content-primary flex items-baseline gap-1">
-                  {statsData ? fmtOkb(statsData.volume24hOkb) : statsError ? "--" : "--"} <span className="text-[10px] font-medium text-content-tertiary">OKB</span>
+                  {statsData ? <AnimatedNumber value={Number(statsData.volume24hOkb) / 1e18 || 0} formatter={(v) => v.toFixed(2)} /> : statsError ? "--" : "--"} <span className="text-[10px] font-medium text-content-tertiary">OKB</span>
                 </div>
               </div>
             </div>
@@ -214,7 +215,7 @@ export default function Home() {
                   Tokens Live
                 </div>
                 <div className="text-sm md:text-base font-bold text-content-primary">
-                  {statsData ? statsData.tokensLive : statsError ? "--" : "--"}
+                  {statsData ? <AnimatedNumber value={statsData.tokensLive} formatter={(v) => Math.floor(v).toString()} /> : statsError ? "--" : "--"}
                 </div>
               </div>
             </div>
@@ -232,7 +233,7 @@ export default function Home() {
                   Graduated
                 </div>
                 <div className="text-sm md:text-base font-bold text-content-primary">
-                  {statsData ? statsData.graduated : statsError ? "--" : "--"}
+                  {statsData ? <AnimatedNumber value={statsData.graduated} formatter={(v) => Math.floor(v).toString()} /> : statsError ? "--" : "--"}
                 </div>
               </div>
             </div>
@@ -250,7 +251,7 @@ export default function Home() {
                   Total Trades
                 </div>
                 <div className="text-sm md:text-base font-bold text-content-primary">
-                  {statsData ? statsData.totalTrades.toLocaleString() : statsError ? "--" : "--"}
+                  {statsData ? <AnimatedNumber value={statsData.totalTrades} formatter={(v) => Math.floor(v).toLocaleString()} /> : statsError ? "--" : "--"}
                 </div>
               </div>
             </div>
