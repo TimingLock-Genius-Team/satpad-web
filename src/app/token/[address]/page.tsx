@@ -18,6 +18,8 @@ import { buildUniswapLinks } from "@/lib/uniswap-links";
 import { formatBpsPercent } from "@/lib/quote-breakdown";
 import { fmtTokenDisplay } from "@/lib/trade-display";
 
+import { sanitizeUrl } from "@/utils/sanitizeUrl";
+
 const TradePanel = dynamic(
   () => import("./TradePanel").then((m) => ({ default: m.TradePanel })),
   {
@@ -306,9 +308,9 @@ export default function TokenDetailPage() {
                     </Link>
                     {(socials?.twitter || socials?.telegram || socials?.website) && (
                       <div className="flex items-center gap-2 text-content-tertiary ml-1">
-                        {socials?.twitter && <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><XIcon className="w-3 h-3" /></a>}
-                        {socials?.telegram && <a href={socials.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Send className="w-3 h-3" /></a>}
-                        {socials?.website && <a href={socials.website} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Globe className="w-3 h-3" /></a>}
+                        {sanitizeUrl(socials?.twitter) && <a href={sanitizeUrl(socials.twitter)} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><XIcon className="w-3 h-3" /></a>}
+                        {sanitizeUrl(socials?.telegram) && <a href={sanitizeUrl(socials.telegram)} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Send className="w-3 h-3" /></a>}
+                        {sanitizeUrl(socials?.website) && <a href={sanitizeUrl(socials.website)} target="_blank" rel="noopener noreferrer" className="hover:text-content-primary transition-colors"><Globe className="w-3 h-3" /></a>}
                       </div>
                     )}
                   </div>

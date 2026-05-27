@@ -29,6 +29,15 @@ export function resolveIpfsUrl(ipfsUri: string | null | undefined): string | nul
   if (match) {
     return gatewayUrl(match[1]);
   }
+  // Sanitize potentially dangerous URIs like javascript:
+  try {
+    const parsed = new URL(ipfsUri);
+    if (parsed.protocol === "javascript:") {
+      return null;
+    }
+  } catch (e) {
+    // Relative paths are fine
+  }
   return ipfsUri;
 }
 
