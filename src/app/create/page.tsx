@@ -304,6 +304,11 @@ export default function CreatePage() {
       await sendPreparedTransactions(walletClient, publicClient, [buildResult.tx]);
 
       await queryClient.invalidateQueries({ queryKey: ["tokens"] });
+      await queryClient.invalidateQueries({ queryKey: ["portfolio", walletAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["portfolio-history", walletAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["portfolio-tax-lots", walletAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["portfolio-tax-events", walletAddress] });
+      await queryClient.invalidateQueries({ queryKey: ["portfolio-tax-summary", walletAddress] });
       setDeployStatus("success");
 
       setTimeout(() => {

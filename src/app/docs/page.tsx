@@ -449,9 +449,21 @@ export default function DocsPage() {
               <span className="text-border-hover">→</span>
               <span className="text-content-primary">eulr</span>
             </div>
-            <p className="text-xs text-content-secondary tracking-widest uppercase">
+            <p className="text-xs text-content-secondary tracking-widest uppercase mb-8">
               Three generations of bonding curves. One principle: code over operator.
             </p>
+            
+            {/* Developer Specs Entry */}
+            <a 
+              href="/docs/specs/v4-sell-tax" 
+              className="group relative inline-flex items-center gap-2 px-4 py-2 bg-surface-elevated hover:bg-surface-highlight border border-border/50 hover:border-accent-primary/50 rounded-xl transition-all duration-300"
+            >
+              <div className="absolute inset-0 bg-accent-primary/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-content-tertiary group-hover:text-accent-primary transition-colors" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              <span className="text-xs font-mono font-medium text-content-secondary group-hover:text-content-primary transition-colors uppercase tracking-widest">
+                View Engineering Specs
+              </span>
+            </a>
           </div>
         </div>
       </div>
