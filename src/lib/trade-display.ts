@@ -18,9 +18,26 @@ export function fmtOkb(wei: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
+export function formatSmallNumber(n: number): string {
+  if (n === 0) return "0";
+  if (n >= 0.01) return n.toString();
+  
+  // Convert to fixed string to avoid e-notation, max 20 decimals
+  const str = n.toFixed(20).replace(/0+$/, '');
+  const match = str.match(/^0\.0(0+)(\d+)$/);
+  
+  if (match) {
+    const zerosCount = match[1].length; // number of zeros between '0.0' and the significant digits
+    const sigDigits = match[2].slice(0, 4); // keep up to 4 significant digits
+    return `0.0{${zerosCount}}${sigDigits}`;
+  }
+  
+  return n.toExponential(2);
+}
+
 export function fmtOkbDisplay(wei: string): string {
   const okb = fmtOkb(wei);
-  if (okb < 0.0001) return okb.toExponential(2);
+  if (okb < 0.0001) return formatSmallNumber(okb);
   return okb.toFixed(6);
 }
 
@@ -54,7 +71,7 @@ export function formatBalanceDisplay(value: bigint | undefined, decimals: number
   const n = Number(formatUnits(value, decimals));
   if (!Number.isFinite(n)) return `-- ${symbol}`;
   if (n === 0) return `0 ${symbol}`;
-  if (n < 0.0001) return `${n.toExponential(2)} ${symbol}`;
+  if (n < 0.0001) return `${formatSmallNumber(n)} ${symbol}`;
   return `${n.toFixed(4)} ${symbol}`;
 }
 

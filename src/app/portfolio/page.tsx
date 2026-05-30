@@ -10,7 +10,7 @@ import { usePortfolio, usePortfolioHistory } from "@/lib/api-hooks";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 
 import { timeAgo } from "@/lib/time-display";
-import { toTradeSide } from "@/lib/trade-display";
+import { toTradeSide, formatSmallNumber } from "@/lib/trade-display";
 
 function fmtOkb(wei: string): number {
   const n = Number(wei) / 1e18;
@@ -19,7 +19,7 @@ function fmtOkb(wei: string): number {
 
 function fmtOkbCompact(wei: string): string {
   const n = fmtOkb(wei);
-  if (n < 0.0001) return n.toExponential(2);
+  if (n < 0.0001) return formatSmallNumber(n);
   return n.toFixed(4);
 }
 
@@ -387,10 +387,10 @@ export default function PortfolioPage() {
                           {fmtTokenBalance(h.balance)}
                         </td>
                         <td className="px-6 py-4 font-medium text-content-secondary font-mono">
-                          {fmtOkbCompact(h.avgCostOkb)}
+                          {fmtOkbCompact(h.avgCostOkb)} OKB
                         </td>
                         <td className="px-6 py-4 font-medium text-content-secondary font-mono">
-                          {fmtOkbCompact(h.currentPriceOkb)}
+                          {fmtOkbCompact(h.currentPriceOkb)} OKB
                         </td>
                         <td className="px-6 py-4 font-semibold font-mono text-content-primary">
                           {fmtOkbCompact(h.currentValueOkb)} OKB

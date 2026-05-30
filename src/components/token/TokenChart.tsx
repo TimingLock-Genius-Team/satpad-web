@@ -6,11 +6,17 @@ import {
   buildBondingCurveChartModel,
   formatCompactTokenAmount,
   formatOkbAmount,
-  formatOkbPrice,
   weiToUnits,
   type BondingCurveChartModel,
 } from "@/lib/bonding-curve-chart";
+import { formatSmallNumber } from "@/lib/trade-display";
 import type { ApiTokenListItem } from "@/lib/api-types";
+
+function formatOkbPriceDisplay(priceOkb: number): string {
+  if (priceOkb === 0) return "0";
+  if (priceOkb < 0.0001) return formatSmallNumber(priceOkb);
+  return priceOkb.toFixed(6);
+}
 
 interface TokenChartProps {
   curve?: ApiTokenListItem["curve"];
@@ -98,8 +104,8 @@ export function TokenChart({
     totalAmount,
   }), [curve, reserveOkbWei, marketPriceOkbWei, mintedAmount, totalAmount]);
   const svg = useMemo(() => buildSvg(model), [model]);
-  const burnPrice = burnPriceOkbWei ? formatOkbPrice(weiToUnits(burnPriceOkbWei)) : "--";
-  const mintPrice = mintPriceOkbWei ? formatOkbPrice(weiToUnits(mintPriceOkbWei)) : "--";
+  const burnPrice = burnPriceOkbWei ? formatOkbPriceDisplay(weiToUnits(burnPriceOkbWei)) : "--";
+  const mintPrice = mintPriceOkbWei ? formatOkbPriceDisplay(weiToUnits(mintPriceOkbWei)) : "--";
   const driftTokens = Math.max(model.maxSupplyTokens - model.current.supplyTokens, 0);
   const xTicks = [0, 0.25, 0.5, 0.75, 1];
   const yTicks = [0, 0.25, 0.5, 0.75, 1];
@@ -127,7 +133,7 @@ export function TokenChart({
           </div>
           <div className="flex items-center gap-1.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
             <span className="opacity-60">price</span>
-            <span className="text-pink-400 font-medium">{formatOkbPrice(model.current.priceOkb)} <span className="text-[9px] opacity-70">OKB</span></span>
+            <span className="text-pink-400 font-medium">{formatOkbPriceDisplay(model.current.priceOkb)} <span className="text-[9px] opacity-70">OKB</span></span>
           </div>
           <div className="flex items-center gap-1.5 bg-surface-base border border-border/40 rounded-[3px] px-2 py-0.5">
             <span className="opacity-60">burn</span>
@@ -153,7 +159,7 @@ export function TokenChart({
           {yTicks.map((tick) => {
             const y = CHART.top + tick * svg.plotHeight;
             const supplyLabel = formatCompactTokenAmount(model.maxSupplyTokens * (1 - tick));
-            const priceLabel = formatOkbPrice(model.maxPriceOkb * (1 - tick));
+            const priceLabel = formatOkbPriceDisplay(model.maxPriceOkb * (1 - tick));
             return (
               <g key={`y-${tick}`}>
                 <line x1={CHART.left} x2={CHART.width - CHART.right} y1={y} y2={y} stroke={CHART_COLORS.grid} strokeDasharray={tick === 0 ? "0" : "3 5"} />

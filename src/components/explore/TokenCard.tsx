@@ -7,6 +7,7 @@ import { cn } from "@/utils/cn";
 import { Token } from "@/types/token";
 import { timeAgo, timestampMs } from "@/lib/time-display";
 import { resolveIpfsUrl } from "@/lib/ipfs";
+import { formatSmallNumber } from "@/lib/trade-display";
 
 interface TokenCardProps {
   token: Token;
@@ -26,7 +27,7 @@ const getTokenColorRGB = (symbol: string) => {
 const formatPrice = (price: number) => {
   if (price === 0) return "0";
   if (price < 0.0001) {
-    return price.toExponential(2);
+    return formatSmallNumber(price);
   }
   if (price >= 1000) {
     return new Intl.NumberFormat('en-US', {
@@ -49,7 +50,7 @@ function fmtOkb(weiString: string): string {
   const n = Number(weiString) / 1e18;
   if (isNaN(n)) return "0";
   if (n === 0) return "0";
-  if (n < 0.0001) return n.toExponential(2);
+  if (n < 0.0001) return formatSmallNumber(n);
   if (n >= 1000) {
     return new Intl.NumberFormat('en-US', {
       notation: 'compact',
@@ -85,7 +86,7 @@ const formatCompactValue = (str: string | undefined | null) => {
         maximumFractionDigits: 2,
       }).format(num);
     } else if (num < 0.001 && num > 0) {
-      rawValue = prefix + num.toExponential(2);
+      rawValue = prefix + formatSmallNumber(num);
     } else {
       rawValue = prefix + new Intl.NumberFormat('en-US', {
         maximumFractionDigits: 4,
@@ -260,7 +261,7 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
         <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
           <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">Price</div>
           <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={formatPrice(priceNum)}>
-            <span className="truncate">{formatPrice(priceNum)}</span>
+            <span className="truncate">{formatPrice(priceNum)} <span className="text-[9px] text-content-secondary shrink-0 font-normal">OKB</span></span>
           </div>
         </div>
         <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">

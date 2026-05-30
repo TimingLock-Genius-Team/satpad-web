@@ -16,7 +16,7 @@ import { resolveIpfsUrl } from "@/lib/ipfs";
 import { getDefaultChain } from "@/config/chains";
 import { buildUniswapLinks } from "@/lib/uniswap-links";
 import { formatBpsPercent } from "@/lib/quote-breakdown";
-import { fmtTokenDisplay } from "@/lib/trade-display";
+import { fmtTokenDisplay, formatSmallNumber } from "@/lib/trade-display";
 
 import { sanitizeUrl } from "@/utils/sanitizeUrl";
 
@@ -66,7 +66,7 @@ function parseOkb(wei: string): number {
 
 function fmtOkbCompact(wei: string): string {
   const okb = parseOkb(wei);
-  if (okb < 0.001) return okb.toExponential(2);
+  if (okb < 0.001) return formatSmallNumber(okb);
   return okb.toFixed(4);
 }
 
