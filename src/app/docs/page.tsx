@@ -1,11 +1,12 @@
 import { Metadata } from "next";
+import { BlockMath } from 'react-katex';
 
 export const metadata: Metadata = {
   title: "Whitepapers — eulr",
   description: "eulr, SATO, and sat1 whitepapers",
 };
 
-const SAT1_WHITEPAPER = `sat1 whitepaper 1.0
+const SAT1_WHITEPAPER = String.raw`sat1 whitepaper 1.0
 
 A salute to SATO, and a record of what sat1 changes.
 
@@ -26,7 +27,10 @@ Inside the SATO hook, two state variables became critical: ethCum, the cumulativ
 During the early entropy phase, minted output was adjusted by a random multiplier. After that window closed, ethCum and totalMintedFair did not return to one invariant. Every later trade kept moving through two already-separated coordinates.
 
 SATO curve:
-  supply(e) = K · (1 - exp(-e / S))
+
+$$
+\text{supply}(e) = K \cdot (1 - \exp(-e / S))
+$$
 
 observed state:
   ethCum implies a higher curve supply
@@ -66,11 +70,16 @@ SATO's deadlock comes from two states. ethCum keeps moving forward, while totalM
 Fees can make the curve reserve thicker. The graduation counter remains the live curve position itself. The 99% selfDeprecated threshold stays reachable from that position, including after round trips and after the early entropy window.
 
 sat1 invariant:
-  stored state     = ethCum
-  fair supply      = Curve.totalMinted(ethCum)
-  price            = Curve.marginalPrice(ethCum)
-  sell quote       = burnFor(Curve.totalMinted(ethCum), fairShare)
-  selfDeprecated   = Curve.totalMinted(ethCum) >= 99% of K
+
+$$
+\begin{aligned}
+\text{stored state}     &= \text{ethCum} \\
+\text{fair supply}      &= \text{Curve.totalMinted(ethCum)} \\
+\text{price}            &= \text{Curve.marginalPrice(ethCum)} \\
+\text{sell quote}       &= \text{burnFor(Curve.totalMinted(ethCum), fairShare)} \\
+\text{selfDeprecated}   &= \text{Curve.totalMinted(ethCum)} \ge 99\% \text{ of } K
+\end{aligned}
+$$
 
 § fee stays in the curve
 
@@ -78,37 +87,37 @@ sat1 charges the same 0.3% friction on both directions. On a buy, the fee reduce
 
 The fee has no recipient. It is not sent to a team, treasury, owner, or external address. It stays inside the same curve state and thickens the reserve.
 
-buy 1.000 ETH:
-  mint quote uses 0.997 ETH
-  curve reserve receives 1.000 ETH
+  buy 1.000 ETH:
+    mint quote uses 0.997 ETH
+    curve reserve receives 1.000 ETH
 
-sell quote 1.000 ETH:
-  seller receives 0.997 ETH
-  curve reserve keeps 0.003 ETH
+  sell quote 1.000 ETH:
+    seller receives 0.997 ETH
+    curve reserve keeps 0.003 ETH
 
-fee recipient:
-  none
+  fee recipient:
+    none
 
 The fee can make the reserve thicker, but it does not create another accounting track. The curve still has one source of truth: ethCum.
 
-sat1 principle:
-  one curve
-  one position
-  one source of truth
+  sat1 principle:
+    one curve
+    one position
+    one source of truth
 
-status:
-  whitepaper 1.0
-  implementation live on ethereum mainnet
+  status:
+    whitepaper 1.0
+    implementation live on ethereum mainnet
 
-deployed contracts:
-  token         0x8f66337a0c2A02202fd91Dd596c411CF977c6060
-  hook          0x2a0A30dd78aF7698E6f40212b8B8324fcE2ee888
-  router        0x9c65d15a671d814ef7bE25418fD46139E7366c07
-  hook deployer 0xcbE096C140dB48199CC7e481116FD835BC33eDC6
+  deployed contracts:
+    token         0x8f66337a0c2A02202fd91Dd596c411CF977c6060
+    hook          0x2a0A30dd78aF7698E6f40212b8B8324fcE2ee888
+    router        0x9c65d15a671d814ef7bE25418fD46139E7366c07
+    hook deployer 0xcbE096C140dB48199CC7e481116FD835BC33eDC6
 
 trade at sat1. read the ancestor on-chain.`;
 
-const SAT0_WHITEPAPER = `sato
+const SAT0_WHITEPAPER = String.raw`sato
 
 a specter has returned to ethereum: the specter of code that runs without an operator
 
@@ -133,13 +142,22 @@ this distinguishes sato from synthetic-supply tokens. there is no token without 
 issuance happens through one contract, a uniswap v4 hook, set as the only minter at deployment and locked there. the formulas below are computed on-chain in PRBMath UD60x18 fixed-point arithmetic.
 
 minted supply at cumulative ether e:
-  q(e) = K · (1 − e^(−e/S))      K = 21,000,000   S = 500 ether
+
+$$
+q(e) = K \cdot (1 - e^{-e/S}) \quad K = 21,000,000 \quad S = 500 \text{ ether}
+$$
 
 price per token at position e:
-  p(e) = (S / K) · e^(e/S)
+
+$$
+p(e) = \frac{S}{K} \cdot e^{e/S}
+$$
 
 ether owed for burning amount b from current supply q:
-  Δe(q, b) = S · ln((K − q + b) / (K − q))
+
+$$
+\Delta e(q, b) = S \cdot \ln\left(\frac{K - q + b}{K - q}\right)
+$$
 
 a 0.3% protocol fee is taken on each side of every mint and every burn. it stays in the hook permanently. it cannot be withdrawn, governed, voted on, or redirected. it isn't a treasury. it is a counterweight that prevents the curve from being a free thing to abuse, and prevents anyone, including us, from extracting value from it.
 
@@ -173,10 +191,12 @@ what this site does is route directly. when you mint or burn here, the call goes
 
 the burn quote at any moment is:
 
-  burn_price (eth per sato)
-    = (S / (K − mintedFair))                  ← marginal inverse curve at mintedFair
-    · (mintedFair / totalSupply)              ← fair-to-real supply correction
-    · (1 − 0.003)                             ← protocol fee retained in reserve
+$$
+\text{burn\_price} = 
+\underbrace{\frac{S}{K - \text{mintedFair}}}_{\substack{\text{marginal inverse curve} \\ \text{at mintedFair}}} \times 
+\underbrace{\frac{\text{mintedFair}}{\text{totalSupply}}}_{\substack{\text{fair-to-real} \\ \text{supply correction}}} \times 
+\underbrace{(1 - 0.003)}_{\substack{\text{protocol fee} \\ \text{retained in reserve}}}
+$$
 
 the corresponding secondary quote is whatever the sato/usdt v4 pool's amm prints at the moment, less aggregator and pool fees. the two prices diverge because they answer different questions: the curve answers "what does the inverse formula owe at this position," the secondary answers "what are people willing to pay right now."
 
@@ -188,14 +208,14 @@ how to choose: compare the "burn" quote in the trade panel to the live sato/usdt
 
 we did not pre-mint. we hold no allocation, no admin role, no pause function, no upgrade path. there is nothing to extract from the hook other than by burning sato back through the inverse curve like anybody else. if everyone who shipped this disappeared tonight, the contract would run tomorrow against the same rules and the same prices. that is what we mean by "no operator." that is the only feature.
 
-token:         0x829f4B62EEBE12Af653b4dD4fFc480966F7d7f09
-hook:          0x0000f07d2B5F1Ddf3244b8780F972f306EFd2888
-manager:       0x000000000004444c5dc75cB358380D2e3dE08A90
-genesis block: 25,015,094
+  token:         0x829f4B62EEBE12Af653b4dD4fFc480966F7d7f09
+  hook:          0x0000f07d2B5F1Ddf3244b8780F972f306EFd2888
+  manager:       0x000000000004444c5dc75cB358380D2e3dE08A90
+  genesis block: 25,015,094
 
 trade at sat0.org. read it on-chain.`;
 
-const EULR_WHITEPAPER = `eulr whitepaper 1.0
+const EULR_WHITEPAPER = String.raw`eulr whitepaper 1.0
 
 An exponential launchpad on XLayer, built on the shoulders of SATO and sat1.
 
@@ -217,16 +237,24 @@ The creator can mint only by paying the same curve price as everyone else. The c
 
 eulr uses the same exponential bonding curve that sat1 hardened, adapted for XLayer and denominated in OKB:
 
-  supply(e) = K · (1 − exp(−e / S))
+$$
+\text{supply}(e) = K \cdot (1 - \exp(-e / S))
+$$
 
-  K = 21,000,000 (fixed supply cap)
-  S = configurable, 1 to 100 (curve steepness)
+K = 21,000,000 (fixed supply cap)
+S = configurable, 1 to 100 (curve steepness)
 
-  price per token at cumulative reserve e:
-  p(e) = (S / K) · exp(e / S)
+price per token at cumulative reserve e:
 
-  reserve needed to reach supply fraction f:
-  e(f) = −S · ln(1 − f)
+$$
+p(e) = \frac{S}{K} \cdot \exp(e / S)
+$$
+
+reserve needed to reach supply fraction f:
+
+$$
+e(f) = -S \cdot \ln(1 - f)
+$$
 
 Lower S means a steeper curve — price rises faster, the token reaches graduation sooner, and early buyers get less supply per unit of reserve. Higher S means a flatter curve — price rises more gradually, more supply is issued before graduation, and the distribution is broader.
 
@@ -272,16 +300,16 @@ On a buy, the fee reduces the amount used for mint calculation while the full re
 
 This is not a revenue model. It is a counterweight. A zero-fee curve would be a free option to print and redeem at the contract's expense — a vulnerability that bots would drain. The fee makes the curve expensive to abuse without creating a value-extraction point for any party, including the eulr team.
 
-buy 1.000 OKB:
-  mint quote uses 0.997 OKB
-  curve reserve receives 1.000 OKB
+  buy 1.000 OKB:
+    mint quote uses 0.997 OKB
+    curve reserve receives 1.000 OKB
 
-sell quote 1.000 OKB:
-  seller receives 0.997 OKB
-  curve reserve keeps 0.003 OKB
+  sell quote 1.000 OKB:
+    seller receives 0.997 OKB
+    curve reserve keeps 0.003 OKB
 
-fee recipient:
-  none
+  fee recipient:
+    none
 
 The fee can make the reserve thicker, but it does not create another accounting track. The curve still has one source of truth: ethCum.
 
@@ -345,26 +373,26 @@ This is the same promise SATO made and sat1 kept: if everyone who shipped this d
 
 § summary
 
-eulr principle:
-  one curve
-  one position
-  one source of truth
-  many tokens
-  permissionless creation
-  verifiable migration
+  eulr principle:
+    one curve
+    one position
+    one source of truth
+    many tokens
+    permissionless creation
+    verifiable migration
 
-status:
-  whitepaper 1.0
-  implementation live on XLayer mainnet
+  status:
+    whitepaper 1.0
+    implementation live on XLayer mainnet
 
-  chain:             XLayer (chain ID 196)
-  native currency:   OKB
-  max supply:        21,000,000 per token
-  curve type:        exponential, sat1 invariant
-  curve parameter:   S ∈ [1, 100], creator-chosen
-  graduation:        80% of max supply
-  migration target:  Uniswap v4 on XLayer
-  fee:               stays in curve, no recipient
+    chain:             XLayer (chain ID 196)
+    native currency:   OKB
+    max supply:        21,000,000 per token
+    curve type:        exponential, sat1 invariant
+    curve parameter:   S ∈ [1, 100], creator-chosen
+    graduation:        80% of max supply
+    migration target:  Uniswap v4 on XLayer
+    fee:               stays in curve, no recipient
 
 trade at eulr. built on sat1. saluting SATO.`;
 
@@ -476,6 +504,9 @@ function renderWhitepaper(text: string, slug: string) {
   const elements: React.ReactNode[] = [];
   let preLines: string[] = [];
   let preKey = 0;
+  let mathKey = 0;
+  let inMathBlock = false;
+  let mathLines: string[] = [];
 
   function flushPre() {
     if (preLines.length > 0) {
@@ -495,6 +526,33 @@ function renderWhitepaper(text: string, slug: string) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    if (line.trim() === "$$") {
+      flushPre();
+      if (inMathBlock) {
+        elements.push(
+          <div key={`math-wrapper-${slug}-${mathKey}`} className="my-8 relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-accent-primary/5 via-accent-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 blur-xl"></div>
+            <div className="relative py-6 px-4 md:px-8 overflow-x-auto no-scrollbar rounded-2xl border border-border/40 bg-surface-elevated/20 backdrop-blur-sm shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex items-center justify-center transition-all duration-500 group-hover:border-accent-primary/20 group-hover:bg-surface-elevated/40 group-hover:shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+              <div className="text-[1.1rem] sm:text-[1.2rem] text-content-primary">
+                <BlockMath math={mathLines.join("\n")} />
+              </div>
+            </div>
+          </div>
+        );
+        mathLines = [];
+        mathKey++;
+        inMathBlock = false;
+      } else {
+        inMathBlock = true;
+      }
+      continue;
+    }
+
+    if (inMathBlock) {
+      mathLines.push(line);
+      continue;
+    }
 
     // Blank line
     if (line.trim() === "") {
@@ -549,45 +607,6 @@ function renderWhitepaper(text: string, slug: string) {
 
     // Indented code/equation lines
     if (line.startsWith("  ")) {
-      preLines.push(line);
-      continue;
-    }
-
-    // Lines that look like equations or code (contain =, no regular text pattern)
-    if (
-      line.includes("supply(e)") ||
-      line.includes("p(e) =") ||
-      line.includes("Δe(") ||
-      line.includes("e(f) =") ||
-      line.includes("burn_price") ||
-      line.includes("q(e) =") ||
-      line.includes("stored state") ||
-      line.includes("fair supply") ||
-      line.includes("sell quote") ||
-      line.includes("selfDeprecated") ||
-      line.includes("mint quote") ||
-      line.includes("curve reserve") ||
-      line.includes("seller receives") ||
-      line.includes("fee recipient") ||
-      line.includes("future mint") ||
-      line.includes("if ethCum") ||
-      line.includes("if totalMintedFair") ||
-      line.includes("result:") ||
-      line.includes("observed state:") ||
-      line.includes("SATO curve:") ||
-      line.includes("sat1 invariant:") ||
-      line.includes("sat1 principle:") ||
-      line.includes("eulr principle:") ||
-      line.includes("one curve") ||
-      line.includes("one position") ||
-      line.includes("many tokens") ||
-      line.includes("permissionless creation") ||
-      line.includes("verifiable migration") ||
-      line.includes("buy 1.000") ||
-      line.includes("sell quote 1.000") ||
-      line.startsWith("buy") && line.includes("OKB") ||
-      line.startsWith("sell") && line.includes("OKB")
-    ) {
       preLines.push(line);
       continue;
     }
