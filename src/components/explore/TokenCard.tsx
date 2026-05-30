@@ -8,6 +8,7 @@ import { Token } from "@/types/token";
 import { timeAgo, timestampMs } from "@/lib/time-display";
 import { resolveIpfsUrl } from "@/lib/ipfs";
 import { formatSmallNumber } from "@/lib/trade-display";
+import { useOkbPrice } from "@/lib/api-hooks";
 
 interface TokenCardProps {
   token: Token;
@@ -26,7 +27,7 @@ const getTokenColorRGB = (symbol: string) => {
 
 const formatPrice = (price: number) => {
   if (price === 0) return "0";
-  if (price < 0.0001) {
+  if (price < 0.01) {
     return formatSmallNumber(price);
   }
   if (price >= 1000) {
@@ -62,7 +63,7 @@ function fmtOkb(weiString: string): string {
   }).format(n);
 }
 
-const formatCompactValue = (str: string | undefined | null) => {
+const formatCompactValue = (str: string | undefined | null, multiplier: number = 1, forceUnit?: string) => {
   if (!str || str === "--") return { value: "--", unit: null };
   
   let rawValue = str;
@@ -71,21 +72,24 @@ const formatCompactValue = (str: string | undefined | null) => {
   const match = str.match(/^(.+?)\s+([A-Za-z]+)$/);
   if (match) {
     rawValue = match[1];
-    unit = match[2];
+    unit = forceUnit ?? match[2];
+  } else if (forceUnit) {
+    unit = forceUnit;
   }
   
   const prefixMatch = rawValue.match(/^([^0-9\.\-]*)/);
   const prefix = prefixMatch ? prefixMatch[1] : "";
   const numericPart = rawValue.slice(prefix.length);
   
-  const num = Number(numericPart.replace(/,/g, ''));
+  let num = Number(numericPart.replace(/,/g, ''));
   if (!isNaN(num) && numericPart.trim() !== "") {
+    num = num * multiplier;
     if (num >= 1000) {
       rawValue = prefix + new Intl.NumberFormat('en-US', {
         notation: 'compact',
         maximumFractionDigits: 2,
       }).format(num);
-    } else if (num < 0.001 && num > 0) {
+    } else if (num < 0.01 && num > 0) {
       rawValue = prefix + formatSmallNumber(num);
     } else {
       rawValue = prefix + new Intl.NumberFormat('en-US', {
@@ -134,7 +138,11 @@ function MiniChartPath({ token }: { token: Token }) {
 
 export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
   const [now, setNow] = useState<number | null>(null);
+  const { data: okbPrice = 0 } = useOkbPrice();
+  
   const priceNum = token.price ?? parsePriceOkb(token.priceOkb);
+  const priceInU = okbPrice > 0 ? priceNum * okbPrice : priceNum;
+  const priceUnit = okbPrice > 0 ? "" : "OKB";
 
   useEffect(() => {
     setNow(Date.now());
@@ -147,7 +155,7 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
   const avatarSrc = resolveIpfsUrl(token.avatarUrl);
   const tokenRGB = getTokenColorRGB(token.symbol);
 
-  const mcapData = formatCompactValue(token.mcap);
+  const mcapData = formatCompactValue(token.mcap, okbPrice > 0 ? okbPrice : 1, okbPrice > 0 ? "" : undefined);
   const volData = formatCompactValue(volumeDisplay);
 
   return (
@@ -260,14 +268,14 @@ export const TokenCard = memo(function TokenCard({ token }: TokenCardProps) {
       <div className="grid grid-cols-3 gap-1.5 mt-auto relative z-10">
         <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
           <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">Price</div>
-          <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={formatPrice(priceNum)}>
-            <span className="truncate">{formatPrice(priceNum)} <span className="text-[9px] text-content-secondary shrink-0 font-normal">OKB</span></span>
+          <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={formatPrice(priceInU)}>
+            <span className="truncate">{okbPrice > 0 && "$"}{formatPrice(priceInU)} {priceUnit && <span className="text-[9px] text-content-secondary shrink-0 font-normal">{priceUnit}</span>}</span>
           </div>
         </div>
         <div className="bg-black/20 rounded-lg p-1.5 border border-white/5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.3)] min-w-0 transition-colors duration-300 group-hover:bg-[rgba(var(--token-rgb),0.03)] group-hover:border-[rgba(var(--token-rgb),0.2)]">
           <div className="text-[9px] text-content-tertiary mb-0.5 uppercase tracking-wider truncate transition-colors duration-300 group-hover:text-[rgba(var(--token-rgb),0.8)]">MCap</div>
           <div className="flex items-baseline gap-0.5 min-w-0 font-mono text-[11px] sm:text-xs font-bold text-content-primary drop-shadow-sm" title={token.mcap ?? undefined}>
-            <span className="truncate">{mcapData.value}</span>
+            <span className="truncate">{okbPrice > 0 && "$"}{mcapData.value}</span>
             {mcapData.unit && <span className="text-[8px] sm:text-[9px] text-content-secondary shrink-0">{mcapData.unit}</span>}
           </div>
         </div>

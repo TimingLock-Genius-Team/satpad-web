@@ -203,6 +203,35 @@ export function usePortfolioTaxSummary(
   });
 }
 
+// OKB Price
+export function useOkbPrice() {
+  return useQuery({
+    queryKey: ["okbPrice"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=okb&vs_currencies=usd");
+        if (!res.ok) throw new Error("Network response was not ok");
+        const data = await res.json();
+        return data.okb.usd as number;
+      } catch (e) {
+        console.error("Failed to fetch OKB price from CoinGecko, trying OKX API...", e);
+        try {
+          const res = await fetch("https://www.okx.com/api/v5/market/ticker?instId=OKB-USDT");
+          if (!res.ok) throw new Error("Network response was not ok");
+          const json = await res.json();
+          const price = Number(json.data[0].last);
+          return isNaN(price) ? 0 : price;
+        } catch (err) {
+          console.error("Failed to fetch OKB price", err);
+          return 0;
+        }
+      }
+    },
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+}
+
 // Mutations
 export function useCreateValidate() {
   const queryClient = useQueryClient();

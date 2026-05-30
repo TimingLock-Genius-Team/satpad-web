@@ -29,7 +29,11 @@ export function formatSmallNumber(n: number): string {
   if (match) {
     const zerosCount = match[1].length; // number of zeros between '0.0' and the significant digits
     const sigDigits = match[2].slice(0, 4); // keep up to 4 significant digits
-    return `0.0{${zerosCount}}${sigDigits}`;
+    if (zerosCount >= 2) {
+      return `0.0{${zerosCount}}${sigDigits}`;
+    } else {
+      return `0.0${match[1]}${sigDigits}`;
+    }
   }
   
   return n.toExponential(2);
@@ -37,7 +41,7 @@ export function formatSmallNumber(n: number): string {
 
 export function fmtOkbDisplay(wei: string): string {
   const okb = fmtOkb(wei);
-  if (okb < 0.0001) return formatSmallNumber(okb);
+  if (okb < 0.01) return formatSmallNumber(okb);
   return okb.toFixed(6);
 }
 
@@ -71,7 +75,7 @@ export function formatBalanceDisplay(value: bigint | undefined, decimals: number
   const n = Number(formatUnits(value, decimals));
   if (!Number.isFinite(n)) return `-- ${symbol}`;
   if (n === 0) return `0 ${symbol}`;
-  if (n < 0.0001) return `${formatSmallNumber(n)} ${symbol}`;
+  if (n < 0.01) return `${formatSmallNumber(n)} ${symbol}`;
   return `${n.toFixed(4)} ${symbol}`;
 }
 
